@@ -1,31 +1,31 @@
-# samgr<a name="EN-US_TOPIC_0000001162068341"></a>
+# samgr组件<a name="ZH-CN_TOPIC_0000001162068341"></a>
 
--   [Introduction](#section11660541593)
--   [Directory Structure](#section161941989596)
--   [Usage](#section1312121216216)
--   [Repositories Involved](#section1371113476307)
+-   [简介](#section11660541593)
+-   [目录](#section161941989596)
+-   [说明](#section1312121216216)
+-   [相关仓](#section1371113476307)
 
-## Introduction<a name="section11660541593"></a>
+## 简介<a name="section11660541593"></a>
 
-The  **samgr**  module is a core module of OpenHarmony. It provides functions related to system abilities \(also called system services\), including system ability \(SA\) startup, registration, and query.
+samgr组件是OpenHarmony的核心组件，提供OpenHarmony系统服务启动、注册、查询等功能。
 
-![](figures/en-us_image_0000001115820566.png)
+![](figures/zh-cn_image_0000001115820566.png)
 
-## Directory Structure<a name="section161941989596"></a>
+## 目录<a name="section161941989596"></a>
 
 ```
 /foundation/distributedschedule/services/samgr/
-├── native             
-│   ├── BUILD.gn  # Compilation script
-│   ├── include   # Header files
-│   ├── samgr.rc  # RC file for starting samgr
-│   ├── source    # Source code
-│   ├── test      # Test code
+├── native
+│   ├── BUILD.gn  # 部件编译脚本
+│   ├── include   # 头文件存放目录
+│   ├── samgr.rc  # samgr启动配置文件
+│   ├── source    # 源代码存放目录
+│   ├── test      # 测试代码存放目录
 ```
 
-## Usage<a name="section1312121216216"></a>
+## 说明<a name="section1312121216216"></a>
 
-1.  After receiving the registration message from the SA framework, the samgr service saves information about the particular SA in the local cache.
+1.  samgr服务接收到sa框架层发送的注册消息，会在本地缓存中存入系统服务相关信息。
 
     ```
     int32_t SystemAbilityManager::AddSystemAbility(int32_t systemAbilityId, const sptr<IRemoteObject>& ability,
@@ -70,7 +70,7 @@ The  **samgr**  module is a core module of OpenHarmony. It provides functions re
     }
     ```
 
-2.  If the SA requested by the SA framework is a local SA, the samgr service searches for the proxy object of the SA based on the SA ID and then returns the proxy object to the SA framework.
+2.  对于本地服务而言，samgr服务接收到sa框架层发送的获取消息，会通过服务id，查找到对应服务的代理对象，然后返回给sa框架。
 
     ```
     sptr<IRemoteObject> SystemAbilityManager::CheckSystemAbility(int32_t systemAbilityId)
@@ -98,9 +98,9 @@ The  **samgr**  module is a core module of OpenHarmony. It provides functions re
     ```
 
 
-## Repositories Involved<a name="section1371113476307"></a>
+## 相关仓<a name="section1371113476307"></a>
 
-Distributed Scheduler subsystem
+分布式任务调度子系统
 
 distributedschedule\_dms\_fwk
 
