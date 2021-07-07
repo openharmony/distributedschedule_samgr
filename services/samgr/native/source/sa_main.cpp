@@ -31,11 +31,6 @@ int main(int argc, char *argv[])
     // Tell IPCThreadState we're the service manager
     OHOS::sptr<OHOS::IRemoteObject> serv = manager->AsObject();
     IPCSkeleton::SetContextObject(serv);
-    auto dBinder = manager->GetDBinder();
-    if (dBinder != nullptr) {
-        bool ret = dBinder->StartDBinderService();
-        HILOGI("started dbinder service result is %{public}s", ret ? "ok" : "fail");
-    }
 
     // Create IPCThreadPool and join in.
     HILOGI("start System Ability Manager Loop");
