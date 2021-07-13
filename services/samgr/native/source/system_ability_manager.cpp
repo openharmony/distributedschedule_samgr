@@ -194,8 +194,11 @@ sptr<IRemoteObject> SystemAbilityManager::CheckSystemAbility(int32_t systemAbili
     if (dBinderService_ != nullptr) {
         string strName = to_string(systemAbilityId);
         remoteBinder = dBinderService_->MakeRemoteBinder(Str8ToStr16(strName), deviceId, systemAbilityId, 0);
-        HILOGI("CheckSystemAbility, MakeRemoteBinder, systemAbilityId is %{public}d, deviceId is %s", 
-            systemAbilityId, AnonymizeDeviceId(deviceId).c_str());
+        HILOGI("CheckSystemAbility, MakeRemoteBinder, systemAbilityId is %{public}d, deviceId is %s",
+            systemAbilityId, deviceId.c_str());
+        if (remoteBinder == nullptr) {
+            HILOGE("MakeRemoteBinder error, remoteBinder is null");
+        }
     }
     return remoteBinder;
 }
