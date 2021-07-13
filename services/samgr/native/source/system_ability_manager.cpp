@@ -769,7 +769,7 @@ int32_t SystemAbilityManager::AddSystemAbility(int32_t systemAbilityId, const sp
     FindSystemAbilityManagerNotify(systemAbilityId, ADD_SYSTEM_ABILITY_TRANSACTION);
     u16string strName = Str8ToStr16(to_string(systemAbilityId));
     if (extraProp.isDistributed && dBinderService_ != nullptr) {
-        dBinderService_->RegisterRemoteProxy(strName, ability);
+        dBinderService_->RegisterRemoteProxy(strName, systemAbilityId);
         HILOGD("AddSystemAbility RegisterRemoteProxy, serviceId is %{public}d", systemAbilityId);
     }
     return ERR_OK;
