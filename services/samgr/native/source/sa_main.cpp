@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#include <thread>
+#include <unistd.h>
+
 #include "errors.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
@@ -21,6 +24,18 @@
 #include "system_ability_manager.h"
 
 using namespace OHOS;
+
+void startDBinderService(OHOS::sptr<OHOS::SystemAbilityManager> manager) {
+    int time = 15;
+    while (time-- > 0) {
+        sleep(1);
+    }
+    auto dBinder = manager->GetDBinder();
+    if (dBinder != nullptr) {
+        bool ret = dBinder->StartDBinderService();
+        HILOGI("started dbinder service result is %{public}s", ret ? "ok" : "fail");
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -31,6 +46,8 @@ int main(int argc, char *argv[])
     // Tell IPCThreadState we're the service manager
     OHOS::sptr<OHOS::IRemoteObject> serv = manager->AsObject();
     IPCSkeleton::SetContextObject(serv);
+    std::thread th(startDBinderService, manager);
+    th.detach();
 
     // Create IPCThreadPool and join in.
     HILOGI("start System Ability Manager Loop");
