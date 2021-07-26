@@ -150,6 +150,7 @@ private:
     sptr<IRemoteObject::DeathRecipient> localAbilityManagerDeath_;
     sptr<IRemoteObject::DeathRecipient> systemReadyCallbackDeath_;
     sptr<DBinderService> dBinderService_;
+    bool isDbinderStart_ = false;
 
     // must hold abilityMapLock_ never access other locks
     std::shared_mutex abilityMapLock_;
