@@ -776,8 +776,8 @@ int32_t SystemAbilityManager::AddSystemAbility(int32_t systemAbilityId, const sp
         if (dBinderService_ != nullptr) {
             bool ret = dBinderService_->StartDBinderService();
             HILOGI("startd dbinder service result is %{public}s", ret ? "ok" : "fail");
+            isDbinderStart_ = true;
         }
-        isDbinderStart = true;
     }
     return ERR_OK;
 }
