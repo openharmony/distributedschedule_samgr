@@ -26,7 +26,7 @@
 using namespace OHOS;
 
 void startDBinderService(OHOS::sptr<OHOS::SystemAbilityManager> manager) {
-    int time = 15;
+    int time = 30;
     while (time-- > 0) {
         sleep(1);
     }
