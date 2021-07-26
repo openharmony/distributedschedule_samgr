@@ -772,7 +772,7 @@ int32_t SystemAbilityManager::AddSystemAbility(int32_t systemAbilityId, const sp
         dBinderService_->RegisterRemoteProxy(strName, systemAbilityId);
         HILOGD("AddSystemAbility RegisterRemoteProxy, serviceId is %{public}d", systemAbilityId);
     }
-    if (systemAbilityId == SOFTBUS_SERVER_SA_ID && !isDbinderStart) {
+    if (systemAbilityId == SOFTBUS_SERVER_SA_ID && !isDbinderStart_) {
         if (dBinderService_ != nullptr) {
             bool ret = dBinderService_->StartDBinderService();
             HILOGI("startd dbinder service result is %{public}s", ret ? "ok" : "fail");
