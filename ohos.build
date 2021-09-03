@@ -24,6 +24,7 @@
                 "//foundation/distributedschedule/samgr/services/samgr/native:etc",
                 "//third_party/libxml2:libxml2"
             ],
+            "test_list": ["//foundation/distributedschedule/samgr/services/samgr/native/test:unittest"],
             "system_kits": []
         }
     },
