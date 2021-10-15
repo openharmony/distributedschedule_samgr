@@ -33,7 +33,7 @@ ohos_shared_library("lsamgr") {
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
     ]
-    part_name = "samgr_L2"
+    part_name = "samgr_standard"
   }
 
   deps = [ "//utils/native/base:utils" ]

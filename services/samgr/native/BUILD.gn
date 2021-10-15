@@ -43,11 +43,11 @@ group("etc") {
 ohos_prebuilt_etc("samgr.rc") {
   relative_install_dir = "init"
   if (use_musl) {
-    source = "samgr_L2.cfg"
+    source = "samgr_standard.cfg"
   } else {
-    source = "samgr_L2.rc"
+    source = "samgr_standard.rc"
   }
-  part_name = "samgr_L2"
+  part_name = "samgr_standard"
   subsystem_name = "distributedschedule"
 }
 
@@ -67,7 +67,7 @@ ohos_executable("samgr") {
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//utils/native/base:utils",
   ]
-  
+
   configs = [
     ":sam_config",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr:config_samgr",
@@ -81,7 +81,7 @@ ohos_executable("samgr") {
       "ipc:libdbinder",
     ]
     public_deps = [ "//third_party/libxml2:libxml2" ]
-    part_name = "samgr_L2"
+    part_name = "samgr_standard"
   }
   subsystem_name = "distributedschedule"
 }

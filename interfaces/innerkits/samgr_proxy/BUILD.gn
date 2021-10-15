@@ -54,7 +54,7 @@ ohos_shared_library("samgr_proxy") {
     ]
 
     deps = [ "//utils/native/base:utils" ]
-    part_name = "samgr_L2"
+    part_name = "samgr_standard"
   }
   subsystem_name = "distributedschedule"
 }
