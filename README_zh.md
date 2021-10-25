@@ -14,7 +14,7 @@ samgr组件是OpenHarmony的核心组件，提供OpenHarmony系统服务启动�
 ## 目录<a name="section161941989596"></a>
 
 ```
-/foundation/distributedschedule/services/samgr/
+/foundation/distributedschedule/samgr/services/samgr/
 ├── native
 │   ├── BUILD.gn  # 部件编译脚本
 │   ├── include   # 头文件存放目录
