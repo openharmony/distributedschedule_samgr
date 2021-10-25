@@ -14,7 +14,7 @@ The  **samgr**  module is a core module of OpenHarmony. It provides functions re
 ## Directory Structure<a name="section161941989596"></a>
 
 ```
-/foundation/distributedschedule/services/samgr/
+/foundation/distributedschedule/samgr/services/samgr/
 ├── native             
 │   ├── BUILD.gn  # Compilation script
 │   ├── include   # Header files
