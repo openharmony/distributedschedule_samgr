@@ -28,11 +28,9 @@ int main(int argc, char *argv[])
 
     OHOS::sptr<OHOS::SystemAbilityManager> manager = OHOS::SystemAbilityManager::GetInstance();
     manager->Init();
-    // Tell IPCThreadState we're the service manager
     OHOS::sptr<OHOS::IRemoteObject> serv = manager->AsObject();
     IPCSkeleton::SetContextObject(serv);
 
-    // Create IPCThreadPool and join in.
     HILOGI("start System Ability Manager Loop");
     OHOS::IPCSkeleton::JoinWorkThread();
     return -1;
