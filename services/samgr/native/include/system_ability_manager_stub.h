@@ -35,33 +35,18 @@ protected:
     static bool IsSystemApp(int32_t callingUid);
 
 private:
-    int32_t GetLocalAbilityInner(MessageParcel& data, MessageParcel& reply);
-    int32_t CheckLocalAbilityInner(MessageParcel& data, MessageParcel& reply);
-    int32_t AddLocalAbilityInner(MessageParcel& data, MessageParcel& reply);
-    int32_t RemoveLocalAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t ListSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t SubsSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t UnSubsSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
-    int32_t GetLocalManagerInner(MessageParcel& data, MessageParcel& reply);
     int32_t CheckRemtSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t AddOndemandSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
-    int32_t RecycleOndemandSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t CheckSystemAbilityImmeInner(MessageParcel& data, MessageParcel& reply);
-    int32_t ConnOndemandSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
-    int32_t DisConnOndemandSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
-    int32_t CheckOndemandSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t CheckRemtSystemAbilityForJavaInner(MessageParcel& data, MessageParcel& reply);
-    int32_t GetSystemAbilityInfoListInner(MessageParcel& data, MessageParcel& reply);
-    int32_t GetDeviceIdInner(MessageParcel& data, MessageParcel& reply);
     int32_t AddSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t GetSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t CheckSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
+    int32_t AddSystemProcessInner(MessageParcel& data, MessageParcel& reply);
     int32_t RemoveSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
-    int32_t RegisterSystemReadyCallbackInner(MessageParcel& data, MessageParcel& reply);
-    int32_t GetCoreSystemAbilityListInner(MessageParcel& data, MessageParcel& reply);
-    int32_t AddSystemCapabilityInner(MessageParcel& data, MessageParcel& reply);
-    int32_t HasSystemCapabilityInner(MessageParcel& data, MessageParcel& reply);
-    int32_t GetSystemAvailableCapabilitiesInner(MessageParcel& data, MessageParcel& reply);
     int32_t UnmarshalingSaExtraProp(MessageParcel& data, SAExtraProp& extraProp);
     static int32_t GetHapIdMultiuser(int32_t uid);
 

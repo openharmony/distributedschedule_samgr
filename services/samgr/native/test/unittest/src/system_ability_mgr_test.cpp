@@ -16,14 +16,19 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "itest_transaction_service.h"
+#include "sa_status_change_mock.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
 #include "system_ability_mgr_test.h"
 #include "test_log.h"
 
+#define private public
+#include "system_ability_manager.h"
+
 using namespace std;
 using namespace testing;
 using namespace testing::ext;
+using namespace OHOS;
 
 namespace OHOS {
 namespace {
@@ -32,6 +37,7 @@ constexpr int32_t TEST_REVERSE_VALUE = 1202;
 constexpr int32_t REPEAT = 10;
 constexpr int32_t TEST_EXCEPTION_HIGH_SA_ID = LAST_SYS_ABILITY_ID + 1;
 constexpr int32_t TEST_EXCEPTION_LOW_SA_ID = FIRST_SYS_ABILITY_ID - 1;
+const std::u16string SAMANAGER_INTERFACE_TOKEN = u"ohos.samgr.accessToken";
 }
 void SystemAbilityMgrTest::SetUpTestCase()
 {
@@ -53,12 +59,11 @@ void SystemAbilityMgrTest::TearDown()
     DTEST_LOG << "TearDown" << std::endl;
 }
 
-/*
- * Feature: SAMGR
- * Function: AddSystemAbility
- * SubFunction: AddSystemAbility
- * FunctionPoints: add system ability, input invalid parameter
- * CaseDescription: test AddSystemAbility interface
+/**
+ * @tc.name: AddSystemAbility001
+ * @tc.desc: add system ability, input invalid parameter
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, AddSystemAbility001, TestSize.Level1)
 {
@@ -69,12 +74,11 @@ HWTEST_F(SystemAbilityMgrTest, AddSystemAbility001, TestSize.Level1)
     EXPECT_TRUE(result != ERR_OK);
 }
 
-/*
- * Feature: SAMGR
- * Function: AddSystemAbility
- * SubFunction: AddSystemAbility
- * FunctionPoints: add system ability
- * CaseDescription: test AddSystemAbility interface
+/**
+ * @tc.name: AddSystemAbility002
+ * @tc.desc: add system ability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, AddSystemAbility002, TestSize.Level1)
 {
@@ -87,12 +91,11 @@ HWTEST_F(SystemAbilityMgrTest, AddSystemAbility002, TestSize.Level1)
     sm->RemoveSystemAbility(DISTRIBUTED_SCHED_TEST_TT_ID);
 }
 
-/*
- * Feature: SAMGR
- * Function: AddSystemAbility
- * SubFunction: AddSystemAbility
- * FunctionPoints: add system ability saId exception
- * CaseDescription: test AddSystemAbility interface
+/**
+ * @tc.name: AddSystemAbility003
+ * @tc.desc: add system ability saId exception.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, AddSystemAbility003, TestSize.Level1)
 {
@@ -107,32 +110,29 @@ HWTEST_F(SystemAbilityMgrTest, AddSystemAbility003, TestSize.Level1)
     sm->RemoveSystemAbility(TEST_EXCEPTION_LOW_SA_ID);
 }
 
-/*
- * Feature: SAMGR
- * Function: AddSystemAbility
- * SubFunction: AddSystemAbility
- * FunctionPoints: add system ability with illegal capability
- * CaseDescription: test AddSystemAbility interface
+/**
+ * @tc.name: AddSystemAbility004
+ * @tc.desc: add system ability with empty capability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, AddSystemAbility004, TestSize.Level1)
 {
     int32_t systemAbilityId = DISTRIBUTED_SCHED_TEST_TT_ID;
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     EXPECT_TRUE(sm != nullptr);
-    std::u16string capability = u"illegal capability";
     ISystemAbilityManager::SAExtraProp saExtraProp(false, ISystemAbilityManager::DUMP_FLAG_PRIORITY_DEFAULT,
-        capability, u"");
+        u"", u"");
     int32_t ret = sm->AddSystemAbility(systemAbilityId, new TestTransactionService(), saExtraProp);
-    EXPECT_TRUE(ret != ERR_OK);
+    EXPECT_EQ(ret, ERR_OK);
     sm->RemoveSystemAbility(systemAbilityId);
 }
 
-/*
- * Feature: SAMGR
- * Function: AddSystemAbility
- * SubFunction: AddSystemAbility
- * FunctionPoints: add system ability with validated capability
- * CaseDescription: test AddSystemAbility interface
+/**
+ * @tc.name: AddSystemAbility005
+ * @tc.desc: add system ability with validated capability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, AddSystemAbility005, TestSize.Level1)
 {
@@ -148,12 +148,11 @@ HWTEST_F(SystemAbilityMgrTest, AddSystemAbility005, TestSize.Level1)
     sm->RemoveSystemAbility(systemAbilityId);
 }
 
-/*
- * Feature: SAMGR
- * Function: RemoveSystemAbility
- * SubFunction: RemoveSystemAbility
- * FunctionPoints: remove not exist system ability
- * CaseDescription: test RemoveSystemAbility interface
+/**
+ * @tc.name: RemoveSystemAbility001
+ * @tc.desc: remove not exist system ability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, RemoveSystemAbility001, TestSize.Level1)
 {
@@ -163,12 +162,11 @@ HWTEST_F(SystemAbilityMgrTest, RemoveSystemAbility001, TestSize.Level1)
     EXPECT_TRUE(result != ERR_OK);
 }
 
-/*
- * Feature: SAMGR
- * Function: RemoveSystemAbility
- * SubFunction: RemoveSystemAbility
- * FunctionPoints: remove system ability
- * CaseDescription: test RemoveSystemAbility interface
+/**
+ * @tc.name: RemoveSystemAbility002
+ * @tc.desc: remove system ability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, RemoveSystemAbility002, TestSize.Level1)
 {
@@ -180,12 +178,11 @@ HWTEST_F(SystemAbilityMgrTest, RemoveSystemAbility002, TestSize.Level1)
     EXPECT_EQ(result, ERR_OK);
 }
 
-/*
- * Feature: SAMGR
- * Function: GetSystemAbility
- * SubFunction: GetSystemAbility
- * FunctionPoints: get not exist system ability
- * CaseDescription: test GetSystemAbility interface
+/**
+ * @tc.name: GetSystemAbility001
+ * @tc.desc: get not exist system ability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, GetSystemAbility001, TestSize.Level1)
 {
@@ -195,12 +192,11 @@ HWTEST_F(SystemAbilityMgrTest, GetSystemAbility001, TestSize.Level1)
     EXPECT_EQ(ability, nullptr);
 }
 
-/*
- * Feature: SAMGR
- * Function: GetSystemAbility
- * SubFunction: GetSystemAbility
- * FunctionPoints: get system ability
- * CaseDescription: test GetSystemAbility interface
+/**
+ * @tc.name: GetSystemAbility002
+ * @tc.desc: get system ability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, GetSystemAbility002, TestSize.Level1)
 {
@@ -213,12 +209,11 @@ HWTEST_F(SystemAbilityMgrTest, GetSystemAbility002, TestSize.Level1)
     sm->RemoveSystemAbility(DISTRIBUTED_SCHED_TEST_TT_ID);
 }
 
-/*
- * Feature: SAMGR
- * Function: GetSystemAbility
- * SubFunction: GetSystemAbility
- * FunctionPoints: get system ability and then transaction
- * CaseDescription: test GetSystemAbility interface
+/**
+ * @tc.name: GetSystemAbility003
+ * @tc.desc: get system ability and then transaction.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, GetSystemAbility003, TestSize.Level1)
 {
@@ -237,12 +232,11 @@ HWTEST_F(SystemAbilityMgrTest, GetSystemAbility003, TestSize.Level1)
     sm->RemoveSystemAbility(DISTRIBUTED_SCHED_TEST_TT_ID);
 }
 
-/*
- * Feature: SAMGR
- * Function: GetSystemAbility
- * SubFunction: GetSystemAbility
- * FunctionPoints: get system ability
- * CaseDescription: test GetSystemAbility interface
+/**
+ * @tc.name: GetSystemAbility004
+ * @tc.desc: get system ability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, GetSystemAbility004, TestSize.Level2)
 {
@@ -260,12 +254,11 @@ HWTEST_F(SystemAbilityMgrTest, GetSystemAbility004, TestSize.Level2)
     }
 }
 
-/*
- * Feature: SAMGR
- * Function: GetSystemAbility
- * SubFunction: GetSystemAbility
- * FunctionPoints: get remote device system ability
- * CaseDescription: test GetSystemAbility interface
+/**
+ * @tc.name: GetSystemAbility005
+ * @tc.desc: get remote device system ability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, GetSystemAbility005, TestSize.Level2)
 {
@@ -274,61 +267,13 @@ HWTEST_F(SystemAbilityMgrTest, GetSystemAbility005, TestSize.Level2)
     string fakeDeviceId = "fake_dev";
     auto abilityObj = sm->GetSystemAbility(DISTRIBUTED_SCHED_TEST_TT_ID, fakeDeviceId);
     EXPECT_EQ(abilityObj, nullptr);
-    sm->SubscribeSystemAbility(DISTRIBUTED_SCHED_TEST_TT_ID, u"test.listener.service");
-    sm->UnSubscribeSystemAbility(DISTRIBUTED_SCHED_TEST_TT_ID, u"test.listener.service");
-    sm->CheckLocalAbilityManager(u"test2.service");
 }
 
-/*
- * Feature: SAMGR
- * Function: GetSystemAbilityInfoList
- * SubFunction: GetSystemAbilityInfoList
- * FunctionPoints: get system ability info list
- * CaseDescription: test GetSystemAbilityInfoList interface with invalid capability
- */
-HWTEST_F(SystemAbilityMgrTest, GetSystemAbilityInfoList001, TestSize.Level1)
-{
-    int32_t systemAbilityId = DISTRIBUTED_SCHED_TEST_TT_ID;
-    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    EXPECT_TRUE(sm != nullptr);
-    std::u16string capability = u"   ";
-    std::list<std::shared_ptr<SystemAbilityInfo>> saInfoList;
-    bool ret = sm->GetSystemAbilityInfoList(systemAbilityId, capability, saInfoList);
-    EXPECT_FALSE(ret);
-    capability = u"illegal capability";
-    ret = sm->GetSystemAbilityInfoList(systemAbilityId, capability, saInfoList);
-    EXPECT_FALSE(ret);
-}
-
-/*
- * Feature: SAMGR
- * Function: SystemAbilityInfo
- * SubFunction: SystemAbilityInfo
- * FunctionPoints: SystemAbilityInfo parcel read and write
- * CaseDescription: test SystemAbilityInfo parcel read and write
- */
-HWTEST_F(SystemAbilityMgrTest, SystemAbilityInfo001, TestSize.Level1)
-{
-    unique_ptr<SystemAbilityInfo> saInfoIn = make_unique<SystemAbilityInfo>();
-    saInfoIn->systemAbilityId = DISTRIBUTED_SCHED_TEST_TT_ID;
-    saInfoIn->deviceId = "deviceId";
-    MessageParcel in;
-    bool ret = saInfoIn->Marshalling(in);
-    EXPECT_TRUE(ret);
-    unique_ptr<SystemAbilityInfo> spSaInfoOut(SystemAbilityInfo::Unmarshalling(in));
-    if (spSaInfoOut == nullptr) {
-        return;
-    }
-    EXPECT_EQ(spSaInfoOut->systemAbilityId, DISTRIBUTED_SCHED_TEST_TT_ID);
-    EXPECT_EQ(spSaInfoOut->deviceId, "deviceId");
-}
-
-/*
- * Feature: SAMGR
- * Function: CheckSystemAbility
- * SubFunction: CheckSystemAbility
- * FunctionPoints: check system ability
- * CaseDescription: test CheckSystemAbility interface
+/**
+ * @tc.name: CheckSystemAbility001
+ * @tc.desc: check system ability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, CheckSystemAbility001, TestSize.Level1)
 {
@@ -342,12 +287,11 @@ HWTEST_F(SystemAbilityMgrTest, CheckSystemAbility001, TestSize.Level1)
     sm->RemoveSystemAbility(systemAbilityId);
 }
 
-/*
- * Feature: SAMGR
- * Function: CheckOnDemandSystemAbility
- * SubFunction: CheckOnDemandSystemAbility
- * FunctionPoints: check on demand system ability
- * CaseDescription: test AddOnDemandSystemAbilityInfo and CheckOnDemandSystemAbility interface
+/**
+ * @tc.name: CheckOnDemandSystemAbility001
+ * @tc.desc: check on demand system ability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, CheckOnDemandSystemAbility001, TestSize.Level1)
 {
@@ -357,17 +301,14 @@ HWTEST_F(SystemAbilityMgrTest, CheckOnDemandSystemAbility001, TestSize.Level1)
     sm->AddSystemAbility(systemAbilityId, new TestTransactionService());
     int32_t ret = sm->AddOnDemandSystemAbilityInfo(systemAbilityId, u"test_localmanagername");
     EXPECT_EQ(ret, ERR_OK);
-    std::u16string localAbilityName = sm->CheckOnDemandSystemAbility(systemAbilityId);
-    EXPECT_TRUE(!localAbilityName.empty());
     sm->RemoveSystemAbility(systemAbilityId);
 }
 
-/*
- * Feature: SAMGR
- * Function: CheckOnDemandSystemAbility
- * SubFunction: CheckOnDemandSystemAbility
- * FunctionPoints: check on demand system ability
- * CaseDescription: test AddOnDemandSystemAbilityInfo and CheckOnDemandSystemAbility interface
+/**
+ * @tc.name: CheckOnDemandSystemAbility002
+ * @tc.desc: check on demand system ability.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, CheckOnDemandSystemAbility002, TestSize.Level1)
 {
@@ -380,17 +321,14 @@ HWTEST_F(SystemAbilityMgrTest, CheckOnDemandSystemAbility002, TestSize.Level1)
     sptr<IRemoteObject> saObject = sm->CheckSystemAbility(systemAbilityId);
     result = sm->AddOnDemandSystemAbilityInfo(systemAbilityId, u"just_test");
     EXPECT_EQ(result, ERR_OK);
-    auto localAbilityManager = sm->CheckOnDemandSystemAbility(systemAbilityId);
-    EXPECT_TRUE(!localAbilityManager.empty());
     sm->RemoveSystemAbility(systemAbilityId);
 }
 
-/*
- * Feature: SAMGR
- * Function: ListSystemAbility
- * SubFunction: ListSystemAbility
- * FunctionPoints: list all system abilities
- * CaseDescription: test ListSystemAbility interface
+/**
+ * @tc.name: ListSystemAbility001
+ * @tc.desc: list all system abilities.
+ * @tc.type: FUNC
+ * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, ListSystemAbility001, TestSize.Level1)
 {
@@ -403,40 +341,5 @@ HWTEST_F(SystemAbilityMgrTest, ListSystemAbility001, TestSize.Level1)
     auto iter = std::find(saList.begin(), saList.end(), to_utf16(std::to_string(systemAbilityId)));
     EXPECT_TRUE(iter != saList.end());
     sm->RemoveSystemAbility(systemAbilityId);
-}
-
-/*
- * Feature: SAMGR
- * Function: GetLocalAbilityManager
- * SubFunction: GetLocalAbilityManager
- * FunctionPoints: get local ability manager
- * CaseDescription: test GetLocalAbilityManager interface
- */
-HWTEST_F(SystemAbilityMgrTest, GetLocalAbilityManager001, TestSize.Level1)
-{
-    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    EXPECT_TRUE(sm != nullptr);
-    u16string locAblilityName(u"123");
-    sptr<IRemoteObject> localAbilityMgr = sm->CheckLocalAbilityManager(locAblilityName);
-    EXPECT_TRUE(localAbilityMgr == nullptr);
-    sm->RemoveLocalAbilityManager(locAblilityName);
-}
-
-/*
- * Feature: SAMGR
- * Function: ConnectSystemAbility
- * SubFunction: ConnectSystemAbility
- * FunctionPoints: connect system ability
- * CaseDescription: test ConnectSystemAbility interface
- */
-HWTEST_F(SystemAbilityMgrTest, ConnectSystemAbility001, TestSize.Level1)
-{
-    int32_t systemAbilityId = DISTRIBUTED_SCHED_TEST_TT_ID;
-    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    EXPECT_TRUE(sm != nullptr);
-    auto result = sm->ConnectSystemAbility(systemAbilityId, nullptr);
-    EXPECT_TRUE(result != ERR_OK);
-    result = sm->DisConnectSystemAbility(systemAbilityId, nullptr);
-    EXPECT_TRUE(result != ERR_OK);
 }
 } // namespace OHOS

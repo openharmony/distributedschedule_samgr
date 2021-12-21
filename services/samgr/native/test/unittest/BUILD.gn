@@ -26,7 +26,13 @@ ohos_unittest("SystemAbilityMgrTest") {
   module_out_path = module_output_path
 
   sources = [
+    "${samgr_dir}/utils/native/source/tools.cpp",
+    "${samgr_services_dir}/source/ability_death_recipient.cpp",
+    "${samgr_services_dir}/source/system_ability_manager.cpp",
+    "${samgr_services_dir}/source/system_ability_manager_stub.cpp",
+    "${samgr_services_dir}/source/system_ability_status_change_proxy.cpp",
     "${samgr_services_dir}/test/unittest/src/itest_transaction_service.cpp",
+    "${samgr_services_dir}/test/unittest/src/sa_status_change_mock.cpp",
     "${samgr_services_dir}/test/unittest/src/system_ability_mgr_test.cpp",
   ]
 
@@ -44,13 +50,16 @@ ohos_unittest("SystemAbilityMgrTest") {
   deps = [
     "${samgr_dir}/interfaces/innerkits/lsamgr:lsamgr",
     "${samgr_dir}/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "appexecfwk_standard:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "ipc:libdbinder",
   ]
 }
 

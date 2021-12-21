@@ -26,40 +26,24 @@ public:
     explicit SystemAbilityManagerProxy(const sptr<IRemoteObject>& impl)
         : IRemoteProxy<ISystemAbilityManager>(impl) {}
     ~SystemAbilityManagerProxy() = default;
-
-    sptr<IRemoteObject> CheckLocalAbilityManager(const std::u16string& name) override;
-    int32_t AddLocalAbilityManager(const std::u16string& name, const sptr<IRemoteObject>& ability) override;
-    int32_t RemoveLocalAbilityManager(const std::u16string& name) override;
     std::vector<std::u16string> ListSystemAbilities(unsigned int dumpFlags) override;
-    int32_t RecycleOnDemandSystemAbility() override;
 
     // IntToString adapter interface
     sptr<IRemoteObject> GetSystemAbility(int32_t systemAbilityId) override;
     sptr<IRemoteObject> CheckSystemAbility(int32_t systemAbilityId) override;
     int32_t RemoveSystemAbility(int32_t systemAbilityId) override;
-    int32_t SubscribeSystemAbility(int32_t systemAbilityId, const std::u16string& listenerName) override;
-    int32_t UnSubscribeSystemAbility(int32_t systemAbilityId, const std::u16string& listenerName) override;
+    int32_t SubscribeSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityStatusChange>& listener) override;
+    int32_t UnSubscribeSystemAbility(int32_t systemAbilityId,
+        const sptr<ISystemAbilityStatusChange> &listener) override;
     sptr<IRemoteObject> GetSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     sptr<IRemoteObject> CheckSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     int32_t AddOnDemandSystemAbilityInfo(int32_t systemAbilityId,
         const std::u16string& localAbilityManagerName) override;
     sptr<IRemoteObject> CheckSystemAbility(int32_t systemAbilityId, bool& isExist) override;
-    int32_t ConnectSystemAbility(int32_t systemAbilityId,
-        const sptr<ISystemAbilityConnectionCallback>& connectionCallback) override;
-    int32_t DisConnectSystemAbility(int32_t systemAbilityId,
-        const sptr<ISystemAbilityConnectionCallback>& connectionCallback) override;
-    const std::u16string CheckOnDemandSystemAbility(int32_t systemAbilityId) override;
-    bool GetSystemAbilityInfoList(int32_t systemAbilityId,
-        const std::u16string& capability, std::list<std::shared_ptr<SystemAbilityInfo>>& saInfoList) override;
-    bool GetDeviceId(std::string& deviceId) override;
-
     int32_t AddSystemAbility(int32_t systemAbilityId, const sptr<IRemoteObject>& ability,
         const SAExtraProp& extraProp) override;
-    int32_t RegisterSystemReadyCallback(const sptr<IRemoteObject>& systemReadyCallback) override;
-    int32_t GetCoreSystemAbilityList(std::vector<int32_t>& coreSaList, int dumpMode) override;
-    int32_t AddSystemCapability(const std::string& sysCap) override;
-    bool HasSystemCapability(const std::string& sysCap) override;
-    std::vector<std::string> GetSystemAvailableCapabilities() override;
+
+    int32_t AddSystemProcess(const std::u16string& procName, const sptr<IRemoteObject>& procObject) override;
 private:
     sptr<IRemoteObject> GetSystemAbilityWrapper(int32_t systemAbilityId, const std::string& deviceId = "");
     sptr<IRemoteObject> CheckSystemAbilityWrapper(int32_t code, MessageParcel& data);

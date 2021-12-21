@@ -13,26 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef IF_LOCAL_ABILITY_MANAGER_H_
-#define IF_LOCAL_ABILITY_MANAGER_H_
+#ifndef SAMGR_INTERFACES_INNERKITS_SAMGR_PROXY_INCLUDE_IF_SYSTEM_ABILITY_STATUS_CHANGE_H
+#define SAMGR_INTERFACES_INNERKITS_SAMGR_PROXY_INCLUDE_IF_SYSTEM_ABILITY_STATUS_CHANGE_H
 
-#include <string>
 #include "iremote_broker.h"
 #include "iremote_object.h"
-#include "iremote_stub.h"
 #include "iremote_proxy.h"
 
 namespace OHOS {
-class ILocalAbilityManager : public IRemoteBroker {
+class ISystemAbilityStatusChange : public IRemoteBroker {
 public:
-    virtual bool StartAbility(int32_t saId) = 0;
-
-    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.ILocalAbilityManager");
-protected:
+    virtual ~ISystemAbilityStatusChange() = default;
+    virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) = 0;
+    virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) = 0;
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.ISystemAbilityStatusChange");
     enum {
-        START_ABILITY_TRANSACTION = 1,
+        ON_ADD_SYSTEM_ABILITY = 1,
+        ON_REMOVE_SYSTEM_ABILITY = 2,
     };
-    static inline const std::u16string LOCAL_ABILITY_MANAGER_INTERFACE_TOKEN = u"ohos.localabilitymanager.accessToken";
 };
 }
-#endif // !defined(IF_LOCAL_ABILITY_MANAGER_H_)
+#endif /* SAMGR_INTERFACES_INNERKITS_SAMGR_PROXY_INCLUDE_IF_SYSTEM_ABILITY_STATUS_CHANGE_H */

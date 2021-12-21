@@ -26,18 +26,18 @@ public:
     ~AbilityDeathRecipient() override = default;
 };
 
-class LocalAbilityManagerDeathRecipient : public IRemoteObject::DeathRecipient {
+class SystemProcessDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
-    LocalAbilityManagerDeathRecipient() = default;
-    ~LocalAbilityManagerDeathRecipient() override = default;
+    SystemProcessDeathRecipient() = default;
+    ~SystemProcessDeathRecipient() override = default;
 };
 
-class SystemReadyCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
+class AbilityStatusDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
-    SystemReadyCallbackDeathRecipient() = default;
-    ~SystemReadyCallbackDeathRecipient() override = default;
+    AbilityStatusDeathRecipient() = default;
+    ~AbilityStatusDeathRecipient() override = default;
 };
 } // namespace OHOS
 

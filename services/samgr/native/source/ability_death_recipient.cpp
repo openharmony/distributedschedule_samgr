@@ -22,21 +22,22 @@
 namespace OHOS {
 void AbilityDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
-    HILOGI("%s called", __func__);
+    HILOGI("%{public}s called", __func__);
     SystemAbilityManager::GetInstance()->RemoveSystemAbility(remote.promote());
-    HILOGI("recv death notice success");
+    HILOGI("%{public}s death notice success", __func__);
 }
 
-void LocalAbilityManagerDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+void SystemProcessDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
-    HILOGI("LocalAbilityManagerDeathRecipient::OnRemoteDied called!");
-    SystemAbilityManager::GetInstance()->RemoveLocalAbilityManager(remote.promote());
-    HILOGI("LocalAbilityManagerDeathRecipient::OnRemoteDied death notice success");
+    HILOGI("%{public}s called!", __func__);
+    SystemAbilityManager::GetInstance()->RemoveSystemProcess(remote.promote());
+    HILOGI("%{public}s death notice success", __func__);
 }
-void SystemReadyCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+
+void AbilityStatusDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
-    HILOGI("SystemReadyCallbackDeathRecipient::coreSa::OnRemoteDied called!");
-    SystemAbilityManager::GetInstance()->RemoveSystemReadyCallback(remote.promote());
-    HILOGI("SystemReadyCallbackDeathRecipient::coreSa::OnRemoteDied death notice success");
+    HILOGI("%{public}s called!", __func__);
+    SystemAbilityManager::GetInstance()->UnSubscribeSystemAbility(remote.promote());
+    HILOGI("%{public}s death notice success", __func__);
 }
 } // namespace OHOS

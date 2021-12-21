@@ -20,7 +20,6 @@
 #include "ipc_types.h"
 #include "sam_log.h"
 #include "string_ex.h"
-#include "system_ability_info.h"
 #include "system_ability_manager.h"
 #include "tools.h"
 
@@ -29,7 +28,6 @@ namespace {
 constexpr int32_t MULTIUSER_HAP_PER_USER_RANGE = 100000;
 constexpr int32_t HID_HAP = 10000;  /* first hap user */
 constexpr int32_t UID_SHELL = 2000;
-const std::u16string SAMANAGER_INTERFACE_TOKEN = u"ohos.samgr.accessToken";
 }
 SystemAbilityManagerStub::SystemAbilityManagerStub()
 {
@@ -49,40 +47,14 @@ SystemAbilityManagerStub::SystemAbilityManagerStub()
         &SystemAbilityManagerStub::CheckRemtSystemAbilityInner;
     memberFuncMap_[ADD_ONDEMAND_SYSTEM_ABILITY_TRANSACTION] =
         &SystemAbilityManagerStub::AddOndemandSystemAbilityInner;
-    memberFuncMap_[RECYCLE_ONDEMAND_SYSTEM_ABILITY_TRANSACTION] =
-        &SystemAbilityManagerStub::RecycleOndemandSystemAbilityInner;
     memberFuncMap_[CHECK_SYSTEM_ABILITY_IMMEDIATELY_TRANSACTION] =
         &SystemAbilityManagerStub::CheckSystemAbilityImmeInner;
-    memberFuncMap_[CONNECTION_SYSTEM_ABILITY_TRANSACTION] =
-        &SystemAbilityManagerStub::ConnOndemandSystemAbilityInner;
-    memberFuncMap_[DISCONNECTION_SYSTEM_ABILITY_TRANSACTION] =
-        &SystemAbilityManagerStub::DisConnOndemandSystemAbilityInner;
-    memberFuncMap_[CHECK_ONDEMAND_SYSTEM_ABILITY_TRANSACTION] =
-        &SystemAbilityManagerStub::CheckOndemandSystemAbilityInner;
     memberFuncMap_[CHECK_REMOTE_SYSTEM_ABILITY_FOR_JAVA_TRANSACTION] =
         &SystemAbilityManagerStub::CheckRemtSystemAbilityForJavaInner;
-    memberFuncMap_[GET_SYSTEM_ABILITYINFOLIST_TRANSACTION] =
-        &SystemAbilityManagerStub::GetSystemAbilityInfoListInner;
     memberFuncMap_[UNSUBSCRIBE_SYSTEM_ABILITY_TRANSACTION] =
         &SystemAbilityManagerStub::UnSubsSystemAbilityInner;
-    memberFuncMap_[GET_LOCAL_DEVICE_ID_TRANSACTION] =
-        &SystemAbilityManagerStub::GetDeviceIdInner;
-    memberFuncMap_[ADD_LOCAL_ABILITY_TRANSACTION] =
-        &SystemAbilityManagerStub::AddLocalAbilityInner;
-    memberFuncMap_[CHECK_LOCAL_ABILITY_TRANSACTION] =
-        &SystemAbilityManagerStub::CheckLocalAbilityInner;
-    memberFuncMap_[REMOVE_LOCAL_ABILITY_TRANSACTION] =
-        &SystemAbilityManagerStub::RemoveLocalAbilityInner;
-    memberFuncMap_[REGISTER_SYSTEM_READY_CALLBACK] =
-        &SystemAbilityManagerStub::RegisterSystemReadyCallbackInner;
-    memberFuncMap_[GET_CORE_SYSTEM_ABILITY_LIST] =
-        &SystemAbilityManagerStub::GetCoreSystemAbilityListInner;
-    memberFuncMap_[ADD_SYSTEM_CAPABILITY] =
-        &SystemAbilityManagerStub::AddSystemCapabilityInner;
-    memberFuncMap_[HAS_SYSTEM_CAPABILITY] =
-        &SystemAbilityManagerStub::HasSystemCapabilityInner;
-    memberFuncMap_[GET_AVAILABLE_SYSTEM_CAPABILITY] =
-        &SystemAbilityManagerStub::GetSystemAvailableCapabilitiesInner;
+    memberFuncMap_[ADD_SYSTEM_PROCESS_TRANSACTION] =
+        &SystemAbilityManagerStub::AddSystemProcessInner;
 }
 int32_t SystemAbilityManagerStub::OnRemoteRequest(uint32_t code,
     MessageParcel& data, MessageParcel& reply, MessageOption &option)
@@ -110,110 +82,6 @@ bool SystemAbilityManagerStub::EnforceInterceToken(MessageParcel& data)
 {
     std::u16string interfaceToken = data.ReadInterfaceToken();
     return interfaceToken == SAMANAGER_INTERFACE_TOKEN;
-}
-
-int32_t SystemAbilityManagerStub::GetSystemAbilityInfoListInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("GetSystemAbilityInfoListInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-    int32_t systemAbilityId = 0;
-    bool ret = data.ReadInt32(systemAbilityId);
-    if (!ret) {
-        HILOGW("SystemAbilityManagerStub::GetSystemAbilityInfoListInner read systemAbilityId failed!");
-        return ERR_NULL_OBJECT;
-    }
-    std::u16string capability = data.ReadString16();
-    std::list<std::shared_ptr<SystemAbilityInfo>> saInfoList;
-    bool saRet = GetSystemAbilityInfoList(systemAbilityId, capability, saInfoList);
-    if (!reply.WriteBool(saRet)) {
-        HILOGW("SystemAbilityManagerStub::GetSystemAbilityListInner write reply size failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-    if (!reply.WriteInt32(static_cast<int32_t>(saInfoList.size()))) {
-        HILOGW("SystemAbilityManagerStub::GetSystemAbilityListInner write reply size failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-    for (const auto& sa : saInfoList) {
-        if (!reply.WriteParcelable(sa.get())) {
-            HILOGW("SystemAbilityManagerStub::GetSystemAbilityListInner write vector failed!");
-            return ERR_FLATTEN_OBJECT;
-        }
-    }
-    return ERR_NONE;
-}
-
-int32_t SystemAbilityManagerStub::CheckLocalAbilityInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("CheckLocalAbilityInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-    std::u16string name = data.ReadString16();
-    if (name.empty()) {
-        HILOGW("SystemAbilityManagerStub::CheckLocalAbilityInner read name failed!");
-        return ERR_NULL_OBJECT;
-    }
-    bool ret = reply.WriteRemoteObject(CheckLocalAbilityManager(name));
-    if (!ret) {
-        HILOGW("SystemAbilityManagerStub::CheckLocalAbilityInner write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return ERR_NONE;
-}
-
-int32_t SystemAbilityManagerStub::AddLocalAbilityInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("AddLocalAbilityInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-    std::u16string name = data.ReadString16();
-    if (name.empty()) {
-        HILOGW("SystemAbilityManagerStub::AddLocalAbilityInner read name failed!");
-        return ERR_NULL_OBJECT;
-    }
-
-    auto object = data.ReadRemoteObject();
-    if (object == nullptr) {
-        HILOGW("SystemAbilityManagerStub::AddLocalAbilityInner readParcelable failed!");
-        return ERR_NULL_OBJECT;
-    }
-
-    int32_t result = AddLocalAbilityManager(name, object);
-    HILOGI("SystemAbilityManagerStub::AddLocalAbilityInner result is %d", result);
-    bool ret = reply.WriteInt32(result);
-    if (!ret) {
-        HILOGW("SystemAbilityManagerStub::AddLocalAbilityInner write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return result;
-}
-
-int32_t SystemAbilityManagerStub::RemoveLocalAbilityInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("RemoveLocalAbilityInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-    std::u16string name = data.ReadString16();
-    if (name.empty()) {
-        HILOGW("SystemAbilityManagerStub::RemoveLocalAbilityInner read name failed!");
-        return ERR_NULL_OBJECT;
-    }
-
-    int32_t result = RemoveLocalAbilityManager(name);
-    HILOGI("SystemAbilityManagerStub::RemoveLocalAbilityInner result is %{public}d", result);
-    bool ret = reply.WriteInt32(result);
-    if (!ret) {
-        HILOGW("SystemAbilityManagerStub::RemoveLocalAbilityInner write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return result;
 }
 
 int32_t SystemAbilityManagerStub::ListSystemAbilityInner(MessageParcel& data, MessageParcel& reply)
@@ -260,13 +128,17 @@ int32_t SystemAbilityManagerStub::SubsSystemAbilityInner(MessageParcel& data, Me
         HILOGW("SystemAbilityManagerStub::SubsSystemAbilityInner read systemAbilityId failed!");
         return ERR_NULL_OBJECT;
     }
-    std::u16string listenerName = data.ReadString16();
-    if (listenerName.empty()) {
-        HILOGW("SystemAbilityManagerStub::SubsSystemAbilityInner read listenerName failed!");
+    sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
+    if (remoteObject == nullptr) {
+        HILOGW("SystemAbilityManagerStub::SubsSystemAbilityInner read listener failed!");
         return ERR_NULL_OBJECT;
     }
-
-    int32_t result = SubscribeSystemAbility(systemAbilityId, listenerName);
+    sptr<ISystemAbilityStatusChange> listener = iface_cast<ISystemAbilityStatusChange>(remoteObject);
+    if (listener == nullptr) {
+        HILOGW("SystemAbilityManagerStub::SubsSystemAbilityInner iface_cast failed!");
+        return ERR_NULL_OBJECT;
+    }
+    int32_t result = SubscribeSystemAbility(systemAbilityId, listener);
     HILOGI("SystemAbilityManagerStub::SubsSystemAbilityInner result is %d", result);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -288,13 +160,17 @@ int32_t SystemAbilityManagerStub::UnSubsSystemAbilityInner(MessageParcel& data, 
         HILOGW("SystemAbilityManagerStub::UnSubsSystemAbilityInner read systemAbilityId failed!");
         return ERR_NULL_OBJECT;
     }
-    std::u16string listenerName = data.ReadString16();
-    if (listenerName.empty()) {
-        HILOGW("SystemAbilityManagerStub::SubsSystemAbilityInner read listenerName failed!");
+    sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
+    if (remoteObject == nullptr) {
+        HILOGW("SystemAbilityManagerStub::UnSubscribeSystemAbility read listener failed!");
         return ERR_NULL_OBJECT;
     }
-
-    int32_t result = UnSubscribeSystemAbility(systemAbilityId, listenerName);
+    sptr<ISystemAbilityStatusChange> listener = iface_cast<ISystemAbilityStatusChange>(remoteObject);
+    if (listener == nullptr) {
+        HILOGW("SystemAbilityManagerStub::UnSubscribeSystemAbility iface_cast failed!");
+        return ERR_NULL_OBJECT;
+    }
+    int32_t result = UnSubscribeSystemAbility(systemAbilityId, listener);
     HILOGI("SystemAbilityManagerStub::UnSubscribeSystemAbility result is %d", result);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -382,23 +258,6 @@ int32_t SystemAbilityManagerStub::AddOndemandSystemAbilityInner(MessageParcel& d
     return result;
 }
 
-int32_t SystemAbilityManagerStub::RecycleOndemandSystemAbilityInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("RecycleOndemandSystemAbilityInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-    int32_t result = RecycleOnDemandSystemAbility();
-    HILOGI("SystemAbilityManagerStub::RecycleOndemandSystemAbilityInner result is %d", result);
-    bool ret = reply.WriteInt32(result);
-    if (!ret) {
-        HILOGW("SystemAbilityManagerStub::RecycleOndemandSystemAbilityInner write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return result;
-}
-
 int32_t SystemAbilityManagerStub::CheckSystemAbilityImmeInner(MessageParcel& data, MessageParcel& reply)
 {
     int32_t systemAbilityId = data.ReadInt32();
@@ -424,112 +283,6 @@ int32_t SystemAbilityManagerStub::CheckSystemAbilityImmeInner(MessageParcel& dat
         return ERR_FLATTEN_OBJECT;
     }
 
-    return ERR_NONE;
-}
-
-int32_t SystemAbilityManagerStub::ConnOndemandSystemAbilityInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("ConnOndemandSystemAbilityInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-    int32_t systemAbilityId = data.ReadInt32();
-    if (!CheckInputSysAbilityId(systemAbilityId)) {
-        HILOGW("SystemAbilityManagerStub::ConnOndemandSystemAbilityInner read systemAbilityId failed!");
-        return ERR_NULL_OBJECT;
-    }
-    auto object = data.ReadRemoteObject();
-    if (object == nullptr) {
-        HILOGW("SystemAbilityManagerStub::ConnOndemandSystemAbilityInner readParcelable failed!");
-        return ERR_NULL_OBJECT;
-    }
-
-    sptr<ISystemAbilityConnectionCallback> connectionAbility =
-        iface_cast<ISystemAbilityConnectionCallback>(object);
-    int32_t result = ConnectSystemAbility(systemAbilityId, connectionAbility);
-    HILOGI("SystemAbilityManagerStub::ConnOndemandSystemAbilityInner result is %d", result);
-    bool ret = reply.WriteInt32(result);
-    if (!ret) {
-        HILOGW("SystemAbilityManagerStub::ConnOndemandSystemAbilityInner write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return result;
-}
-
-int32_t SystemAbilityManagerStub::DisConnOndemandSystemAbilityInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("DisConnOndemandSystemAbilityInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-    int32_t systemAbilityId = data.ReadInt32();
-    if (!CheckInputSysAbilityId(systemAbilityId)) {
-        HILOGW("SystemAbilityManagerStub::DisConnOndemandSystemAbilityInner read systemAbilityId failed!");
-        return ERR_NULL_OBJECT;
-    }
-    auto object = data.ReadRemoteObject();
-    if (object == nullptr) {
-        HILOGW("SystemAbilityManagerStub::DisConnOndemandSystemAbilityInner readParcel failed!");
-        return ERR_NULL_OBJECT;
-    }
-
-    sptr<ISystemAbilityConnectionCallback> connectionAbility =
-        iface_cast<ISystemAbilityConnectionCallback>(object);
-    int32_t result = DisConnectSystemAbility(systemAbilityId, connectionAbility);
-    HILOGI("SystemAbilityManagerStub::DisConnOndemandSystemAbilityInner result is %d", result);
-    bool ret = reply.WriteInt32(result);
-    if (!ret) {
-        HILOGW("SystemAbilityManagerStub::DisConnOndemandSystemAbilityInner write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return result;
-}
-
-int32_t SystemAbilityManagerStub::CheckOndemandSystemAbilityInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("CheckOndemandSystemAbilityInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-    int32_t systemAbilityId = data.ReadInt32();
-    if (!CheckInputSysAbilityId(systemAbilityId)) {
-        HILOGW("SystemAbilityManagerStub::CheckOndemandSystemAbilityInner read systemAbilityId failed!");
-        return ERR_NULL_OBJECT;
-    }
-    bool ret = reply.WriteString16((CheckOnDemandSystemAbility(systemAbilityId)).c_str());
-    if (!ret) {
-        HILOGW("SystemAbilityManagerStub::ConnOndemandSystemAbilityInner write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return ERR_NONE;
-}
-
-int32_t SystemAbilityManagerStub::GetDeviceIdInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("GetDeviceIdInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-    std::string deviceId = SystemAbilityManager::GetInstance()->GetLocalNodeId();
-    if (deviceId.empty()) {
-        HILOGW("SystemAbilityManagerStub::GetLocalDeviceIdInner get  deviceId failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    bool result = reply.WriteString(deviceId);
-    if (!result) {
-        HILOGW("SystemAbilityManagerStub::GetDeviceIdInner write deviceId failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
-        HILOGW("SystemAbilityManagerStub::GetDeviceIdInner write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
     return ERR_NONE;
 }
 
@@ -640,94 +393,33 @@ int32_t SystemAbilityManagerStub::RemoveSystemAbilityInner(MessageParcel& data, 
     return result;
 }
 
-int32_t SystemAbilityManagerStub::RegisterSystemReadyCallbackInner(MessageParcel& data, MessageParcel& reply)
+
+int32_t SystemAbilityManagerStub::AddSystemProcessInner(MessageParcel& data, MessageParcel& reply)
 {
-    auto object = data.ReadRemoteObject();
-    if (object == nullptr) {
-        HILOGW("SystemAbilityManagerStub::RegisterSystemReadyCallback readParcelable failed!");
+    if (!CanRequest()) {
+        HILOGE("AddSystemProcessInner PERMISSION DENIED!");
+        return ERR_PERMISSION_DENIED;
+    }
+    std::u16string procName = data.ReadString16();
+    if (procName.empty()) {
+        HILOGW("SystemAbilityManagerStub::AddSystemProcessInner read process name failed!");
         return ERR_NULL_OBJECT;
     }
-    int32_t result = RegisterSystemReadyCallback(object);
-    HILOGI("SystemAbilityManagerStub::RegisterSystemReadyCallbackInner result is %{public}d", result);
+
+    sptr<IRemoteObject> procObject = data.ReadRemoteObject();
+    if (procObject == nullptr) {
+        HILOGW("SystemAbilityManagerStub::AddSystemProcessInner readParcelable failed!");
+        return ERR_NULL_OBJECT;
+    }
+
+    int32_t result = AddSystemProcess(procName, procObject);
+    HILOGI("SystemAbilityManagerStub::AddSystemProcessInner result is %{public}d", result);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
-        HILOGW("SystemAbilityManagerStub::RegisterSystemReadyCallbackInner write reply failed.");
+        HILOGW("SystemAbilityManagerStub::AddSystemProcessInner write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
     return result;
-}
-
-int32_t SystemAbilityManagerStub::GetCoreSystemAbilityListInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("SystemAbilityManagerStub::GetCoreSystemAbilityListInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-    int32_t dumpMode = data.ReadInt32();
-    std::vector<int32_t> coreSaList;
-    int32_t result = GetCoreSystemAbilityList(coreSaList, dumpMode);
-    HILOGI("SystemAbilityManagerStub::GetCoreSystemAbilityListInner result is %{public}d", result);
-    bool ret = reply.WriteInt32(result);
-    if (!ret) {
-        HILOGW("SystemAbilityManagerStub::GetCoreSystemAbilityListInner write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
-    if (result == ERR_NONE && (!reply.WriteInt32Vector(coreSaList))) {
-        return ERR_FLATTEN_OBJECT;
-    }
-    return result;
-}
-
-int32_t SystemAbilityManagerStub::AddSystemCapabilityInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("SystemAbilityManagerStub::AddSystemCapabilityInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-
-    std::u16string sysCap = data.ReadString16();
-    bool ret = AddSystemCapability(Str16ToStr8(sysCap));
-    if (!reply.WriteInt32(ret)) {
-        HILOGW("SystemAbilityManagerStub::AddSystemCapabilityInner write reply failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return ERR_NONE;
-}
-
-int32_t SystemAbilityManagerStub::HasSystemCapabilityInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("SystemAbilityManagerStub::HasSystemCapabilityInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-
-    std::u16string sysCap = data.ReadString16();
-    if (!reply.WriteBool(HasSystemCapability(Str16ToStr8(sysCap)))) {
-        HILOGW("SystemAbilityManagerStub::HasSystemCapabilityInner write reply failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return ERR_NONE;
-}
-
-int32_t SystemAbilityManagerStub::GetSystemAvailableCapabilitiesInner(MessageParcel& data, MessageParcel& reply)
-{
-    if (!CanRequest()) {
-        HILOGE("SystemAbilityManagerStub::GetSystemAvailableCapabilitiesInner PERMISSION DENIED!");
-        return ERR_PERMISSION_DENIED;
-    }
-    std::vector<std::string> sysCaps = GetSystemAvailableCapabilities();
-    std::vector<std::u16string> u16SysCaps;
-    for (const std::string& sysCap : sysCaps) {
-        u16SysCaps.emplace_back(Str8ToStr16(sysCap));
-    }
-    if (!reply.WriteString16Vector(u16SysCaps)) {
-        HILOGW("SystemAbilityManagerStub::GetSystemAvailableCapabilitiesInner write reply failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return ERR_NONE;
 }
 
 int32_t SystemAbilityManagerStub::GetHapIdMultiuser(int32_t uid)

@@ -55,14 +55,15 @@ ohos_executable("samgr") {
   install_enable = true
   sources = [
     "//foundation/distributedschedule/samgr/services/samgr/native/source/ability_death_recipient.cpp",
-    "//foundation/distributedschedule/samgr/services/samgr/native/source/sa_main.cpp",
+    "//foundation/distributedschedule/samgr/services/samgr/native/source/main.cpp",
     "//foundation/distributedschedule/samgr/services/samgr/native/source/system_ability_manager.cpp",
     "//foundation/distributedschedule/samgr/services/samgr/native/source/system_ability_manager_stub.cpp",
-    "//foundation/distributedschedule/samgr/services/samgr/native/source/utils.cpp",
+    "//foundation/distributedschedule/samgr/services/samgr/native/source/system_ability_status_change_proxy.cpp",
     "//foundation/distributedschedule/samgr/utils/native/source/tools.cpp",
   ]
 
   deps = [
+    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr:lsamgr",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//utils/native/base:utils",
@@ -76,6 +77,7 @@ ohos_executable("samgr") {
 
   if (is_standard_system) {
     external_deps = [
+      "appexecfwk_standard:libeventhandler",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "ipc:libdbinder",

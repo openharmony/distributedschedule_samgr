@@ -13,26 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef IF_LOCAL_ABILITY_MANAGER_H_
-#define IF_LOCAL_ABILITY_MANAGER_H_
+#include "sa_status_change_mock.h"
 
-#include <string>
-#include "iremote_broker.h"
-#include "iremote_object.h"
-#include "iremote_stub.h"
-#include "iremote_proxy.h"
+#include "sam_log.h"
 
 namespace OHOS {
-class ILocalAbilityManager : public IRemoteBroker {
-public:
-    virtual bool StartAbility(int32_t saId) = 0;
-
-    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.ILocalAbilityManager");
-protected:
-    enum {
-        START_ABILITY_TRANSACTION = 1,
-    };
-    static inline const std::u16string LOCAL_ABILITY_MANAGER_INTERFACE_TOKEN = u"ohos.localabilitymanager.accessToken";
-};
+void SaStatusChangeMock::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    HILOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
 }
-#endif // !defined(IF_LOCAL_ABILITY_MANAGER_H_)
+
+void SaStatusChangeMock::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    HILOGI("OnRemoveSystemAbility systemAbilityId:%{public}d removed!", systemAbilityId);
+}
+}

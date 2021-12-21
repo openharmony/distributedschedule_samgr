@@ -27,21 +27,7 @@ public:
         : IRemoteProxy<ILocalAbilityManager>(impl) {}
     ~LocalAbilityManagerProxy() = default;
 
-    bool Debug(int32_t saId);
-    bool Test(int32_t saId);
-    bool SADump(int32_t saId);
-    bool HandoffAbilityAfter(const std::u16string& begin, const std::u16string& after);
-    bool HandoffAbilityBegin(int32_t saId);
     bool StartAbility(int32_t saId);
-    bool StopAbility(int32_t saId);
-    bool OnAddSystemAbility(int32_t saId, const std::string& deviceId = "");
-    bool OnRemoveSystemAbility(int32_t saId, const std::string& deviceId = "");
-    void StartAbilityAsyn(int32_t saId);
-    bool RecycleOndemandSystemAbility(int32_t saId);
-private:
-    bool TransactInner(uint32_t code, uint32_t flags, int32_t saId);
-    bool TransactInner(uint32_t code, int32_t saId, const std::string& deviceId);
-
 private:
     static inline BrokerDelegator<LocalAbilityManagerProxy> delegator_;
     OHOS::HiviewDFX::HiLogLabel label_ = { LOG_CORE, 0xD001800, "SA" };

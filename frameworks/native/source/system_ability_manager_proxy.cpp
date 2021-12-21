@@ -25,7 +25,6 @@
 #include "string_ex.h"
 
 #include "sam_log.h"
-#include "system_ability_info.h"
 
 using namespace std;
 namespace OHOS {
@@ -33,69 +32,10 @@ namespace {
 const int32_t RETRY_TIME_OUT_NUMBER = 10;
 const int32_t SLEEP_INTERVAL_TIME = 100;
 const int32_t SLEEP_ONE_MILLI_SECOND_TIME = 1000;
-const std::u16string SAMANAGER_INTERFACE_TOKEN = u"ohos.samgr.accessToken";
-constexpr int32_t MAX_SYSCAP_NAME_LEN = 64;
 }
 sptr<IRemoteObject> SystemAbilityManagerProxy::GetSystemAbility(int32_t systemAbilityId)
 {
     return GetSystemAbilityWrapper(systemAbilityId);
-}
-
-bool SystemAbilityManagerProxy::GetSystemAbilityInfoList(int32_t systemAbilityId,
-    const std::u16string& capability, std::list<std::shared_ptr<SystemAbilityInfo>>& saInfoList)
-{
-    HILOGD("GetSystemAbilityInfoList called, systemAbilityId is %{public}d", systemAbilityId);
-    if (!CheckInputSysAbilityId(systemAbilityId)) {
-        HILOGE("GetSystemAbilityInfoList systemAbilityId is invalid");
-        return false;
-    }
-
-    auto remote = Remote();
-    if (remote == nullptr) {
-        HILOGI("remote is nullptr!");
-        return false;
-    }
-
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        HILOGW("GetSystemAbilityInfoList write InterfaceToken failed!");
-        return false;
-    }
-    bool ret = data.WriteInt32(systemAbilityId);
-    if (!ret) {
-        HILOGW("GetSystemAbilityInfoList write systemAbilityId failed!");
-        return false;
-    }
-    ret = data.WriteString16(capability);
-    if (!ret) {
-        HILOGW("GetSystemAbilityInfoList write capability failed!");
-        return false;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t err = remote->SendRequest(GET_SYSTEM_ABILITYINFOLIST_TRANSACTION, data, reply, option);
-    if (err != ERR_NONE) {
-        return false;
-    }
-    ret = reply.ReadBool();
-    if (!ret) {
-        HILOGW("GetSystemAbilityInfoList read vector failed!");
-        return false;
-    }
-    int32_t replySize = 0;
-    ret = reply.ReadInt32(replySize);
-    if (!ret) {
-        HILOGW("GetSystemAbilityInfoList read replySize failed!");
-        return false;
-    }
-    for (int32_t i = 0; i < replySize; i++) {
-        std::shared_ptr<SystemAbilityInfo> spSAInfo(reply.ReadParcelable<SystemAbilityInfo>());
-        if (spSAInfo != nullptr) {
-            saInfoList.emplace_back(spSAInfo);
-        }
-    }
-    return true;
 }
 
 sptr<IRemoteObject> SystemAbilityManagerProxy::GetSystemAbility(int32_t systemAbilityId,
@@ -120,7 +60,8 @@ sptr<IRemoteObject> SystemAbilityManagerProxy::GetSystemAbilityWrapper(int32_t s
             svc = CheckSystemAbility(systemAbilityId, isExist);
             if (!isExist) {
                 HILOGE("%{public}s:sa %{public}d is not exist", __func__, systemAbilityId);
-                return nullptr;
+                usleep(SLEEP_ONE_MILLI_SECOND_TIME * SLEEP_INTERVAL_TIME);
+                continue;
             }
         } else {
             svc = CheckSystemAbility(systemAbilityId, deviceId);
@@ -167,25 +108,6 @@ sptr<IRemoteObject> SystemAbilityManagerProxy::CheckSystemAbility(int32_t system
         return nullptr;
     }
     return CheckSystemAbilityWrapper(CHECK_SYSTEM_ABILITY_TRANSACTION, data);
-}
-
-sptr<IRemoteObject> SystemAbilityManagerProxy::CheckLocalAbilityManager(const u16string& name)
-{
-    HILOGI("%{public}s called", __func__);
-    if (name.empty()) {
-        HILOGI("name is nullptr.");
-        return nullptr;
-    }
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return nullptr;
-    }
-    bool ret = data.WriteString16(name);
-    if (!ret) {
-        HILOGW("CheckLocalAbilityManager Write name failed!");
-        return nullptr;
-    }
-    return CheckSystemAbilityWrapper(CHECK_LOCAL_ABILITY_TRANSACTION, data);
 }
 
 sptr<IRemoteObject> SystemAbilityManagerProxy::CheckSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
@@ -321,157 +243,6 @@ int32_t SystemAbilityManagerProxy::AddOnDemandSystemAbilityInfo(int32_t systemAb
     return result;
 }
 
-int32_t SystemAbilityManagerProxy::RecycleOnDemandSystemAbility()
-{
-    HILOGI("%{public}s called", __func__);
-
-    auto remote = Remote();
-    if (remote == nullptr) {
-        HILOGE("RecycleOnDemandSystemAbility remote is nullptr !");
-        return ERR_INVALID_OPERATION;
-    }
-
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return ERR_FLATTEN_OBJECT;
-    }
-    int32_t err = remote->SendRequest(RECYCLE_ONDEMAND_SYSTEM_ABILITY_TRANSACTION, data, reply, option);
-
-    HILOGI("%{public}s:recycle ondemand system ability %{public}s, return %{public}d",
-        __func__, err ? "fail" : "succ", err);
-    if (err != ERR_NONE) {
-        HILOGE("RecycleOnDemandSystemAbility SendRequest error:%{public}d!", err);
-        return err;
-    }
-
-    int32_t result = 0;
-    if (!reply.ReadInt32(result)) {
-        HILOGW("RecycleOnDemandSystemAbility Read result failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return result;
-}
-
-int32_t SystemAbilityManagerProxy::ConnectSystemAbility(int32_t systemAbilityId,
-    const sptr<ISystemAbilityConnectionCallback>& connectionCallback)
-{
-    HILOGI("%{public}s called", __func__);
-    if (!CheckInputSysAbilityId(systemAbilityId)) {
-        HILOGE("ConnectSystemAbility systemAbilityId invalid.");
-        return ERR_INVALID_VALUE;
-    }
-
-    if (connectionCallback == nullptr) {
-        HILOGE("ConnectSystemAbility connectionCallback nullptr.");
-        return ERR_INVALID_VALUE;
-    }
-    HILOGI("connection ondemand system ability name is : %{public}d ", systemAbilityId);
-
-    auto remote = Remote();
-    if (remote == nullptr) {
-        HILOGE("ConnectSystemAbility remote is nullptr !");
-        return ERR_INVALID_OPERATION;
-    }
-
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return ERR_FLATTEN_OBJECT;
-    }
-    bool ret = data.WriteInt32(systemAbilityId);
-    if (!ret) {
-        HILOGW("ConnectSystemAbility Write name failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-    ret = data.WriteRemoteObject(connectionCallback->AsObject());
-    if (!ret) {
-        HILOGW("ConnectSystemAbility Write connectionCallback failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
-    int32_t err = remote->SendRequest(CONNECTION_SYSTEM_ABILITY_TRANSACTION, data, reply, option);
-
-    HILOGI("%{public}s:connect ondemand system ability %{public}d %{public}s, err: %{public}d",
-        __func__, systemAbilityId, err ? "fail" : "succ", err);
-
-    return err;
-}
-
-int32_t SystemAbilityManagerProxy::DisConnectSystemAbility(int32_t systemAbilityId,
-    const sptr<ISystemAbilityConnectionCallback>& connectionCallback)
-{
-    HILOGI("%{public}s called", __func__);
-    if (!CheckInputSysAbilityId(systemAbilityId)) {
-        HILOGE("DisConnectSystemAbility systemAbilityId is invalid.");
-        return ERR_INVALID_VALUE;
-    }
-    if (connectionCallback == nullptr) {
-        HILOGE("DisConnectSystemAbility connectionCallback nullptr.");
-        return ERR_INVALID_VALUE;
-    }
-    HILOGI("disconnect ondemand system ability name is : %{public}d ", systemAbilityId);
-
-    auto remote = Remote();
-    if (remote == nullptr) {
-        HILOGE("DisConnectSystemAbility remote is nullptr !");
-        return ERR_INVALID_OPERATION;
-    }
-
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return ERR_FLATTEN_OBJECT;
-    }
-    bool ret = data.WriteInt32(systemAbilityId);
-    if (!ret) {
-        HILOGW("DisConnectSystemAbility Write systemAbilityId failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    ret = data.WriteRemoteObject(connectionCallback->AsObject());
-    if (!ret) {
-        HILOGW("DisConnectSystemAbility Write connectionCallback failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
-    int32_t err = remote->SendRequest(DISCONNECTION_SYSTEM_ABILITY_TRANSACTION, data, reply,
-        option);
-
-    HILOGI("%{public}s:disconnect ondemand system ability %{public}d %{public}s, err: %{public}d",
-        __func__, systemAbilityId, err ? "fail" : "succ", err);
-
-    return err;
-}
-
-int32_t SystemAbilityManagerProxy::AddLocalAbilityManager(const u16string& name, const sptr<IRemoteObject>& ability)
-{
-    HILOGI("%{public}s called, local ability name is %{public}s", __func__, Str16ToStr8(name).c_str());
-    if (name.empty()) {
-        HILOGI("name is invalid.");
-        return ERR_INVALID_VALUE;
-    }
-
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return ERR_FLATTEN_OBJECT;
-    }
-    if (!data.WriteString16(name)) {
-        HILOGW("AddLocalAbilityManager Write name failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    if (!data.WriteRemoteObject(ability)) {
-        HILOGW("AddLocalAbilityManager Write ability failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-    return AddSystemAbilityWrapper(ADD_LOCAL_ABILITY_TRANSACTION, data);
-}
-
 int32_t SystemAbilityManagerProxy::RemoveSystemAbilityWrapper(int32_t code, MessageParcel& data)
 {
     sptr<IRemoteObject> remote = Remote();
@@ -518,28 +289,6 @@ int32_t SystemAbilityManagerProxy::RemoveSystemAbility(int32_t systemAbilityId)
     return RemoveSystemAbilityWrapper(REMOVE_SYSTEM_ABILITY_TRANSACTION, data);
 }
 
-int32_t SystemAbilityManagerProxy::RemoveLocalAbilityManager(const u16string& name)
-{
-    HILOGI("%{public}s called", __func__);
-    if (name.empty()) {
-        HILOGI("name is null.");
-        return ERR_INVALID_VALUE;
-    }
-
-    HILOGI("RemoveLocalAbilityManager name is : %{public}s \n", Str16ToStr8(name).c_str());
-
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return ERR_FLATTEN_OBJECT;
-    }
-    bool ret = data.WriteString16(name);
-    if (!ret) {
-        HILOGW("RemoveLocalAbilityManager Write name failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-    return RemoveSystemAbilityWrapper(REMOVE_LOCAL_ABILITY_TRANSACTION, data);
-}
-
 std::vector<u16string> SystemAbilityManagerProxy::ListSystemAbilities(unsigned int dumpFlags)
 {
     HILOGI("%{public}s called", __func__);
@@ -579,17 +328,16 @@ std::vector<u16string> SystemAbilityManagerProxy::ListSystemAbilities(unsigned i
     return saNames;
 }
 
-int32_t SystemAbilityManagerProxy::SubscribeSystemAbility(int32_t systemAbilityId, const std::u16string& listenerName)
+int32_t SystemAbilityManagerProxy::SubscribeSystemAbility(int32_t systemAbilityId,
+    const sptr<ISystemAbilityStatusChange>& listener)
 {
     HILOGI("%{public}s called", __func__);
-    if (!CheckInputSysAbilityId(systemAbilityId) || listenerName.empty()) {
-        HILOGE("SubscribeSystemAbility systemAbilityId:%{public}d or listenerName:%{public}s invalid!",
-            systemAbilityId, Str16ToStr8(listenerName).c_str());
+    if (!CheckInputSysAbilityId(systemAbilityId) || listener == nullptr) {
+        HILOGE("SubscribeSystemAbility systemAbilityId:%{public}d or listener invalid!", systemAbilityId);
         return ERR_INVALID_VALUE;
     }
 
-    HILOGD("SubscribeSystemAbility systemAbilityId:%{public}d: listenerName:%{public}s",
-        systemAbilityId, Str16ToStr8(listenerName).c_str());
+    HILOGI("SubscribeSystemAbility systemAbilityId:%{public}d", systemAbilityId);
 
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
@@ -607,7 +355,7 @@ int32_t SystemAbilityManagerProxy::SubscribeSystemAbility(int32_t systemAbilityI
         return ERR_FLATTEN_OBJECT;
     }
 
-    ret = data.WriteString16(listenerName);
+    ret = data.WriteRemoteObject(listener->AsObject());
     if (!ret) {
         HILOGW("SubscribeSystemAbility Write listenerName failed!");
         return ERR_FLATTEN_OBJECT;
@@ -616,14 +364,11 @@ int32_t SystemAbilityManagerProxy::SubscribeSystemAbility(int32_t systemAbilityI
     MessageParcel reply;
     MessageOption option;
     int32_t err = remote->SendRequest(SUBSCRIBE_SYSTEM_ABILITY_TRANSACTION, data, reply, option);
-
-    HILOGI("%{public}s : systemAbilityId:%{public}d: listenerName:%{public}s : %{public}s return %{public}d",
-        __func__, systemAbilityId, Str16ToStr8(listenerName).c_str(), err ? "fail" : "succ", err);
     if (err != ERR_NONE) {
         HILOGE("SubscribeSystemAbility SendRequest error:%{public}d!", err);
         return err;
     }
-
+    HILOGI("SubscribeSystemAbility SendRequest succeed!");
     int32_t result = 0;
     ret = reply.ReadInt32(result);
     if (!ret) {
@@ -634,17 +379,16 @@ int32_t SystemAbilityManagerProxy::SubscribeSystemAbility(int32_t systemAbilityI
     return result;
 }
 
-int32_t SystemAbilityManagerProxy::UnSubscribeSystemAbility(int32_t systemAbilityId, const std::u16string& listenerName)
+int32_t SystemAbilityManagerProxy::UnSubscribeSystemAbility(int32_t systemAbilityId,
+    const sptr<ISystemAbilityStatusChange>& listener)
 {
     HILOGI("%{public}s called", __func__);
-    if (!CheckInputSysAbilityId(systemAbilityId) || listenerName.empty()) {
-        HILOGE("UnSubscribeSystemAbility systemAbilityId:%{public}d or listenerName:%{public}s invalid!",
-            systemAbilityId, Str16ToStr8(listenerName).c_str());
+    if (!CheckInputSysAbilityId(systemAbilityId) || listener == nullptr) {
+        HILOGE("UnSubscribeSystemAbility systemAbilityId:%{public}d or listener invalid!", systemAbilityId);
         return ERR_INVALID_VALUE;
     }
 
-    HILOGD("UnSubscribeSystemAbility systemAbilityId:%{public}d: listenerName:%{public}s",
-        systemAbilityId, Str16ToStr8(listenerName).c_str());
+    HILOGI("UnSubscribeSystemAbility systemAbilityId:%{public}d", systemAbilityId);
 
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
@@ -662,7 +406,7 @@ int32_t SystemAbilityManagerProxy::UnSubscribeSystemAbility(int32_t systemAbilit
         return ERR_FLATTEN_OBJECT;
     }
 
-    ret = data.WriteString16(listenerName);
+    ret = data.WriteRemoteObject(listener->AsObject());
     if (!ret) {
         HILOGW("UnSubscribeSystemAbility Write listenerSaId failed!");
         return ERR_FLATTEN_OBJECT;
@@ -671,14 +415,11 @@ int32_t SystemAbilityManagerProxy::UnSubscribeSystemAbility(int32_t systemAbilit
     MessageParcel reply;
     MessageOption option;
     int32_t err = remote->SendRequest(UNSUBSCRIBE_SYSTEM_ABILITY_TRANSACTION, data, reply, option);
-
-    HILOGI("%{public}s : systemAbilityId:%{public}d: listenerName:%{public}s : %{public}s return %{public}d",
-        __func__, systemAbilityId, Str16ToStr8(listenerName).c_str(), err ? "fail" : "succ", err);
     if (err != ERR_NONE) {
         HILOGE("UnSubscribeSystemAbility SendRequest error:%{public}d!", err);
         return err;
     }
-
+    HILOGI("UnSubscribeSystemAbility SendRequest succeed!");
     int32_t result = 0;
     ret = reply.ReadInt32(result);
     if (!ret) {
@@ -686,75 +427,6 @@ int32_t SystemAbilityManagerProxy::UnSubscribeSystemAbility(int32_t systemAbilit
         return ERR_FLATTEN_OBJECT;
     }
 
-    return result;
-}
-
-const std::u16string SystemAbilityManagerProxy::CheckOnDemandSystemAbility(int32_t systemAbilityId)
-{
-    HILOGI("%{public}s called", __func__);
-    std::u16string localManagerName;
-    auto remote = Remote();
-    if (remote == nullptr) {
-        HILOGE("CheckOnDemandSystemAbility remote is nullptr !");
-        return localManagerName;
-    }
-
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return localManagerName;
-    }
-    bool ret = data.WriteInt32(systemAbilityId);
-    if (!ret) {
-        HILOGW("CheckOnDemandSystemAbility Write name failed!");
-        return localManagerName;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t err = remote->SendRequest(CHECK_ONDEMAND_SYSTEM_ABILITY_TRANSACTION, data, reply, option);
-    if (err != ERR_NONE) {
-        HILOGE("CheckOnDemandSystemAbility SendRequest error:%{public}d!", err);
-        return localManagerName;
-    }
-
-    localManagerName = reply.ReadString16();
-    if (localManagerName.empty()) {
-        HILOGW("CheckOnDemandSystemAbility localManagerName is empty!");
-    }
-    return localManagerName;
-}
-
-bool SystemAbilityManagerProxy::GetDeviceId(string& deviceId)
-{
-    HILOGI("%{public}s called", __func__);
-    sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        HILOGI("remote is nullptr !");
-        return false;
-    }
-
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return false;
-    }
-    int32_t err = remote->SendRequest(GET_LOCAL_DEVICE_ID_TRANSACTION, data, reply, option);
-    if (err != ERR_NONE) {
-        HILOGE("GetDeviceId SendRequest error:%{public}d!", err);
-        return false;
-    }
-    bool ret = reply.ReadString(deviceId);
-    if (!ret) {
-        HILOGW("GetDeviceId Read deviceId failed!");
-        return false;
-    }
-    bool result = false;
-    ret = reply.ReadBool(result);
-    if (!ret) {
-        HILOGW("GetDeviceId Read result failed!");
-        return false;
-    }
     return result;
 }
 
@@ -833,178 +505,27 @@ int32_t SystemAbilityManagerProxy::AddSystemAbilityWrapper(int32_t code, Message
     return result;
 }
 
-int32_t SystemAbilityManagerProxy::RegisterSystemReadyCallback(const sptr<IRemoteObject>& systemReadyCallback)
+int32_t SystemAbilityManagerProxy::AddSystemProcess(const u16string& procName, const sptr<IRemoteObject>& procObject)
 {
-    if (systemReadyCallback == nullptr) {
+    HILOGI("%{public}s called, process name is %{public}s", __func__, Str16ToStr8(procName).c_str());
+    if (procName.empty()) {
+        HILOGI("process name is invalid!");
         return ERR_INVALID_VALUE;
     }
+
     MessageParcel data;
     if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
         return ERR_FLATTEN_OBJECT;
     }
-    if (!data.WriteRemoteObject(systemReadyCallback)) {
-        HILOGW("RegisterSystemReadyCallback Write systemReadyCallback failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-    sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        HILOGI("remote is nullptr !");
-        return ERR_INVALID_OPERATION;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t err = remote->SendRequest(REGISTER_SYSTEM_READY_CALLBACK, data, reply, option);
-    if (err != ERR_NONE) {
-        HILOGE("RegisterSystemReadyCallback SendRequest error:%{public}d!", err);
-        return err;
-    }
-    int32_t result = 0;
-    bool ret = reply.ReadInt32(result);
-    if (!ret) {
-        HILOGE("RegisterSystemReadyCallback read result error!");
-        return ERR_FLATTEN_OBJECT;
-    }
-    return result;
-}
-
-int32_t SystemAbilityManagerProxy::GetCoreSystemAbilityList(std::vector<int32_t>& coreSaList, int dumpMode)
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return ERR_FLATTEN_OBJECT;
-    }
-    if (!data.WriteInt32(dumpMode)) {
-        return ERR_FLATTEN_OBJECT;
-    }
-    sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        HILOGI("remote is nullptr !");
-        return ERR_INVALID_OPERATION;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t err = remote->SendRequest(GET_CORE_SYSTEM_ABILITY_LIST, data, reply, option);
-    if (err != ERR_NONE) {
-        HILOGE("GetCoreSaList SendRequest error:%{public}d!", err);
-        return err;
-    }
-    int32_t result = 0;
-    bool ret = reply.ReadInt32(result);
-    if (!ret) {
-        HILOGE("GetCoreSaList read result error!");
-        return ERR_FLATTEN_OBJECT;
-    }
-    if (result == ERR_NONE && (!reply.ReadInt32Vector(&coreSaList))) {
-        HILOGE("GetCoreSaList ReadInt32Vector error!");
-        return ERR_FLATTEN_OBJECT;
-    }
-    return result;
-}
-
-int32_t SystemAbilityManagerProxy::AddSystemCapability(const std::string& sysCap)
-{
-    if (sysCap.empty() || sysCap.length() > MAX_SYSCAP_NAME_LEN) {
-        return ERR_INVALID_VALUE;
-    }
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return ERR_FLATTEN_OBJECT;
-    }
-    if (!data.WriteString16(Str8ToStr16(sysCap))) {
-        HILOGW("%{public}s Write sysCap failed!", __func__);
+    if (!data.WriteString16(procName)) {
+        HILOGW("AddSystemProcess Write name failed!");
         return ERR_FLATTEN_OBJECT;
     }
 
-    sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        HILOGI("AddSystemCapability remote is nullptr !");
-        return ERR_INVALID_OPERATION;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t err = remote->SendRequest(ADD_SYSTEM_CAPABILITY, data, reply, option);
-    if (err != ERR_NONE) {
-        HILOGE("%{public}s SendRequest error:%{public}d!", __func__, err);
-        return err;
-    }
-    int32_t result = 0;
-    bool ret = reply.ReadInt32(result);
-    if (!ret) {
-        HILOGE("%{public}s read result error!", __func__);
+    if (!data.WriteRemoteObject(procObject)) {
+        HILOGW("AddSystemProcess Write ability failed!");
         return ERR_FLATTEN_OBJECT;
     }
-    return result;
-}
-
-bool SystemAbilityManagerProxy::HasSystemCapability(const std::string& sysCap)
-{
-    if (sysCap.empty() || sysCap.length() > MAX_SYSCAP_NAME_LEN) {
-        return false;
-    }
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return false;
-    }
-    if (!data.WriteString16(Str8ToStr16(sysCap))) {
-        HILOGW("%{public}s Write sysCap failed!", __func__);
-        return false;
-    }
-
-    sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        HILOGI("HasSystemCapability remote is nullptr !");
-        return false;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t err = remote->SendRequest(HAS_SYSTEM_CAPABILITY, data, reply, option);
-    if (err != ERR_NONE) {
-        HILOGE("%{public}s SendRequest error:%{public}d!", __func__, err);
-        return false;
-    }
-    bool result = false;
-    bool ret = reply.ReadBool(result);
-    if (!ret) {
-        HILOGE("%{public}s read result error!", __func__);
-        return false;
-    }
-    return result;
-}
-
-vector<string> SystemAbilityManagerProxy::GetSystemAvailableCapabilities()
-{
-    vector<string> sysCaps;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
-        return sysCaps;
-    }
-
-    sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        HILOGI("GetSystemAvailableCapabilities remote is nullptr !");
-        return sysCaps;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t err = remote->SendRequest(GET_AVAILABLE_SYSTEM_CAPABILITY, data, reply, option);
-    if (err != ERR_NONE) {
-        HILOGE("%{public}s SendRequest error:%{public}d!", __func__, err);
-        return sysCaps;
-    }
-    vector<u16string> result;
-    bool ret = reply.ReadString16Vector(&result);
-    if (!ret) {
-        HILOGE("%{public}s read result error!", __func__);
-        return sysCaps;
-    }
-    for (const u16string& sysCap : result) {
-        sysCaps.emplace_back(Str16ToStr8(sysCap));
-    }
-    return sysCaps;
+    return AddSystemAbilityWrapper(ADD_SYSTEM_PROCESS_TRANSACTION, data);
 }
 } // namespace OHOS

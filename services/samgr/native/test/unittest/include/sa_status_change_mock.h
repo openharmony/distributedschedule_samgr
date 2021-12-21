@@ -13,5 +13,15 @@
  * limitations under the License.
  */
 
+#ifndef SAMGR_SERVICES_SAMGR_NATIVE_TEST_UNITTEST_INCLUDE_SA_STATUS_CHANGE_MOCK_H
+#define SAMGR_SERVICES_SAMGR_NATIVE_TEST_UNITTEST_INCLUDE_SA_STATUS_CHANGE_MOCK_H
+
+#include "system_ability_status_change_stub.h"
 namespace OHOS {
-} // namespace OHOS
+class SaStatusChangeMock : public SystemAbilityStatusChangeStub {
+public:
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+};
+}
+#endif /* SAMGR_SERVICES_SAMGR_NATIVE_TEST_UNITTEST_INCLUDE_SA_STATUS_CHANGE_MOCK_H */
