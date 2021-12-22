@@ -16,7 +16,6 @@
 #ifndef SERVICES_SAMGR_NATIVE_INCLUDE_SYSTEM_ABILITY_MANAGER_H_
 #define SERVICES_SAMGR_NATIVE_INCLUDE_SYSTEM_ABILITY_MANAGER_H_
 
-#include "system_ability_manager_stub.h"
 #include <map>
 #include <mutex>
 #include <set>
@@ -29,6 +28,7 @@
 #include "dbinder_service_stub.h"
 #include "sa_profiles.h"
 #include "system_ability_definition.h"
+#include "system_ability_manager_stub.h"
 
 namespace OHOS {
 struct SAInfo {
