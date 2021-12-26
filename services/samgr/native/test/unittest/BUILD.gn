@@ -56,7 +56,7 @@ ohos_unittest("SystemAbilityMgrTest") {
   ]
 
   external_deps = [
-    "appexecfwk_standard:libeventhandler",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "ipc:libdbinder",
