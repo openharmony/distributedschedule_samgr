@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -73,8 +73,7 @@ public:
 
     sptr<IRemoteObject> CheckSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
-    int32_t AddOnDemandSystemAbilityInfo(int32_t systemAbilityId,
-        const std::u16string& localAbilityManagerName) override;
+    int32_t AddOnDemandSystemAbilityInfo(int32_t systemAbilityId, const std::u16string& procName) override;
 
     sptr<IRemoteObject> CheckSystemAbility(int32_t systemAbilityId, bool& isExist) override;
 
@@ -88,13 +87,25 @@ public:
 
     int32_t AddSystemProcess(const std::u16string& procName, const sptr<IRemoteObject>& procObject) override;
     int32_t RemoveSystemProcess(const sptr<IRemoteObject>& procObject);
+
+    int32_t LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback) override;
+    void OnAbilityCallbackDied(const sptr<IRemoteObject>& remoteObject);
 private:
+    enum class AbilityState {
+        INIT,
+        STARTING,
+        STARTED,
+    };
+    struct AbilityItem {
+        AbilityState state = AbilityState::INIT;
+        std::list<std::pair<sptr<ISystemAbilityLoadCallback>, int32_t>> callbackList;
+    };
+
     SystemAbilityManager();
     std::u16string GetSystemAbilityName(int32_t index) override;
     void DoInsertSaData(const std::u16string& name, const sptr<IRemoteObject>& ability, const SAExtraProp& extraProp);
     bool IsNameInValid(const std::u16string& name);
     int32_t StartOnDemandAbility(int32_t systemAbilityId);
-    void DeleteStartingAbilityMember(int32_t systemAbilityId);
     void ParseRemoteSaName(const std::u16string& name, std::string& deviceId, std::u16string& saName);
     bool IsLocalDeviceId(const std::string& deviceId);
     bool CheckDistributedPermission();
@@ -104,7 +115,7 @@ private:
     int32_t FindSystemAbilityNotify(int32_t systemAbilityId, const std::string& deviceId, int32_t code);
 
     sptr<IRemoteObject> GetSystemProcess(const std::u16string& procName);
-    sptr<IRemoteObject> CheckLocalAbilityManager(const std::u16string& name);
+
     void InitSaProfile();
     bool GetSaProfile(int32_t saId, SaProfile& saProfile);
     void NotifySystemAbilityChanged(int32_t systemAbilityId, const std::string& deviceId, int32_t code,
@@ -112,12 +123,26 @@ private:
     void UnSubscribeSystemAbilityLocked(std::list<std::pair<sptr<ISystemAbilityStatusChange>, int32_t>>& listenerList,
         const sptr<IRemoteObject>& listener);
 
+    void SendSystemAbilityAddedMsg(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject);
+    void SendSystemAbilityRemovedMsg(int32_t systemAbilityId);
+
+    void NotifySystemAbilityLoaded(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject);
+    void NotifySystemAbilityLoaded(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject,
+        const sptr<ISystemAbilityLoadCallback>& callback);
+    int32_t StartingSystemProcess(const std::u16string& name, int32_t systemAbilityId);
+    void StartOnDemandAbility(const std::u16string& name, int32_t systemAbilityId);
+    void StartOnDemandAbilityInner(const std::u16string& name, int32_t systemAbilityId, AbilityItem& abilityItem);
+    int32_t StartDynamicSystemProcess(const std::u16string& name, int32_t systemAbilityId);
+    void RemoveStartingAbilityCallback(AbilityItem& abilityItem, const sptr<IRemoteObject>& remoteObject);
+    void RemoveStartingAbilityCallbackLocked(std::pair<sptr<ISystemAbilityLoadCallback>, int32_t>& itemPair);
+
     std::u16string deviceName_;
     static sptr<SystemAbilityManager> instance;
     static std::mutex instanceLock;
     sptr<IRemoteObject::DeathRecipient> abilityDeath_;
     sptr<IRemoteObject::DeathRecipient> systemProcessDeath_;
     sptr<IRemoteObject::DeathRecipient> abilityStatusDeath_;
+    sptr<IRemoteObject::DeathRecipient> abilityCallbackDeath_;
     sptr<DBinderService> dBinderService_;
     bool isDbinderStart_ = false;
 
@@ -125,21 +150,19 @@ private:
     std::shared_mutex abilityMapLock_;
     std::map<int32_t, SAInfo> abilityMap_;
 
-    // must hold systemProcessMapLock_ never access other locks
-    std::recursive_mutex systemProcessMapLock_;
-    std::map<std::u16string, sptr<IRemoteObject>> systemProcessMap_;
-
-    // maybe hold listenerMapLock_ and then access systemProcessMapLock_
+    // maybe hold listenerMapLock_ and then access onDemandLock_
     std::recursive_mutex listenerMapLock_;
     std::map<int32_t, std::list<std::pair<sptr<ISystemAbilityStatusChange>, int32_t>>> listenerMap_;
     std::map<int32_t, int32_t> subscribeCountMap_;
 
-    // maybe hold onDemandAbilityMapLock_ and then access systemProcessMapLock_
-    std::recursive_mutex onDemandAbilityMapLock_;
+    std::recursive_mutex onDemandLock_;
     std::map<int32_t, std::u16string> onDemandAbilityMap_;
-    std::list<int32_t> startingAbilityList_;
+    std::map<int32_t, AbilityItem> startingAbilityMap_;
+    std::map<std::u16string, sptr<IRemoteObject>> systemProcessMap_;
+    std::map<std::u16string, int64_t> startingProcessMap_;
+    std::map<int32_t, int32_t> callbackCountMap_;
 
-    std::shared_ptr<AppExecFwk::EventHandler> parseHandler_;
+    std::shared_ptr<AppExecFwk::EventHandler> workHandler_;
 
     std::map<int32_t, SaProfile> saProfileMap_;
     std::mutex saProfileMapLock_;

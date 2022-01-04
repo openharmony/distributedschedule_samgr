@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -300,7 +300,7 @@ HWTEST_F(SystemAbilityMgrTest, CheckOnDemandSystemAbility001, TestSize.Level1)
     EXPECT_TRUE(sm != nullptr);
     sm->AddSystemAbility(systemAbilityId, new TestTransactionService());
     int32_t ret = sm->AddOnDemandSystemAbilityInfo(systemAbilityId, u"test_localmanagername");
-    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_TRUE(ret != ERR_OK);
     sm->RemoveSystemAbility(systemAbilityId);
 }
 
@@ -320,7 +320,7 @@ HWTEST_F(SystemAbilityMgrTest, CheckOnDemandSystemAbility002, TestSize.Level1)
     EXPECT_EQ(result, ERR_OK);
     sptr<IRemoteObject> saObject = sm->CheckSystemAbility(systemAbilityId);
     result = sm->AddOnDemandSystemAbilityInfo(systemAbilityId, u"just_test");
-    EXPECT_EQ(result, ERR_OK);
+    EXPECT_TRUE(result != ERR_OK);
     sm->RemoveSystemAbility(systemAbilityId);
 }
 
@@ -341,5 +341,340 @@ HWTEST_F(SystemAbilityMgrTest, ListSystemAbility001, TestSize.Level1)
     auto iter = std::find(saList.begin(), saList.end(), to_utf16(std::to_string(systemAbilityId)));
     EXPECT_TRUE(iter != saList.end());
     sm->RemoveSystemAbility(systemAbilityId);
+}
+
+/**
+ * @tc.name: LoadSystemAbility001
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility001, TestSize.Level0)
+{
+    int32_t systemAbilityId = TEST_EXCEPTION_LOW_SA_ID;
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_TRUE(sm != nullptr);
+    int32_t result = sm->LoadSystemAbility(systemAbilityId, nullptr);
+    EXPECT_TRUE(result != ERR_OK);
+}
+
+/**
+ * @tc.name: LoadSystemAbility002
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility002, TestSize.Level0)
+{
+    int32_t systemAbilityId = TEST_EXCEPTION_HIGH_SA_ID;
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_TRUE(sm != nullptr);
+    int32_t result = sm->LoadSystemAbility(systemAbilityId, nullptr);
+    EXPECT_TRUE(result != ERR_OK);
+}
+
+/**
+ * @tc.name: LoadSystemAbility003
+ * @tc.desc: load system ability with invalid callback.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility003, TestSize.Level0)
+{
+    int32_t systemAbilityId = DISTRIBUTED_SCHED_TEST_SO_ID;
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_TRUE(sm != nullptr);
+    int32_t result = sm->LoadSystemAbility(systemAbilityId, nullptr);
+    EXPECT_TRUE(result != ERR_OK);
+}
+
+/**
+ * @tc.name: LoadSystemAbility004
+ * @tc.desc: load system ability with not exist systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility004, TestSize.Level0)
+{
+    int32_t systemAbilityId = DISTRIBUTED_SCHED_TEST_SO_ID;
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_TRUE(sm != nullptr);
+    sptr<ISystemAbilityLoadCallback> callback = new SystemAbilityLoadCallbackMock();
+    int32_t result = sm->LoadSystemAbility(systemAbilityId, callback);
+    EXPECT_TRUE(result != ERR_OK);
+}
+
+/**
+ * @tc.name: LoadSystemAbility005
+ * @tc.desc: test OnRemoteRequest, invalid interface token.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility005, TestSize.Level1)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t result = saMgr->OnRemoteRequest(ISystemAbilityManager::LOAD_SYSTEM_ABILITY_TRANSACTION,
+        data, reply, option);
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: LoadSystemAbility006
+ * @tc.desc: test OnRemoteRequest, invalid systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility006, TestSize.Level1)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    MessageParcel data;
+    data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t result = saMgr->OnRemoteRequest(ISystemAbilityManager::LOAD_SYSTEM_ABILITY_TRANSACTION,
+        data, reply, option);
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: LoadSystemAbility007
+ * @tc.desc: test OnRemoteRequest, invalid systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility007, TestSize.Level1)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    MessageParcel data;
+    data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN);
+    data.WriteInt32(TEST_EXCEPTION_HIGH_SA_ID);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t result = saMgr->OnRemoteRequest(ISystemAbilityManager::LOAD_SYSTEM_ABILITY_TRANSACTION,
+        data, reply, option);
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: LoadSystemAbility008
+ * @tc.desc: test OnRemoteRequest, null callback.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility008, TestSize.Level1)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    MessageParcel data;
+    data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN);
+    data.WriteInt32(DISTRIBUTED_SCHED_TEST_SO_ID);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t result = saMgr->OnRemoteRequest(ISystemAbilityManager::LOAD_SYSTEM_ABILITY_TRANSACTION,
+        data, reply, option);
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: LoadSystemAbility009
+ * @tc.desc: test OnRemoteRequest, not exist systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility009, TestSize.Level1)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    MessageParcel data;
+    data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN);
+    data.WriteInt32(DISTRIBUTED_SCHED_TEST_SO_ID);
+    sptr<ISystemAbilityLoadCallback> callback = new SystemAbilityLoadCallbackMock();
+    data.WriteRemoteObject(callback->AsObject());
+    MessageParcel reply;
+    MessageOption option;
+    int32_t result = saMgr->OnRemoteRequest(ISystemAbilityManager::LOAD_SYSTEM_ABILITY_TRANSACTION,
+        data, reply, option);
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: OnRemoteDied001
+ * @tc.desc: test OnRemoteDied, remove registered callback.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, OnRemoteDied001, TestSize.Level1)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    sptr<ISystemAbilityLoadCallback> callback = new SystemAbilityLoadCallbackMock();
+    saMgr->OnAbilityCallbackDied(callback->AsObject());
+    EXPECT_TRUE(saMgr->startingAbilityMap_.empty());
+}
+
+/**
+ * @tc.name: StartOnDemandAbility001
+ * @tc.desc: test StartOnDemandAbility, invalid systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility001, TestSize.Level0)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    int32_t result = saMgr->StartOnDemandAbility(TEST_EXCEPTION_LOW_SA_ID);
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: StartOnDemandAbility002
+ * @tc.desc: test StartOnDemandAbility, invalid systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility002, TestSize.Level0)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    int32_t result = saMgr->StartOnDemandAbility(TEST_EXCEPTION_HIGH_SA_ID);
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: StartOnDemandAbility003
+ * @tc.desc: test StartOnDemandAbility, not exist systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility003, TestSize.Level0)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    int32_t result = saMgr->StartOnDemandAbility(DISTRIBUTED_SCHED_TEST_SO_ID);
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: StartOnDemandAbility004
+ * @tc.desc: test StartOnDemandAbility, not on-demand systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility004, TestSize.Level0)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    int32_t result = saMgr->StartOnDemandAbility(DISTRIBUTED_SCHED_SA_ID);
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: AddOnDemandSystemAbilityInfo001
+ * @tc.desc: test AddOnDemandSystemAbilityInfo, invalid systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo001, TestSize.Level0)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    int32_t result = saMgr->AddOnDemandSystemAbilityInfo(TEST_EXCEPTION_LOW_SA_ID, u"");
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: AddOnDemandSystemAbilityInfo002
+ * @tc.desc: test AddOnDemandSystemAbilityInfo, invalid systemAbilityId.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo002, TestSize.Level0)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    int32_t result = saMgr->AddOnDemandSystemAbilityInfo(TEST_EXCEPTION_HIGH_SA_ID, u"");
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: AddOnDemandSystemAbilityInfo003
+ * @tc.desc: test AddOnDemandSystemAbilityInfo, invalid procName.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo003, TestSize.Level0)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    int32_t result = saMgr->AddOnDemandSystemAbilityInfo(DISTRIBUTED_SCHED_TEST_SO_ID, u"");
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: AddOnDemandSystemAbilityInfo004
+ * @tc.desc: test AddOnDemandSystemAbilityInfo, procName not registered.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo004, TestSize.Level0)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    int32_t result = saMgr->AddOnDemandSystemAbilityInfo(DISTRIBUTED_SCHED_TEST_SO_ID, u"fake_process_name");
+    EXPECT_TRUE(result != ERR_NONE);
+}
+
+/**
+ * @tc.name: OnLoadSystemAbilitySuccess001
+ * @tc.desc: test OnLoadSystemAbilitySuccess, null callback.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, OnLoadSystemAbilitySuccess001, TestSize.Level1)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    sptr<SystemAbilityLoadCallbackMock> callback = new SystemAbilityLoadCallbackMock();
+    saMgr->NotifySystemAbilityLoaded(DISTRIBUTED_SCHED_TEST_SO_ID, nullptr, nullptr);
+    EXPECT_TRUE(callback->GetSystemAbilityId() == 0);
+}
+
+/**
+ * @tc.name: OnLoadSystemAbilitySuccess002
+ * @tc.desc: test OnLoadSystemAbilitySuccess, null IRemoteObject.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, OnLoadSystemAbilitySuccess002, TestSize.Level1)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    sptr<SystemAbilityLoadCallbackMock> callback = new SystemAbilityLoadCallbackMock();
+    saMgr->NotifySystemAbilityLoaded(DISTRIBUTED_SCHED_TEST_SO_ID, nullptr, callback);
+    EXPECT_TRUE(callback->GetSystemAbilityId() == DISTRIBUTED_SCHED_TEST_SO_ID);
+    EXPECT_TRUE(callback->GetRemoteObject() == nullptr);
+}
+
+/**
+ * @tc.name: OnLoadSystemAbilitySuccess003
+ * @tc.desc: test OnLoadSystemAbilitySuccess.
+ * @tc.type: FUNC
+ * @tc.require: #I4OH9B
+ */
+HWTEST_F(SystemAbilityMgrTest, OnLoadSystemAbilitySuccess003, TestSize.Level1)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    EXPECT_TRUE(saMgr != nullptr);
+    sptr<SystemAbilityLoadCallbackMock> callback = new SystemAbilityLoadCallbackMock();
+    sptr<IRemoteObject> remoteObject = new TestTransactionService();
+    saMgr->NotifySystemAbilityLoaded(DISTRIBUTED_SCHED_TEST_SO_ID, remoteObject, callback);
+    EXPECT_TRUE(callback->GetSystemAbilityId() == DISTRIBUTED_SCHED_TEST_SO_ID);
+    EXPECT_TRUE(callback->GetRemoteObject() == remoteObject);
 }
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #include "iremote_broker.h"
 #include "iremote_object.h"
 #include "iremote_proxy.h"
+#include "isystem_ability_load_callback.h"
 #include "isystem_ability_status_change.h"
 
 namespace OHOS {
@@ -54,6 +55,7 @@ public:
         REMOVE_SYSTEM_ABILITY_TRANSACTION = 4,
         LIST_SYSTEM_ABILITY_TRANSACTION = 5,
         SUBSCRIBE_SYSTEM_ABILITY_TRANSACTION = 6,
+        LOAD_SYSTEM_ABILITY_TRANSACTION = 7,
         CHECK_REMOTE_SYSTEM_ABILITY_TRANSACTION = 9,
         ADD_ONDEMAND_SYSTEM_ABILITY_TRANSACTION = 10,
         CHECK_SYSTEM_ABILITY_IMMEDIATELY_TRANSACTION = 12,
@@ -111,6 +113,7 @@ public:
         const SAExtraProp& extraProp = SAExtraProp(false, DUMP_FLAG_PRIORITY_DEFAULT, u"", u"")) = 0;
 
     virtual int32_t AddSystemProcess(const std::u16string& procName, const sptr<IRemoteObject>& procObject) = 0;
+    virtual int32_t LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback) = 0;
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.ISystemAbilityManager");
 protected:

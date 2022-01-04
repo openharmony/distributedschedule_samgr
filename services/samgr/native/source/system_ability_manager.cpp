@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,14 +23,13 @@
 #include "directory_ex.h"
 #include "errors.h"
 #include "if_local_ability_manager.h"
+#include "ipc_skeleton.h"
 #include "local_ability_manager_proxy.h"
 #include "parse_util.h"
-
 #include "sam_log.h"
+#include "service_control.h"
 #include "string_ex.h"
-#include "ipc_skeleton.h"
 #include "system_ability_definition.h"
-
 #include "tools.h"
 
 using namespace std;
@@ -63,9 +62,10 @@ void SystemAbilityManager::Init()
     abilityDeath_ = sptr<IRemoteObject::DeathRecipient>(new AbilityDeathRecipient());
     systemProcessDeath_ = sptr<IRemoteObject::DeathRecipient>(new SystemProcessDeathRecipient());
     abilityStatusDeath_ = sptr<IRemoteObject::DeathRecipient>(new AbilityStatusDeathRecipient());
-    if (parseHandler_ == nullptr) {
-        auto parseRunner = AppExecFwk::EventRunner::Create("ParseHandler");
-        parseHandler_ = make_shared<AppExecFwk::EventHandler>(parseRunner);
+    abilityCallbackDeath_ = sptr<IRemoteObject::DeathRecipient>(new AbilityCallbackDeathRecipient());
+    if (workHandler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create("workHandler");
+        workHandler_ = make_shared<AppExecFwk::EventHandler>(runner);
     }
     InitSaProfile();
 }
@@ -86,7 +86,7 @@ sptr<SystemAbilityManager> SystemAbilityManager::GetInstance()
 
 void SystemAbilityManager::InitSaProfile()
 {
-    if (parseHandler_ == nullptr) {
+    if (workHandler_ == nullptr) {
         HILOGE("InitSaProfile parseHandler_ not init!");
         return;
     }
@@ -110,7 +110,7 @@ void SystemAbilityManager::InitSaProfile()
         }
         HILOGI("[PerformanceTest] InitSaProfile spend %{public}" PRId64 " ms", GetTickCount() - begin);
     };
-    bool ret = parseHandler_->PostTask(callback);
+    bool ret = workHandler_->PostTask(callback);
     if (!ret) {
         HILOGW("SystemAbilityManager::InitSaProfile PostTask fail");
     }
@@ -235,16 +235,43 @@ bool SystemAbilityManager::IsNameInValid(const std::u16string& name)
     return ret;
 }
 
+void SystemAbilityManager::StartOnDemandAbility(const std::u16string& procName, int32_t systemAbilityId)
+{
+    lock_guard<recursive_mutex> autoLock(onDemandLock_);
+    auto iter = startingAbilityMap_.find(systemAbilityId);
+    if (iter == startingAbilityMap_.end()) {
+        return;
+    }
+    auto& abilityItem = iter->second;
+    StartOnDemandAbilityInner(procName, systemAbilityId, abilityItem);
+}
+
+void SystemAbilityManager::StartOnDemandAbilityInner(const std::u16string& procName, int32_t systemAbilityId,
+    AbilityItem& abilityItem)
+{
+    if (abilityItem.state != AbilityState::INIT) {
+        return;
+    }
+    sptr<ILocalAbilityManager> procObject =
+        iface_cast<ILocalAbilityManager>(GetSystemProcess(procName));
+    if (procObject == nullptr) {
+        HILOGI("get process:%{public}s fail", Str16ToStr8(procName).c_str());
+        return;
+    }
+    procObject->StartAbility(systemAbilityId);
+    abilityItem.state = AbilityState::STARTING;
+}
+
 int32_t SystemAbilityManager::AddOnDemandSystemAbilityInfo(int32_t systemAbilityId,
-    const std::u16string& localAbilityManagerName)
+    const std::u16string& procName)
 {
     HILOGI("%{public}s called", __func__);
-    if (!CheckInputSysAbilityId(systemAbilityId) || IsNameInValid(localAbilityManagerName)) {
-        HILOGI("var is invalid.");
+    if (!CheckInputSysAbilityId(systemAbilityId) || IsNameInValid(procName)) {
+        HILOGW("AddOnDemandSystemAbilityInfo systemAbilityId or procName invalid.");
         return ERR_INVALID_VALUE;
     }
 
-    lock_guard<recursive_mutex> autoLock(onDemandAbilityMapLock_);
+    lock_guard<recursive_mutex> autoLock(onDemandLock_);
     auto onDemandSaSize = onDemandAbilityMap_.size();
     if (onDemandSaSize >= MAX_SERVICES) {
         HILOGE("map size error, (Has been greater than %{public}zu)",
@@ -252,30 +279,39 @@ int32_t SystemAbilityManager::AddOnDemandSystemAbilityInfo(int32_t systemAbility
         return ERR_INVALID_VALUE;
     }
 
-    onDemandAbilityMap_[systemAbilityId] = localAbilityManagerName;
-    HILOGI("insert %{public}d. size : %{public}zu", systemAbilityId, onDemandAbilityMap_.size());
+    if (systemProcessMap_.count(procName) == 0) {
+        HILOGW("AddOnDemandSystemAbilityInfo procName:%{public}s not exist.", Str16ToStr8(procName).c_str());
+        return ERR_INVALID_VALUE;
+    }
+    onDemandAbilityMap_[systemAbilityId] = procName;
+    HILOGI("insert onDemand systemAbilityId:%{public}d. size : %{public}zu", systemAbilityId,
+        onDemandAbilityMap_.size());
+    if (startingAbilityMap_.count(systemAbilityId) != 0) {
+        if (workHandler_ != nullptr) {
+            auto pendingTask = [procName, systemAbilityId, this] () {
+                StartOnDemandAbility(procName, systemAbilityId);
+            };
+            bool ret = workHandler_->PostTask(pendingTask);
+            if (!ret) {
+                HILOGW("AddOnDemandSystemAbilityInfo PostTask failed!");
+            }
+        }
+    }
     return ERR_OK;
 }
 
 int32_t SystemAbilityManager::StartOnDemandAbility(int32_t systemAbilityId)
 {
     HILOGI("%{public}s called, systemAbilityId is %{public}d", __func__, systemAbilityId);
-    lock_guard<recursive_mutex> onDemandAbilityLock(onDemandAbilityMapLock_);
+    lock_guard<recursive_mutex> onDemandAbilityLock(onDemandLock_);
     auto iter = onDemandAbilityMap_.find(systemAbilityId);
-    if (iter != onDemandAbilityMap_.end()) {
-        HILOGI("found onDemandAbility: %{public}d.", systemAbilityId);
-        sptr<ILocalAbilityManager> procObject =
-            iface_cast<ILocalAbilityManager>(GetSystemProcess(iter->second));
-        if (procObject == nullptr) {
-            HILOGI("get process:%{public}s fail", Str16ToStr8(iter->second).c_str());
-            return ERR_OK;
-        }
-        procObject->StartAbility(systemAbilityId);
-        startingAbilityList_.emplace_back(systemAbilityId);
-        return ERR_OK;
+    if (iter == onDemandAbilityMap_.end()) {
+        return ERR_INVALID_VALUE;
     }
-
-    return ERR_INVALID_VALUE;
+    HILOGI("found onDemandAbility: %{public}d.", systemAbilityId);
+    AbilityItem& abilityItem = startingAbilityMap_[systemAbilityId];
+    StartOnDemandAbilityInner(iter->second, systemAbilityId, abilityItem);
+    return ERR_OK;
 }
 
 sptr<IRemoteObject> SystemAbilityManager::CheckSystemAbility(int32_t systemAbilityId, bool& isExist)
@@ -285,14 +321,11 @@ sptr<IRemoteObject> SystemAbilityManager::CheckSystemAbility(int32_t systemAbili
     }
     sptr<IRemoteObject> abilityProxy = CheckSystemAbility(systemAbilityId);
     if (abilityProxy == nullptr) {
-        {
-            lock_guard<recursive_mutex> autoLock(onDemandAbilityMapLock_);
-            for (int32_t startingAbilityId : startingAbilityList_) {
-                if (startingAbilityId == systemAbilityId) {
-                    isExist = true;
-                    return nullptr;
-                }
-            }
+        lock_guard<recursive_mutex> autoLock(onDemandLock_);
+        auto iter = startingAbilityMap_.find(systemAbilityId);
+        if (iter != startingAbilityMap_.end() && iter->second.state == AbilityState::STARTING) {
+            isExist = true;
+            return nullptr;
         }
 
         int32_t ret = StartOnDemandAbility(systemAbilityId);
@@ -308,21 +341,6 @@ sptr<IRemoteObject> SystemAbilityManager::CheckSystemAbility(int32_t systemAbili
 
     isExist = true;
     return abilityProxy;
-}
-
-void SystemAbilityManager::DeleteStartingAbilityMember(int32_t systemAbilityId)
-{
-    if (!CheckInputSysAbilityId(systemAbilityId)) {
-        return;
-    }
-    lock_guard<recursive_mutex> autoLock(onDemandAbilityMapLock_);
-    for (auto iter = startingAbilityList_.begin(); iter != startingAbilityList_.end();) {
-        if (*iter == systemAbilityId) {
-            iter = startingAbilityList_.erase(iter);
-        } else {
-            ++iter;
-        }
-    }
 }
 
 int32_t SystemAbilityManager::RemoveSystemAbility(int32_t systemAbilityId)
@@ -347,9 +365,7 @@ int32_t SystemAbilityManager::RemoveSystemAbility(int32_t systemAbilityId)
         HILOGI("%s called, systemAbilityId : %{public}d, size : %{public}zu", __func__, systemAbilityId,
             abilityMap_.size());
     }
-
-    FindSystemAbilityNotify(systemAbilityId, REMOVE_SYSTEM_ABILITY_TRANSACTION);
-    DeleteStartingAbilityMember(systemAbilityId);
+    SendSystemAbilityRemovedMsg(systemAbilityId);
     return ERR_OK;
 }
 
@@ -379,8 +395,7 @@ int32_t SystemAbilityManager::RemoveSystemAbility(const sptr<IRemoteObject>& abi
     }
 
     if (saId != 0) {
-        FindSystemAbilityNotify(saId, REMOVE_SYSTEM_ABILITY_TRANSACTION);
-        DeleteStartingAbilityMember(saId);
+        SendSystemAbilityRemovedMsg(saId);
     }
     return ERR_OK;
 }
@@ -572,7 +587,7 @@ int32_t SystemAbilityManager::AddSystemAbility(int32_t systemAbilityId, const sp
     if (abilityDeath_ != nullptr) {
         ability->AddDeathRecipient(abilityDeath_);
     }
-    FindSystemAbilityNotify(systemAbilityId, ADD_SYSTEM_ABILITY_TRANSACTION);
+
     u16string strName = Str8ToStr16(to_string(systemAbilityId));
     if (extraProp.isDistributed && dBinderService_ != nullptr) {
         dBinderService_->RegisterRemoteProxy(strName, systemAbilityId);
@@ -585,6 +600,7 @@ int32_t SystemAbilityManager::AddSystemAbility(int32_t systemAbilityId, const sp
             isDbinderStart_ = true;
         }
     }
+    SendSystemAbilityAddedMsg(systemAbilityId, ability);
     return ERR_OK;
 }
 
@@ -596,7 +612,7 @@ int32_t SystemAbilityManager::AddSystemProcess(const u16string& procName,
         return ERR_INVALID_VALUE;
     }
 
-    lock_guard<recursive_mutex> autoLock(systemProcessMapLock_);
+    lock_guard<recursive_mutex> autoLock(onDemandLock_);
     size_t procNum = systemProcessMap_.size();
     if (procNum >= MAX_SERVICES) {
         HILOGE("AddSystemProcess map size reach MAX_SERVICES already");
@@ -609,6 +625,13 @@ int32_t SystemAbilityManager::AddSystemProcess(const u16string& procName,
     }
     HILOGI("AddSystemProcess insert %{public}s. size : %{public}zu", Str16ToStr8(procName).c_str(),
         systemProcessMap_.size());
+    auto iterStarting = startingProcessMap_.find(procName);
+    if (iterStarting != startingProcessMap_.end()) {
+        int64_t end = GetTickCount();
+        HILOGI("[PerformanceTest] AddSystemProcess start process:%{public}s spend %{public}" PRId64 " ms",
+            Str16ToStr8(procName).c_str(), (end - iterStarting->second));
+        startingProcessMap_.erase(iterStarting);
+    }
     return ERR_OK;
 }
 
@@ -620,7 +643,7 @@ int32_t SystemAbilityManager::RemoveSystemProcess(const sptr<IRemoteObject>& pro
         return ERR_INVALID_VALUE;
     }
 
-    lock_guard<recursive_mutex> autoLock(systemProcessMapLock_);
+    lock_guard<recursive_mutex> autoLock(onDemandLock_);
     for (const auto& [procName, object] : systemProcessMap_) {
         if (object == procObject) {
             if (systemProcessDeath_ != nullptr) {
@@ -643,7 +666,7 @@ sptr<IRemoteObject> SystemAbilityManager::GetSystemProcess(const u16string& proc
         return nullptr;
     }
 
-    lock_guard<recursive_mutex> autoLock(systemProcessMapLock_);
+    lock_guard<recursive_mutex> autoLock(onDemandLock_);
     auto iter = systemProcessMap_.find(procName);
     if (iter != systemProcessMap_.end()) {
         HILOGI("process:%{public}s found", Str16ToStr8(procName).c_str());
@@ -651,6 +674,190 @@ sptr<IRemoteObject> SystemAbilityManager::GetSystemProcess(const u16string& proc
     }
     HILOGE("process:%{public}s not exist", Str16ToStr8(procName).c_str());
     return nullptr;
+}
+
+void SystemAbilityManager::SendSystemAbilityAddedMsg(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject)
+{
+    if (workHandler_ == nullptr) {
+        HILOGE("SendSystemAbilityAddedMsg work handler not initialized!");
+        return;
+    }
+    auto notifyAddedTask = [systemAbilityId, remoteObject, this]() {
+        FindSystemAbilityNotify(systemAbilityId, ADD_SYSTEM_ABILITY_TRANSACTION);
+        NotifySystemAbilityLoaded(systemAbilityId, remoteObject);
+    };
+    bool ret = workHandler_->PostTask(notifyAddedTask);
+    if (!ret) {
+        HILOGW("SendSystemAbilityAddedMsg PostTask failed!");
+    }
+}
+
+void SystemAbilityManager::SendSystemAbilityRemovedMsg(int32_t systemAbilityId)
+{
+    if (workHandler_ == nullptr) {
+        HILOGE("SendSystemAbilityRemovedMsg work handler not initialized!");
+        return;
+    }
+    auto notifyRemovedTask = [systemAbilityId, this]() {
+        FindSystemAbilityNotify(systemAbilityId, REMOVE_SYSTEM_ABILITY_TRANSACTION);
+    };
+    bool ret = workHandler_->PostTask(notifyRemovedTask);
+    if (!ret) {
+        HILOGW("SendSystemAbilityRemovedMsg PostTask failed!");
+    }
+}
+
+void SystemAbilityManager::NotifySystemAbilityLoaded(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject,
+    const sptr<ISystemAbilityLoadCallback>& callback)
+{
+    if (callback == nullptr) {
+        HILOGE("NotifySystemAbilityLoaded callback null!");
+        return;
+    }
+    callback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
+}
+
+void SystemAbilityManager::NotifySystemAbilityLoaded(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject)
+{
+    lock_guard<recursive_mutex> autoLock(onDemandLock_);
+    auto iter = startingAbilityMap_.find(systemAbilityId);
+    if (iter == startingAbilityMap_.end()) {
+        return;
+    }
+    auto& abilityItem = iter->second;
+    for (auto& callbackItem : abilityItem.callbackList) {
+        NotifySystemAbilityLoaded(systemAbilityId, remoteObject, callbackItem.first);
+        RemoveStartingAbilityCallbackLocked(callbackItem);
+    }
+    startingAbilityMap_.erase(iter);
+}
+
+int32_t SystemAbilityManager::StartDynamicSystemProcess(const std::u16string& name, int32_t systemAbilityId)
+{
+    std::string strExtra = std::to_string(systemAbilityId);
+    auto extraArgv = strExtra.c_str();
+    auto result = ServiceControlWithExtra(Str16ToStr8(name).c_str(), START, &extraArgv, 1);
+    HILOGI("StartDynamicSystemProcess call ServiceControlWithExtra result:%{public}d!", result);
+    if (result == 0) {
+        return ERR_OK;
+    }
+    return ERR_INVALID_VALUE;
+}
+
+int32_t SystemAbilityManager::StartingSystemProcess(const std::u16string& procName, int32_t systemAbilityId)
+{
+    lock_guard<recursive_mutex> autoLock(onDemandLock_);
+    if (startingProcessMap_.count(procName) != 0) {
+        HILOGI("StartingSystemProcess process:%{public}s already starting!", Str16ToStr8(procName).c_str());
+        return ERR_OK;
+    }
+    auto iter = systemProcessMap_.find(procName);
+    if (iter != systemProcessMap_.end()) {
+        StartOnDemandAbility(systemAbilityId);
+        return ERR_OK;
+    }
+    // call init start process
+    int64_t begin = GetTickCount();
+    int32_t result = StartDynamicSystemProcess(procName, systemAbilityId);
+    if (result == ERR_OK) {
+        startingProcessMap_.emplace(procName, begin);
+    }
+    return result;
+}
+
+int32_t SystemAbilityManager::LoadSystemAbility(int32_t systemAbilityId,
+    const sptr<ISystemAbilityLoadCallback>& callback)
+{
+    if (!CheckInputSysAbilityId(systemAbilityId) || callback == nullptr) {
+        HILOGW("LoadSystemAbility systemAbilityId or callback invalid!");
+        return ERR_INVALID_VALUE;
+    }
+    SaProfile saProfile;
+    bool ret = GetSaProfile(systemAbilityId, saProfile);
+    if (!ret) {
+        HILOGE("LoadSystemAbility systemAbilityId:%{public}d not supported!", systemAbilityId);
+        return ERR_INVALID_VALUE;
+    }
+
+    sptr<IRemoteObject> targetObject = CheckSystemAbility(systemAbilityId);
+    if (targetObject != nullptr) {
+        NotifySystemAbilityLoaded(systemAbilityId, targetObject, callback);
+        return ERR_OK;
+    }
+
+    auto callingPid = IPCSkeleton::GetCallingPid();
+    lock_guard<recursive_mutex> autoLock(onDemandLock_);
+    auto& abilityItem = startingAbilityMap_[systemAbilityId];
+    for (const auto& itemCallback : abilityItem.callbackList) {
+        if (callback->AsObject() == itemCallback.first->AsObject()) {
+            HILOGI("LoadSystemAbility already existed callback object systemAbilityId:%{public}d", systemAbilityId);
+            return ERR_OK;
+        }
+    }
+    auto& count = callbackCountMap_[callingPid];
+    if (count >= MAX_SUBSCRIBE_COUNT) {
+        HILOGE("LoadSystemAbility pid:%{public}d overflow max callback count!", callingPid);
+        return ERR_PERMISSION_DENIED;
+    }
+    ++count;
+    abilityItem.callbackList.emplace_back(callback, callingPid);
+    if (abilityCallbackDeath_ != nullptr) {
+        bool ret = callback->AsObject()->AddDeathRecipient(abilityCallbackDeath_);
+        HILOGI("LoadSystemAbility systemAbilityId:%{public}d AddDeathRecipient %{public}s",
+            systemAbilityId, ret ? "succeed" : "failed");
+    }
+    int32_t result = StartingSystemProcess(saProfile.process, systemAbilityId);
+    HILOGI("LoadSystemAbility systemAbilityId:%{public}d size : %{public}zu",
+        systemAbilityId, abilityItem.callbackList.size());
+    return result;
+}
+
+void SystemAbilityManager::RemoveStartingAbilityCallbackLocked(
+    std::pair<sptr<ISystemAbilityLoadCallback>, int32_t>& itemPair)
+{
+    if (abilityCallbackDeath_ != nullptr) {
+        itemPair.first->AsObject()->RemoveDeathRecipient(abilityCallbackDeath_);
+    }
+    auto iterCount = callbackCountMap_.find(itemPair.second);
+    if (iterCount != callbackCountMap_.end()) {
+        --iterCount->second;
+        if (iterCount->second == 0) {
+            callbackCountMap_.erase(iterCount);
+        }
+    }
+}
+
+void SystemAbilityManager::RemoveStartingAbilityCallback(AbilityItem& abilityItem,
+    const sptr<IRemoteObject>& remoteObject)
+{
+    auto& callbacks = abilityItem.callbackList;
+    auto iterCallback = callbacks.begin();
+    while (iterCallback != callbacks.end()) {
+        auto& callbackPair = *iterCallback;
+        if (callbackPair.first->AsObject() == remoteObject) {
+            RemoveStartingAbilityCallbackLocked(callbackPair);
+            iterCallback = callbacks.erase(iterCallback);
+            break;
+        } else {
+            ++iterCallback;
+        }
+    }
+}
+
+void SystemAbilityManager::OnAbilityCallbackDied(const sptr<IRemoteObject>& remoteObject)
+{
+    HILOGI("OnAbilityCallbackDied received remoteObject died message!");
+    lock_guard<recursive_mutex> autoLock(onDemandLock_);
+    auto iter = startingAbilityMap_.begin();
+    while (iter != startingAbilityMap_.end()) {
+        AbilityItem& abilityItem = iter->second;
+        RemoveStartingAbilityCallback(abilityItem, remoteObject);
+        if (abilityItem.callbackList.empty()) {
+            iter = startingAbilityMap_.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
 }
 
 std::string SystemAbilityManager::TransformDeviceId(const std::string& deviceId, int32_t type, bool isPrivate)

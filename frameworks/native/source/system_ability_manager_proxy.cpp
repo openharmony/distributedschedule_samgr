@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -427,6 +427,54 @@ int32_t SystemAbilityManagerProxy::UnSubscribeSystemAbility(int32_t systemAbilit
         return ERR_FLATTEN_OBJECT;
     }
 
+    return result;
+}
+
+int32_t SystemAbilityManagerProxy::LoadSystemAbility(int32_t systemAbilityId,
+    const sptr<ISystemAbilityLoadCallback>& callback)
+{
+    if (!CheckInputSysAbilityId(systemAbilityId) || callback == nullptr) {
+        HILOGE("LoadSystemAbility systemAbilityId:%{public}d or callback invalid!", systemAbilityId);
+        return ERR_INVALID_VALUE;
+    }
+
+    HILOGI("LoadSystemAbility systemAbilityId:%{public}d", systemAbilityId);
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        HILOGE("LoadSystemAbility remote is null!");
+        return ERR_INVALID_OPERATION;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
+        HILOGW("LoadSystemAbility Write interface token failed!");
+        return ERR_FLATTEN_OBJECT;
+    }
+    bool ret = data.WriteInt32(systemAbilityId);
+    if (!ret) {
+        HILOGW("LoadSystemAbility Write systemAbilityId failed!");
+        return ERR_FLATTEN_OBJECT;
+    }
+    ret = data.WriteRemoteObject(callback->AsObject());
+    if (!ret) {
+        HILOGW("LoadSystemAbility Write callback failed!");
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = remote->SendRequest(LOAD_SYSTEM_ABILITY_TRANSACTION, data, reply, option);
+    if (err != ERR_NONE) {
+        HILOGE("LoadSystemAbility SendRequest error:%{public}d!", err);
+        return err;
+    }
+    HILOGI("LoadSystemAbility SendRequest succeed!");
+    int32_t result = 0;
+    ret = reply.ReadInt32(result);
+    if (!ret) {
+        HILOGW("LoadSystemAbility Read reply failed!");
+        return ERR_FLATTEN_OBJECT;
+    }
     return result;
 }
 

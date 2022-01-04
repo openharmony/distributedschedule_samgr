@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,6 +55,8 @@ SystemAbilityManagerStub::SystemAbilityManagerStub()
         &SystemAbilityManagerStub::UnSubsSystemAbilityInner;
     memberFuncMap_[ADD_SYSTEM_PROCESS_TRANSACTION] =
         &SystemAbilityManagerStub::AddSystemProcessInner;
+    memberFuncMap_[LOAD_SYSTEM_ABILITY_TRANSACTION] =
+        &SystemAbilityManagerStub::LoadSystemAbilityInner;
 }
 int32_t SystemAbilityManagerStub::OnRemoteRequest(uint32_t code,
     MessageParcel& data, MessageParcel& reply, MessageOption &option)
@@ -417,6 +419,33 @@ int32_t SystemAbilityManagerStub::AddSystemProcessInner(MessageParcel& data, Mes
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGW("SystemAbilityManagerStub::AddSystemProcessInner write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return result;
+}
+
+int32_t SystemAbilityManagerStub::LoadSystemAbilityInner(MessageParcel& data, MessageParcel& reply)
+{
+    int32_t systemAbilityId = data.ReadInt32();
+    if (!CheckInputSysAbilityId(systemAbilityId)) {
+        HILOGW("SystemAbilityManagerStub::LoadSystemAbilityInner read systemAbilityId failed!");
+        return ERR_INVALID_VALUE;
+    }
+    sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
+    if (remoteObject == nullptr) {
+        HILOGW("SystemAbilityManagerStub::LoadSystemAbilityInner read callback failed!");
+        return ERR_INVALID_VALUE;
+    }
+    sptr<ISystemAbilityLoadCallback> callback = iface_cast<ISystemAbilityLoadCallback>(remoteObject);
+    if (callback == nullptr) {
+        HILOGW("SystemAbilityManagerStub::LoadSystemAbilityInner iface_cast failed!");
+        return ERR_INVALID_VALUE;
+    }
+    int32_t result = LoadSystemAbility(systemAbilityId, callback);
+    HILOGI("SystemAbilityManagerStub::LoadSystemAbilityInner result is %{public}d", result);
+    bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        HILOGW("SystemAbilityManagerStub::LoadSystemAbilityInner write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
     return result;
