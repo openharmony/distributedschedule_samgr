@@ -19,7 +19,10 @@ samgr_services_dir = "${samgr_dir}/services/samgr/native"
 
 config("sam_test_config") {
   visibility = [ ":*" ]
-  include_dirs = [ "${samgr_services_dir}/test/unittest/include" ]
+  include_dirs = [
+    "${samgr_services_dir}/test/unittest/include",
+    "//utils/system/safwk/native/include",
+    ]
 }
 
 ohos_unittest("SystemAbilityMgrTest") {
