@@ -88,7 +88,7 @@ sptr<IRemoteObject> SystemAbilityManagerProxy::CheckSystemAbilityWrapper(int32_t
     MessageOption option;
     int32_t err = remote->SendRequest(code, data, reply, option);
     if (err != ERR_NONE) {
-        HILOGE("CheckSystemAbility SendRequest error:%{public}d!", err);
+        HILOGE("CheckSystemAbility SA not found error:%{public}d!", err);
         return nullptr;
     }
     return reply.ReadRemoteObject();
@@ -178,7 +178,7 @@ sptr<IRemoteObject> SystemAbilityManagerProxy::CheckSystemAbility(int32_t system
     MessageOption option;
     int32_t err = remote->SendRequest(CHECK_SYSTEM_ABILITY_IMMEDIATELY_TRANSACTION, data, reply, option);
     if (err != ERR_NONE) {
-        HILOGE("CheckSystemAbility SendRequest error:%{public}d!", err);
+        HILOGE("CheckSystemAbility SA not found error:%{public}d!", err);
         return nullptr;
     }
     sptr<IRemoteObject> irsp(reply.ReadRemoteObject());
@@ -230,7 +230,7 @@ int32_t SystemAbilityManagerProxy::AddOnDemandSystemAbilityInfo(int32_t systemAb
     HILOGI("%{public}s:add ondemand system ability %{public}d %{public}s, return %{public}d",
         __func__, systemAbilityId, err ? "fail" : "succ", err);
     if (err != ERR_NONE) {
-        HILOGE("AddOnDemandSystemAbilityInfo SendRequest error:%{public}d!", err);
+        HILOGE("AddOnDemandSystemAbilityInfo SA not found error:%{public}d!", err);
         return err;
     }
 
@@ -465,7 +465,7 @@ int32_t SystemAbilityManagerProxy::LoadSystemAbility(int32_t systemAbilityId,
     MessageOption option;
     int32_t err = remote->SendRequest(LOAD_SYSTEM_ABILITY_TRANSACTION, data, reply, option);
     if (err != ERR_NONE) {
-        HILOGE("LoadSystemAbility SendRequest error:%{public}d!", err);
+        HILOGE("LoadSystemAbility SA invalid error:%{public}d!", err);
         return err;
     }
     HILOGI("LoadSystemAbility SendRequest succeed!");
@@ -541,7 +541,7 @@ int32_t SystemAbilityManagerProxy::AddSystemAbilityWrapper(int32_t code, Message
     MessageOption option;
     int32_t err = remote->SendRequest(code, data, reply, option);
     if (err != ERR_NONE) {
-        HILOGE("AddSystemAbility SendRequest error:%{public}d!", err);
+        HILOGE("AddSystemAbility SA invalid error:%{public}d!", err);
         return err;
     }
     int32_t result = 0;
