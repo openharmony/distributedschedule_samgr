@@ -21,11 +21,18 @@ config("config_samgr") {
   ]
 }
 
+config("public_config_lsamgr") {
+  include_dirs =
+      [ "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr" ]
+}
+
 ################################################################################
 ohos_shared_library("lsamgr") {
   sources = [ "../../../services/lsamgr/src/local_ability_manager_proxy.cpp" ]
 
   configs = [ ":config_samgr" ]
+  public_configs = [ ":public_config_lsamgr" ]
+
   if (is_standard_system) {
     external_deps = [
       "hiviewdfx_hilog_native:libhilog",

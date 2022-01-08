@@ -28,6 +28,16 @@
                         ]
                     },
                     "name": "//foundation/distributedschedule/samgr/interfaces/innerkits/common:samgr_common"
+                },
+                {
+                    "header": {
+                        "header_base": "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr/",
+                        "header_files": [
+                            "if_local_ability_manager.h",
+                            "local_ability_manager_proxy.h"
+                        ]
+                    },
+                    "name": "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr:lsamgr"
                 }
             ],
             "module_list": [
