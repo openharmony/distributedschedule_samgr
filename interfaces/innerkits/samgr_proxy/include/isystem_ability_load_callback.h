@@ -25,10 +25,12 @@ class ISystemAbilityLoadCallback : public IRemoteBroker {
 public:
     virtual ~ISystemAbilityLoadCallback() = default;
     virtual void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) = 0;
+    virtual void OnLoadSystemAbilityFail(int32_t systemAbilityId) = 0;
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.ISystemAbilityLoadCallback");
 protected:
     enum {
         ON_LOAD_SYSTEM_ABILITY_SUCCESS = 1,
+        ON_LOAD_SYSTEM_ABILITY_FAIL = 2,
     };
 };
 }

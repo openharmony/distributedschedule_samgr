@@ -30,6 +30,8 @@ class SystemAbilityLoadCallbackMock : public SystemAbilityLoadCallbackStub {
 public:
     void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
 
+    void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
+
     int32_t GetSystemAbilityId() const
     {
         return currSystemAbilityId;

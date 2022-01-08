@@ -31,6 +31,7 @@ protected:
     class OnDemandLoadCallback : public SystemAbilityLoadCallbackStub {
     public:
         void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
+        void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
     };
 private:
     OnDemandHelper();

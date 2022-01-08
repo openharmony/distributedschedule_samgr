@@ -77,6 +77,11 @@ void OnDemandHelper::OnDemandLoadCallback::OnLoadSystemAbilitySuccess(int32_t sy
         ((remoteObject != nullptr) ? "succeed" : "failed") << endl;
     OnDemandHelper::GetInstance().OnLoadSystemAbility(systemAbilityId);
 }
+
+void OnDemandHelper::OnDemandLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
+{
+    cout << "OnLoadSystemAbilityFail systemAbilityId:" << systemAbilityId << endl;
+}
 }
 
 int main(int argc, char* argv[])

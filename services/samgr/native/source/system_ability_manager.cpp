@@ -43,6 +43,7 @@ constexpr int32_t SPLIT_NAME_VECTOR_SIZE = 2;
 constexpr int32_t UID_ROOT = 0;
 constexpr int32_t UID_SYSTEM = 1000;
 constexpr int32_t MAX_SUBSCRIBE_COUNT = 256;
+constexpr int64_t CHECK_LOADED_DELAY_TIME = 60 * 1000; // ms
 }
 
 std::mutex SystemAbilityManager::instanceLock;
@@ -584,6 +585,7 @@ int32_t SystemAbilityManager::AddSystemAbility(int32_t systemAbilityId, const sp
         abilityMap_[systemAbilityId] = std::move(saInfo);
         HILOGI("insert %{public}d. size : %{public}zu", systemAbilityId, abilityMap_.size());
     }
+    RemoveCheckLoadedMsg(systemAbilityId);
     if (abilityDeath_ != nullptr) {
         ability->AddDeathRecipient(abilityDeath_);
     }
@@ -707,6 +709,60 @@ void SystemAbilityManager::SendSystemAbilityRemovedMsg(int32_t systemAbilityId)
     }
 }
 
+void SystemAbilityManager::SendCheckLoadedMsg(int32_t systemAbilityId, const std::u16string& name,
+    const sptr<ISystemAbilityLoadCallback>& callback)
+{
+    if (workHandler_ == nullptr) {
+        HILOGE("SendCheckLoadedMsg work handler not initialized!");
+        return;
+    }
+
+    auto delayTask = [systemAbilityId, name, callback, this]() {
+        HILOGI("SendCheckLoadedMsg handle for SA : %{public}d.", systemAbilityId);
+        if (CheckSystemAbility(systemAbilityId) != nullptr) {
+            HILOGI("SendCheckLoadedMsg SA : %{public}d loaded.", systemAbilityId);
+            return;
+        }
+        {
+            lock_guard<recursive_mutex> autoLock(onDemandLock_);
+            auto iter = startingAbilityMap_.find(systemAbilityId);
+            if (iter == startingAbilityMap_.end()) {
+                HILOGI("SendCheckLoadedMsg SA : %{public}d not in startingAbilityMap.", systemAbilityId);
+                return;
+            }
+            auto& abilityItem = iter->second;
+            for (auto& callbackItem : abilityItem.callbackList) {
+                if (callback->AsObject() == callbackItem.first->AsObject()) {
+                    NotifySystemAbilityLoadFail(systemAbilityId, callbackItem.first);
+                    RemoveStartingAbilityCallbackLocked(callbackItem);
+                    abilityItem.callbackList.remove(callbackItem);
+                    break;
+                }
+            }
+            if (abilityItem.callbackList.empty()) {
+                HILOGD("SendCheckLoadedMsg startingAbilityMap remove SA : %{public}d.", systemAbilityId);
+                startingAbilityMap_.erase(iter);
+            }
+        }
+        (void)GetSystemProcess(name);
+    };
+    HILOGI("SendCheckLoadedMsg PostTask name : %{public}d!", systemAbilityId);
+    bool ret = workHandler_->PostTask(delayTask, ToString(systemAbilityId), CHECK_LOADED_DELAY_TIME);
+    if (!ret) {
+        HILOGW("SendCheckLoadedMsg PostTask failed!");
+    }
+}
+
+void SystemAbilityManager::RemoveCheckLoadedMsg(int32_t systemAbilityId)
+{
+    if (workHandler_ == nullptr) {
+        HILOGE("RemoveCheckLoadedMsg work handler not initialized!");
+        return;
+    }
+    HILOGI("RemoveCheckLoadedMsg sa : %{public}d!", systemAbilityId);
+    workHandler_->RemoveTask(ToString(systemAbilityId));
+}
+
 void SystemAbilityManager::NotifySystemAbilityLoaded(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject,
     const sptr<ISystemAbilityLoadCallback>& callback)
 {
@@ -730,6 +786,16 @@ void SystemAbilityManager::NotifySystemAbilityLoaded(int32_t systemAbilityId, co
         RemoveStartingAbilityCallbackLocked(callbackItem);
     }
     startingAbilityMap_.erase(iter);
+}
+
+void SystemAbilityManager::NotifySystemAbilityLoadFail(int32_t systemAbilityId,
+    const sptr<ISystemAbilityLoadCallback>& callback)
+{
+    if (callback == nullptr) {
+        HILOGE("NotifySystemAbilityLoadFail callback null!");
+        return;
+    }
+    callback->OnLoadSystemAbilityFail(systemAbilityId);
 }
 
 int32_t SystemAbilityManager::StartDynamicSystemProcess(const std::u16string& name, int32_t systemAbilityId)
@@ -784,31 +850,34 @@ int32_t SystemAbilityManager::LoadSystemAbility(int32_t systemAbilityId,
         NotifySystemAbilityLoaded(systemAbilityId, targetObject, callback);
         return ERR_OK;
     }
-
+    int32_t result = ERR_INVALID_VALUE;
     auto callingPid = IPCSkeleton::GetCallingPid();
-    lock_guard<recursive_mutex> autoLock(onDemandLock_);
-    auto& abilityItem = startingAbilityMap_[systemAbilityId];
-    for (const auto& itemCallback : abilityItem.callbackList) {
-        if (callback->AsObject() == itemCallback.first->AsObject()) {
-            HILOGI("LoadSystemAbility already existed callback object systemAbilityId:%{public}d", systemAbilityId);
-            return ERR_OK;
+    {
+        lock_guard<recursive_mutex> autoLock(onDemandLock_);
+        auto& abilityItem = startingAbilityMap_[systemAbilityId];
+        for (const auto& itemCallback : abilityItem.callbackList) {
+            if (callback->AsObject() == itemCallback.first->AsObject()) {
+                HILOGI("LoadSystemAbility already existed callback object systemAbilityId:%{public}d", systemAbilityId);
+                return ERR_OK;
+            }
         }
+        auto& count = callbackCountMap_[callingPid];
+        if (count >= MAX_SUBSCRIBE_COUNT) {
+            HILOGE("LoadSystemAbility pid:%{public}d overflow max callback count!", callingPid);
+            return ERR_PERMISSION_DENIED;
+        }
+        ++count;
+        abilityItem.callbackList.emplace_back(callback, callingPid);
+        if (abilityCallbackDeath_ != nullptr) {
+            bool ret = callback->AsObject()->AddDeathRecipient(abilityCallbackDeath_);
+            HILOGI("LoadSystemAbility systemAbilityId:%{public}d AddDeathRecipient %{public}s",
+                systemAbilityId, ret ? "succeed" : "failed");
+        }
+        result = StartingSystemProcess(saProfile.process, systemAbilityId);
+        HILOGI("LoadSystemAbility systemAbilityId:%{public}d size : %{public}zu",
+            systemAbilityId, abilityItem.callbackList.size());
     }
-    auto& count = callbackCountMap_[callingPid];
-    if (count >= MAX_SUBSCRIBE_COUNT) {
-        HILOGE("LoadSystemAbility pid:%{public}d overflow max callback count!", callingPid);
-        return ERR_PERMISSION_DENIED;
-    }
-    ++count;
-    abilityItem.callbackList.emplace_back(callback, callingPid);
-    if (abilityCallbackDeath_ != nullptr) {
-        bool ret = callback->AsObject()->AddDeathRecipient(abilityCallbackDeath_);
-        HILOGI("LoadSystemAbility systemAbilityId:%{public}d AddDeathRecipient %{public}s",
-            systemAbilityId, ret ? "succeed" : "failed");
-    }
-    int32_t result = StartingSystemProcess(saProfile.process, systemAbilityId);
-    HILOGI("LoadSystemAbility systemAbilityId:%{public}d size : %{public}zu",
-        systemAbilityId, abilityItem.callbackList.size());
+    SendCheckLoadedMsg(systemAbilityId, saProfile.process, callback);
     return result;
 }
 

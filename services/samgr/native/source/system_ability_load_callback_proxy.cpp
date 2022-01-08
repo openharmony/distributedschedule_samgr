@@ -61,4 +61,35 @@ void SystemAbilityLoadCallbackProxy::OnLoadSystemAbilitySuccess(int32_t systemAb
         return;
     }
 }
+
+void SystemAbilityLoadCallbackProxy::OnLoadSystemAbilityFail(int32_t systemAbilityId)
+{
+    if (systemAbilityId <= 0) {
+        HILOGE("OnLoadSystemAbilityFail systemAbilityId:%{public}d invalid!", systemAbilityId);
+        return;
+    }
+
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        HILOGE("OnLoadSystemAbilityFail Remote() return null!");
+        return;
+    }
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        HILOGE("OnLoadSystemAbilityFail write interface token failed!");
+        return;
+    }
+    bool ret = data.WriteInt32(systemAbilityId);
+    if (!ret) {
+        HILOGE("OnLoadSystemAbilityFail write systemAbilityId failed!");
+        return;
+    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    int32_t status = remote->SendRequest(ON_LOAD_SYSTEM_ABILITY_FAIL, data, reply, option);
+    if (status != NO_ERROR) {
+        HILOGE("OnLoadSystemAbilityFail SendRequest failed, return value:%{public}d !", status);
+        return;
+    }
+}
 }

@@ -129,12 +129,16 @@ private:
     void NotifySystemAbilityLoaded(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject);
     void NotifySystemAbilityLoaded(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject,
         const sptr<ISystemAbilityLoadCallback>& callback);
+    void NotifySystemAbilityLoadFail(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback);
     int32_t StartingSystemProcess(const std::u16string& name, int32_t systemAbilityId);
     void StartOnDemandAbility(const std::u16string& name, int32_t systemAbilityId);
     void StartOnDemandAbilityInner(const std::u16string& name, int32_t systemAbilityId, AbilityItem& abilityItem);
     int32_t StartDynamicSystemProcess(const std::u16string& name, int32_t systemAbilityId);
     void RemoveStartingAbilityCallback(AbilityItem& abilityItem, const sptr<IRemoteObject>& remoteObject);
     void RemoveStartingAbilityCallbackLocked(std::pair<sptr<ISystemAbilityLoadCallback>, int32_t>& itemPair);
+    void SendCheckLoadedMsg(int32_t systemAbilityId, const std::u16string& name,
+        const sptr<ISystemAbilityLoadCallback>& callback);
+    void RemoveCheckLoadedMsg(int32_t systemAbilityId);
 
     std::u16string deviceName_;
     static sptr<SystemAbilityManager> instance;

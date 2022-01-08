@@ -31,6 +31,8 @@ int32_t SystemAbilityLoadCallbackStub::OnRemoteRequest(uint32_t code,
     switch (code) {
         case ON_LOAD_SYSTEM_ABILITY_SUCCESS:
             return OnLoadSystemAbilitySuccessInner(data, reply);
+        case ON_LOAD_SYSTEM_ABILITY_FAIL:
+            return OnLoadSystemAbilityFailInner(data, reply);
         default:
             HILOGW("SystemAbilityLoadCallbackStub::OnRemoteRequest unknown request code!");
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -46,6 +48,17 @@ int32_t SystemAbilityLoadCallbackStub::OnLoadSystemAbilitySuccessInner(MessagePa
     }
     sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
     OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
+    return ERR_NONE;
+}
+
+int32_t SystemAbilityLoadCallbackStub::OnLoadSystemAbilityFailInner(MessageParcel& data, MessageParcel& reply)
+{
+    int32_t systemAbilityId = data.ReadInt32();
+    if (!CheckInputSystemAbilityId(systemAbilityId)) {
+        HILOGW("OnLoadSystemAbilityFailInner invalid systemAbilityId:%{public}d !", systemAbilityId);
+        return ERR_INVALID_VALUE;
+    }
+    OnLoadSystemAbilityFail(systemAbilityId);
     return ERR_NONE;
 }
 

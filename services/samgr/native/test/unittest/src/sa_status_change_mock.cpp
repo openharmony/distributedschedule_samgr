@@ -35,4 +35,10 @@ void SystemAbilityLoadCallbackMock::OnLoadSystemAbilitySuccess(int32_t systemAbi
     currSystemAbilityId = systemAbilityId;
     currRemoteObject = remoteObject;
 }
+
+void SystemAbilityLoadCallbackMock::OnLoadSystemAbilityFail(int32_t systemAbilityId)
+{
+    HILOGI("OnLoadSystemAbilityFail systemAbilityId:%{public}d load fail!", systemAbilityId);
+    currSystemAbilityId = systemAbilityId;
+}
 }
