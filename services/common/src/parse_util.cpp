@@ -219,12 +219,13 @@ bool ParseUtil::ParseProcess(const xmlNodePtr& rootNode, std::u16string& process
 bool ParseUtil::ParseSaProfiles(const string& profilePath)
 {
     HILOGI("xmlFile:%{private}s", profilePath.c_str());
-    if (!CheckPathExist(profilePath.c_str())) {
+    std::string realPath = GetRealPath(profilePath);
+    if (!CheckPathExist(realPath.c_str())) {
         HILOGE("bad profile path!");
         return false;
     }
     std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> ptrDoc(
-        xmlReadFile(profilePath.c_str(), nullptr, XML_PARSE_NOBLANKS), xmlFreeDoc);
+        xmlReadFile(realPath.c_str(), nullptr, XML_PARSE_NOBLANKS), xmlFreeDoc);
 
     if (ptrDoc == nullptr) {
         HILOGE("xmlReadFile error!");
@@ -268,6 +269,17 @@ std::u16string ParseUtil::GetProcessName() const
     return procName_;
 }
 
+std::string ParseUtil::GetRealPath(const string& profilePath) const
+{
+    char path[PATH_MAX] = {'\0'};
+    if (realpath(profilePath.c_str(), path) == nullptr) {
+        HILOGE("get real path fail");
+        return "";
+    }
+    std::string realPath(path);
+    return realPath;
+}
+
 bool ParseUtil::CheckPathExist(const string& profilePath)
 {
     std::ifstream profileStream(profilePath.c_str());
@@ -278,12 +290,13 @@ bool ParseUtil::ParseTrustConfig(const string& profilePath,
     std::map<std::u16string, std::set<int32_t>>& values)
 {
     HILOGI("config path:%{private}s", profilePath.c_str());
-    if (!CheckPathExist(profilePath.c_str())) {
+    std::string realPath = GetRealPath(profilePath);
+    if (!CheckPathExist(realPath.c_str())) {
         HILOGE("bad profile path!");
         return false;
     }
     std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> docPtr(
-        xmlReadFile(profilePath.c_str(), nullptr, XML_PARSE_NOBLANKS), xmlFreeDoc);
+        xmlReadFile(realPath.c_str(), nullptr, XML_PARSE_NOBLANKS), xmlFreeDoc);
     if (docPtr == nullptr) {
         HILOGE("ParseTrustConfig xmlReadFile error!");
         return false;

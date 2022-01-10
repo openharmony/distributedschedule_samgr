@@ -299,14 +299,14 @@ int32_t SystemAbilityManagerStub::UnmarshalingSaExtraProp(MessageParcel& data, S
 
     int32_t dumpFlags = 0;
     ret = data.ReadInt32(dumpFlags);
-    if (!ret) {
-        HILOGW("SystemAbilityManagerStub::UnmarshalingSaExtraProp read dumpFlags failed!");
+    if (!ret || dumpFlags < 0) {
+        HILOGW("SystemAbilityManagerStub::UnmarshalingSaExtraProp dumpFlags failed!");
         return ERR_FLATTEN_OBJECT;
     }
     std::u16string capability = data.ReadString16();
     std::u16string permission = data.ReadString16();
     extraProp.isDistributed = isDistributed;
-    extraProp.dumpFlags = dumpFlags;
+    extraProp.dumpFlags = static_cast<uint32_t>(dumpFlags);
     extraProp.capability = capability;
     extraProp.permission = permission;
     return ERR_OK;
