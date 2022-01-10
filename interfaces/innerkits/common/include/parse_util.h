@@ -50,6 +50,7 @@ private:
     bool CheckRootTag(const xmlNodePtr& rootNodePtr);
     bool ParseTrustConfigInner(const xmlNodePtr& rootNodePtr, std::map<std::u16string, std::set<int32_t>>& values);
     bool ParseSaId(const xmlNodePtr& rootNode, int32_t& saId);
+    std::string GetRealPath(const std::string& profilePath) const;
     std::list<SaProfile> saProfiles_;
     std::u16string procName_;
 };
