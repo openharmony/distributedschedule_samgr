@@ -22,7 +22,7 @@ config("sam_test_config") {
   include_dirs = [
     "${samgr_services_dir}/test/unittest/include",
     "//utils/system/safwk/native/include",
-    ]
+  ]
 }
 
 ohos_unittest("SystemAbilityMgrTest") {
