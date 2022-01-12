@@ -1,0 +1,85 @@
+{
+    "name": "@ohos/distributedschedule_samgr",
+    "description": "提供系统服务的注册、发现能力。",
+    "homePage": "https://gitee.com/openharmony",
+    "version": "3.1",
+    "license": "Apache License 2.0",
+    "repository": "https://gitee.com/openharmony/distributedschedule_samgr",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "foundation/distributedschedule/samgr"
+    },
+    "dirs": {},
+    "scripts": {},
+    "component": {
+        "name": "samgr",
+        "subsystem": "distributedschedule",
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [
+                "eventhandler",
+                "hiviewdfx_hilog_native",
+                "init",
+                "ipc",
+                "utils_base"
+            ],
+            "third_party": [ "libxml2" ]
+        },
+        "build": {
+            "sub_component": [
+                "//foundation/distributedschedule/samgr/interfaces/innerkits/common:samgr_common",
+                "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+                "//foundation/distributedschedule/samgr/services/samgr/native:samgr",
+                "//foundation/distributedschedule/samgr/services/samgr/native:etc",
+                "//third_party/libxml2:libxml2"
+            ],
+            "inner_kits": [
+                {
+                    "header": {
+                        "header_base": "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include/",
+                        "header_files": [
+                            "if_system_ability_manager.h",
+                            "iservice_registry.h",
+                            "isystem_ability_load_callback.h",
+                            "isystem_ability_status_change.h",
+                            "system_ability_definition.h",
+                            "system_ability_manager_proxy.h",
+                            "system_ability_load_callback_stub.h",
+                            "system_ability_status_change_stub.h",
+                            "sam_log.h"
+                        ]
+                    },
+                    "name": "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy"
+                },
+                {
+                    "header": {
+                        "header_base": "//foundation/distributedschedule/samgr/interfaces/innerkits/common/include/",
+                        "header_files": [
+                            "sa_profiles.h",
+                            "parse_util.h"
+                        ]
+                    },
+                    "name": "//foundation/distributedschedule/samgr/interfaces/innerkits/common:samgr_common"
+                },
+                {
+                    "header": {
+                        "header_base": "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr/",
+                        "header_files": [
+                            "if_local_ability_manager.h",
+                            "local_ability_manager_proxy.h"
+                        ]
+                    },
+                    "name": "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr:lsamgr"
+                }
+            ],
+            "test": [
+                "//foundation/distributedschedule/samgr/services/samgr/native/test:unittest",
+                "//foundation/distributedschedule/samgr/services/common/test:unittest"
+            ]
+        }
+    }
+}
