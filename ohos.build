@@ -11,6 +11,7 @@
                             "iservice_registry.h",
                             "isystem_ability_load_callback.h",
                             "isystem_ability_status_change.h",
+                            "system_ability_definition.h",
                             "system_ability_manager_proxy.h",
                             "system_ability_load_callback_stub.h",
                             "system_ability_status_change_stub.h",
