@@ -12,7 +12,7 @@
     "dirs": {},
     "scripts": {},
     "component": {
-        "name": "samgr",
+        "name": "samgr_standard",
         "subsystem": "distributedschedule",
         "adapted_system_type": [
             "standard"
