@@ -209,6 +209,8 @@ enum {
     DEVICE_STORAGE_MANAGER_SERVICE_ID                = 5000,
     STORAGE_SERVICE_ID                               = 5001,
     STORAGE_MANAGER_DAEMON_ID                        = 5002,
+    STORAGE_MANAGER_MANAGER_ID                       = 5003,
+    FILE_MANAGER_SERVICE_ID                          = 5010,
     DEVICE_SERVICE_MANAGER_SA_ID                     = 5100,
     DISTRIBUTED_DEVICE_PROFILE_SA_ID                 = 6001,
     SUBSYS_ACE_SYS_ABILITY_ID_BEGIN                  = 7001,
