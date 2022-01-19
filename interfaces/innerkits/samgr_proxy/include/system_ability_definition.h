@@ -216,6 +216,7 @@ enum {
     DEVICE_SERVICE_MANAGER_SA_ID                     = 5100,
     DISTRIBUTED_DEVICE_PROFILE_SA_ID                 = 6001,
     SUBSYS_ACE_SYS_ABILITY_ID_BEGIN                  = 7001,
+    CA_DAEMON_ID                                     = 8001,
     LAST_SYS_ABILITY_ID                              = 0x00ffffff,  // 16777215
 };
 
@@ -268,6 +269,7 @@ static const std::map<int, std::string> saNameMap_ = {
     { GRAPHIC_DUMPER_SERVICE_SA_ID, "GraphicDumperService" },
     { GRAPHIC_DUMPER_COMMAND_SA_ID, "GraphicDumperCommand" },
     { ANIMATION_SERVER_SA_ID, "AnimationServer" },
+    { CA_DAEMON_ID, "CaDaemon"},
 };
 } // namespace OHOS
 
