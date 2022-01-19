@@ -155,6 +155,7 @@ enum {
     SUBSYS_POWERMNG_SYS_ABILITY_ID_BEGIN             = 3300,
     POWER_MANAGER_SERVICE_ID                         = 3301,
     POWER_MANAGER_BATT_SERVICE_ID                    = 3302,
+    POWER_MANAGER_THERMAL_SERVICE_ID                 = 3303,
     DISPLAY_MANAGER_SERVICE_ID                       = 3308,
     IVIPOWER_ENHANCED_SERVICE_ID                     = 3309,
     SUBSYS_ROUTER_SYS_ABILITY_ID_BEGIN               = 3400,
