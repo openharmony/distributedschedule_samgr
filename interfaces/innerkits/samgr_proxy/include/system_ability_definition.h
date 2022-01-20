@@ -45,6 +45,8 @@ enum {
     SUBSYS_ARVR_SYS_ABILITY_ID_BEGIN                 = 600,
     SUBSYS_ARVRHARDWARE_SYS_ABILITY_ID_BEGIN         = 700,
     SUBSYS_BARRIERFREE_SYS_ABILITY_ID_BEGIN          = 800,
+    ACCESSIBILITY_MANAGER_SERVICE_ID                 = 801,
+    SUBSYS_BARRIERFREE_SYS_ABILITY_ID_END            = 899,
     SUBSYS_USERIAM_SYS_ABILITY_ID_BEGIN              = 900,
     SUBSYS_USERIAM_SYS_ABILITY_USERIDM               = 901,
     SUBSYS_USERIAM_SYS_ABILITY_USERAUTH              = 921,
@@ -275,6 +277,7 @@ static const std::map<int, std::string> saNameMap_ = {
     { GRAPHIC_DUMPER_COMMAND_SA_ID, "GraphicDumperCommand" },
     { ANIMATION_SERVER_SA_ID, "AnimationServer" },
     { CA_DAEMON_ID, "CaDaemon"},
+    { ACCESSIBILITY_MANAGER_SERVICE_ID, "AccessibilityManagerService"},
 };
 } // namespace OHOS
 
