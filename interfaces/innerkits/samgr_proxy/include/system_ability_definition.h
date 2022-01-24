@@ -114,6 +114,7 @@ enum {
     RESSCHEDD_SA_ID                                  = 1902,
     BACKGROUND_TASK_MANAGER_SERVICE_ID               = 1903,
     WORK_SCHEDULE_SERVICE_ID                         = 1904,
+    SOC_PERF_SERVICE_SA_ID                           = 1906,
     SUBSYS_IDE_SYS_ABILITY_ID_BEGIN                  = 2000,
     SUBSYS_INTELLIACCESSORIES_SYS_ABILITY_ID_BEGIN   = 2100,
     SUBSYS_INTELLISPEAKER_SYS_ABILITY_ID_BEGIN       = 2200,
