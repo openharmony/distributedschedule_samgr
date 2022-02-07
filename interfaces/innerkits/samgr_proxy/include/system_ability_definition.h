@@ -116,6 +116,7 @@ enum {
     WORK_SCHEDULE_SERVICE_ID                         = 1904,
     SOC_PERF_SERVICE_SA_ID                           = 1906,
     DEVICE_UASAGE_STATISTICS_SYS_ABILITY_ID          = 1907,
+    MEMORY_MANAGER_SA_ID                             = 1909,
     SUBSYS_IDE_SYS_ABILITY_ID_BEGIN                  = 2000,
     SUBSYS_INTELLIACCESSORIES_SYS_ABILITY_ID_BEGIN   = 2100,
     SUBSYS_INTELLISPEAKER_SYS_ABILITY_ID_BEGIN       = 2200,
@@ -284,6 +285,7 @@ static const std::map<int, std::string> saNameMap_ = {
     { ANIMATION_SERVER_SA_ID, "AnimationServer" },
     { CA_DAEMON_ID, "CaDaemon"},
     { ACCESSIBILITY_MANAGER_SERVICE_ID, "AccessibilityManagerService"},
+    { MEMORY_MANAGER_SA_ID, "MemoryManagerService" },
 };
 } // namespace OHOS
 
