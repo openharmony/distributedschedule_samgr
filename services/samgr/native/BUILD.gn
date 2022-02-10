@@ -70,6 +70,7 @@ ohos_executable("samgr") {
 
   if (is_standard_system) {
     external_deps = [
+      "access_token:libaccesstoken_sdk",
       "eventhandler:libeventhandler",
       "hiviewdfx_hilog_native:libhilog",
       "init:libbegetutil",

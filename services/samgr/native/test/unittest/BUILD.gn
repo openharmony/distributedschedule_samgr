@@ -59,6 +59,7 @@ ohos_unittest("SystemAbilityMgrTest") {
   ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",

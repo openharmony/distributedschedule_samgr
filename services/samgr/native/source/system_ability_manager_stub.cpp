@@ -15,6 +15,7 @@
 
 #include "system_ability_manager_stub.h"
 
+#include "accesstoken_kit.h"
 #include "errors.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
@@ -23,12 +24,9 @@
 #include "system_ability_manager.h"
 #include "tools.h"
 
+using namespace OHOS::Security;
+
 namespace OHOS {
-namespace {
-constexpr int32_t MULTIUSER_HAP_PER_USER_RANGE = 100000;
-constexpr int32_t HID_HAP = 10000;  /* first hap user */
-constexpr int32_t UID_SHELL = 2000;
-}
 SystemAbilityManagerStub::SystemAbilityManagerStub()
 {
     memberFuncMap_[GET_SYSTEM_ABILITY_TRANSACTION] =
@@ -49,8 +47,6 @@ SystemAbilityManagerStub::SystemAbilityManagerStub()
         &SystemAbilityManagerStub::AddOndemandSystemAbilityInner;
     memberFuncMap_[CHECK_SYSTEM_ABILITY_IMMEDIATELY_TRANSACTION] =
         &SystemAbilityManagerStub::CheckSystemAbilityImmeInner;
-    memberFuncMap_[CHECK_REMOTE_SYSTEM_ABILITY_FOR_JAVA_TRANSACTION] =
-        &SystemAbilityManagerStub::CheckRemtSystemAbilityForJavaInner;
     memberFuncMap_[UNSUBSCRIBE_SYSTEM_ABILITY_TRANSACTION] =
         &SystemAbilityManagerStub::UnSubsSystemAbilityInner;
     memberFuncMap_[ADD_SYSTEM_PROCESS_TRANSACTION] =
@@ -185,6 +181,10 @@ int32_t SystemAbilityManagerStub::UnSubsSystemAbilityInner(MessageParcel& data, 
 
 int32_t SystemAbilityManagerStub::CheckRemtSystemAbilityInner(MessageParcel& data, MessageParcel& reply)
 {
+    if (!CanRequest()) {
+        HILOGE("CheckRemoteSystemAbilityInner PERMISSION DENIED!");
+        return ERR_PERMISSION_DENIED;
+    }
     int32_t systemAbilityId = data.ReadInt32();
     if (!CheckInputSysAbilityId(systemAbilityId)) {
         HILOGW("SystemAbilityManagerStub::CheckRemtSystemAbilityInner read systemAbilityId failed!");
@@ -201,31 +201,6 @@ int32_t SystemAbilityManagerStub::CheckRemtSystemAbilityInner(MessageParcel& dat
     ret = reply.WriteRemoteObject(GetSystemAbility(systemAbilityId, uuid));
     if (!ret) {
         HILOGW("SystemAbilityManagerStub::CheckRemtSystemAbilityInner write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return ERR_NONE;
-}
-
-int32_t SystemAbilityManagerStub::CheckRemtSystemAbilityForJavaInner(MessageParcel& data, MessageParcel& reply)
-{
-    int32_t systemAbilityId = data.ReadInt32();
-    if (!CheckInputSysAbilityId(systemAbilityId)) {
-        HILOGW("SystemAbilityManagerStub::CheckRemtSystemAbilityForJavaInner read systemAbilityId failed!");
-        return ERR_NULL_OBJECT;
-    }
-
-    std::u16string str16DeviceId = data.ReadString16();
-    if (str16DeviceId.empty()) {
-        HILOGW("SystemAbilityManagerStub::CheckRemtSystemAbilityInner read deviceId failed!");
-        return ERR_FLATTEN_OBJECT;
-    }
-    std::string deviceId = Str16ToStr8(str16DeviceId);
-    std::string uuid = SystemAbilityManager::GetInstance()->TransformDeviceId(deviceId, UUID, false);
-    bool result = false;
-    result = reply.WriteRemoteObject(GetSystemAbility(systemAbilityId, uuid));
-    if (!result) {
-        HILOGE("SystemAbilityManagerStub::CheckRemtSystemAbilityForJavaInner write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
 
@@ -451,22 +426,17 @@ int32_t SystemAbilityManagerStub::LoadSystemAbilityInner(MessageParcel& data, Me
     return result;
 }
 
-int32_t SystemAbilityManagerStub::GetHapIdMultiuser(int32_t uid)
-{
-    return uid % MULTIUSER_HAP_PER_USER_RANGE;
-}
-
 bool SystemAbilityManagerStub::CanRequest()
 {
-    // never allow non-system uid request
-    auto callingUid = IPCSkeleton::GetCallingUid();
-    auto uid = GetHapIdMultiuser(callingUid);
-    return (uid < HID_HAP) && (uid != UID_SHELL);
-}
-
-bool SystemAbilityManagerStub::IsSystemApp(int32_t callingUid)
-{
-    auto uid = GetHapIdMultiuser(callingUid);
-    return uid < HID_HAP;
+    auto accessTokenId = IPCSkeleton::GetCallingTokenID();
+    // accessTokenId equals 0 means kernel not supported
+    if (accessTokenId == 0) {
+        HILOGW("SystemAbilityManagerStub::CanRequest GetCallingTokenID kernel not supported!");
+        return true;
+    }
+    AccessToken::ATokenTypeEnum tokenType = AccessToken::AccessTokenKit::GetTokenTypeFlag(accessTokenId);
+    HILOGD("SystemAbilityManagerStub::CanRequest tokenId:%{public}u, tokenType:%{public}d",
+        accessTokenId, tokenType);
+    return (tokenType == AccessToken::ATokenTypeEnum::TOKEN_NATIVE);
 }
 } // namespace OHOS

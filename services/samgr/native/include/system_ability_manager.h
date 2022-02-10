@@ -104,7 +104,6 @@ private:
     };
 
     SystemAbilityManager();
-    std::u16string GetSystemAbilityName(int32_t index) override;
     void DoInsertSaData(const std::u16string& name, const sptr<IRemoteObject>& ability, const SAExtraProp& extraProp);
     bool IsNameInValid(const std::u16string& name);
     int32_t StartOnDemandAbility(int32_t systemAbilityId);

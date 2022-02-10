@@ -434,21 +434,6 @@ vector<u16string> SystemAbilityManager::ListSystemAbilities(uint32_t dumpFlags)
     return list;
 }
 
-u16string SystemAbilityManager::GetSystemAbilityName(int32_t index)
-{
-    shared_lock<shared_mutex> readLock(abilityMapLock_);
-    if (index < 0 || static_cast<uint32_t>(index) >= abilityMap_.size()) {
-        return u16string();
-    }
-    int32_t count = 0;
-    for (auto iter = abilityMap_.begin(); iter != abilityMap_.end(); iter++) {
-        if (count++ == index) {
-            return Str8ToStr16(to_string(iter->first));
-        }
-    }
-    return u16string();
-}
-
 int32_t SystemAbilityManager::SubscribeSystemAbility(int32_t systemAbilityId,
     const sptr<ISystemAbilityStatusChange>& listener)
 {

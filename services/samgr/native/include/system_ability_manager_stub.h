@@ -29,10 +29,8 @@ public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption &option) override;
 
 protected:
-    virtual std::u16string GetSystemAbilityName(int32_t index) = 0;
     static bool CanRequest();
     static bool EnforceInterceToken(MessageParcel& data);
-    static bool IsSystemApp(int32_t callingUid);
 
 private:
     int32_t ListSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
@@ -41,7 +39,6 @@ private:
     int32_t CheckRemtSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t AddOndemandSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t CheckSystemAbilityImmeInner(MessageParcel& data, MessageParcel& reply);
-    int32_t CheckRemtSystemAbilityForJavaInner(MessageParcel& data, MessageParcel& reply);
     int32_t AddSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t GetSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
     int32_t CheckSystemAbilityInner(MessageParcel& data, MessageParcel& reply);
