@@ -1,10 +1,4 @@
 # samgr组件<a name="ZH-CN_TOPIC_0000001162068341"></a>
-
--   [简介](#section11660541593)
--   [目录](#section161941989596)
--   [说明](#section1312121216216)
--   [相关仓](#section1371113476307)
-
 ## 简介<a name="section11660541593"></a>
 
 samgr组件是OpenHarmony的核心组件，提供OpenHarmony系统服务启动、注册、查询等功能。
@@ -14,13 +8,14 @@ samgr组件是OpenHarmony的核心组件，提供OpenHarmony系统服务启动�
 ## 目录<a name="section161941989596"></a>
 
 ```
-/foundation/distributedschedule/samgr/services/samgr/
-├── native
-│   ├── BUILD.gn  # 部件编译脚本
-│   ├── include   # 头文件存放目录
-│   ├── samgr.rc  # samgr启动配置文件
-│   ├── source    # 源代码存放目录
-│   ├── test      # 测试代码存放目录
+/foundation/distributedschedule
+├── samgr
+│   ├── bundle.json  # 部件描述及编译文件
+│   ├── frameworks   # 框架实现存在目录
+│   ├── interfaces   # 接口目录
+│   ├── services     # 组件服务端目录
+│   ├── test         # 测试代码存放目录
+│   ├── utils        # 工具类目录
 ```
 
 ## 说明<a name="section1312121216216"></a>
@@ -31,7 +26,7 @@ samgr组件是OpenHarmony的核心组件，提供OpenHarmony系统服务启动�
     int32_t SystemAbilityManager::AddSystemAbility(int32_t systemAbilityId, const sptr<IRemoteObject>& ability,
         const SAExtraProp& extraProp)
     {
-        if (!CheckInputSysAbilityId(systemAbilityId) || ability == nullptr || (!CheckCapability(extraProp.capability))) {
+        if (!CheckInputSysAbilityId(systemAbilityId) || ability == nullptr) {
             HILOGE("AddSystemAbilityExtra input params is invalid.");
             return ERR_INVALID_VALUE;
         }
@@ -48,25 +43,27 @@ samgr组件是OpenHarmony的核心组件，提供OpenHarmony系统服务启动�
             saInfo.capability = extraProp.capability;
             saInfo.permission = Str16ToStr8(extraProp.permission);
             abilityMap_[systemAbilityId] = std::move(saInfo);
-            HILOGI("insert %{public}d. size : %zu,", systemAbilityId, abilityMap_.size());
+            HILOGI("insert %{public}d. size : %{public}zu", systemAbilityId, abilityMap_.size());
         }
+        RemoveCheckLoadedMsg(systemAbilityId);
         if (abilityDeath_ != nullptr) {
             ability->AddDeathRecipient(abilityDeath_);
         }
-        FindSystemAbilityManagerNotify(systemAbilityId, ADD_SYSTEM_ABILITY_TRANSACTION);
+
         u16string strName = Str8ToStr16(to_string(systemAbilityId));
         if (extraProp.isDistributed && dBinderService_ != nullptr) {
-            dBinderService_->RegisterRemoteProxy(strName, ability);
+            dBinderService_->RegisterRemoteProxy(strName, systemAbilityId);
             HILOGD("AddSystemAbility RegisterRemoteProxy, serviceId is %{public}d", systemAbilityId);
         }
-        if (systemAbilityDataStorage_ == nullptr) {
-            HILOGE("AddSystemAbility systemAbilityDataStorage not init!");
-            return ERR_NO_INIT;
+        if (systemAbilityId == SOFTBUS_SERVER_SA_ID && !isDbinderStart_) {
+            if (dBinderService_ != nullptr && rpcCallbackImp_ != nullptr) {
+                bool ret = dBinderService_->StartDBinderService(rpcCallbackImp_);
+                HILOGI("start result is %{public}s", ret ? "succeed" : "fail");
+                isDbinderStart_ = true;
+            }
         }
-        if (extraProp.isDistributed) {
-            systemAbilityDataStorage_->ClearSyncRecords();
-            DoInsertSaData(strName, ability, extraProp);
-        }
+        SendSystemAbilityAddedMsg(systemAbilityId, ability);
+        return ERR_OK;
     }
     ```
 
@@ -76,41 +73,86 @@ samgr组件是OpenHarmony的核心组件，提供OpenHarmony系统服务启动�
     sptr<IRemoteObject> SystemAbilityManager::CheckSystemAbility(int32_t systemAbilityId)
     {
         if (!CheckInputSysAbilityId(systemAbilityId)) {
+            HILOGW("CheckSystemAbility CheckSystemAbility invalid!");
             return nullptr;
         }
-    
-        std::string selectedDeviceId;
-        if (CheckRemoteSa(to_string(systemAbilityId), selectedDeviceId)) {
-           return CheckSystemAbility(systemAbilityId, selectedDeviceId);
-        }
-    
+
         shared_lock<shared_mutex> readLock(abilityMapLock_);
         auto iter = abilityMap_.find(systemAbilityId);
         if (iter != abilityMap_.end()) {
-            auto callingUid = IPCSkeleton::GetCallingUid();
-            if (IsSystemApp(callingUid) || CheckPermission(iter->second.permission)) {
-                 return iter->second.remoteObj;
-            }
-            return nullptr;
+            HILOGI("found service : %{public}d.", systemAbilityId);
+            return iter->second.remoteObj;
         }
+        HILOGI("NOT found service : %{public}d", systemAbilityId);
         return nullptr;
     }
     ```
 
+3. 动态加载系统服务进程及SystemAbility, 系统进程无需开机启动，而是在SystemAbility被访问的时候按需拉起，并加载指定SystemAbility。  
+    3.1 继承SystemAbilityLoadCallbackStub类，并覆写OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject)、OnLoadSystemAbilityFail(int32_t systemAbilityId)方法。
+    
+    ```
+    class OnDemandLoadCallback : public SystemAbilityLoadCallbackStub {
+    public:
+        void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
+        void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
+    };
+    
+    void OnDemandLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
+        const sptr<IRemoteObject>& remoteObject) // systemAbilityId为指定加载的SAID，remoteObject为指定systemAbility的代理对象
+    {
+        cout << "OnLoadSystemAbilitySuccess systemAbilityId:" << systemAbilityId << " IRemoteObject result:" <<
+            ((remoteObject != nullptr) ? "succeed" : "failed") << endl;
+    }
+    
+    void OnDemandLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId) // systemAbilityId为指定加载的SAID
+    {
+        cout << "OnLoadSystemAbilityFail systemAbilityId:" << systemAbilityId << endl;
+    }
+    ```
+    
+    3.2 调用samgr提供的动态加载接口LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback)。
+    ```
+    // 构造步骤1的SystemAbilityLoadCallbackStub子类的实例
+    sptr<OnDemandLoadCallback> loadCallback_ = new OnDemandLoadCallback();
+    // 调用LoadSystemAbility方法
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sm == nullptr) {
+        cout << "GetSystemAbilityManager samgr object null!" << endl;
+        return;
+    }
+    int32_t result = sm->LoadSystemAbility(systemAbilityId, loadCallback_);
+    if (result != ERR_OK) {
+        cout << "systemAbilityId:" << systemAbilityId << " load failed, result code:" << result << endl;
+        return;
+    }
+    ```
+>说明：  
+>1.LoadSystemAbility方法调用成功后，指定SystemAbility加载成功后会触发回调OnLoadSystemAbilitySuccess，加载失败触发回调OnLoadSystemAbilityFail。  
+>2.动态加载的进程cfg文件不能配置为开机启动，需指定"dynamic" : true, 示例如下:
+>```
+>{
+>     "services" : [{
+>         "name" : "listen_test",
+>         "path" : ["/system/bin/sa_main", "/system/profile/listen_test.xml"],
+>         "dynamic" : true,
+>         "uid" : "system",
+>         "gid" : ["system", "shell"]
+>         }
+>     ]
+>}
+>```
+>3.LoadSystemAbility方法适用于动态加载场景，其他获取SystemAbility场景建议使用CheckSystemAbility方法。
 
 ## 相关仓<a name="section1371113476307"></a>
 
-分布式任务调度子系统
+系统服务管理子系统
 
-distributedschedule\_dms\_fwk
+[distributedschedule\_safwk](https://gitee.com/openharmony/distributedschedule_safwk)
 
-distributedschedule\_safwk
+[**distributedschedule\_samgr**](https://gitee.com/openharmony/distributedschedule_samgr)
 
-**distributedschedule\_samgr**
+[distributedschedule\_safwk\_lite](https://gitee.com/openharmony/distributedschedule_safwk_lite)
 
-distributedschedule\_safwk\_lite
-
-hdistributedschedule\_samgr\_lite
-
-distributedschedule\_dms\_fwk\_lite
+[distributedschedule\_samgr\_lite](https://gitee.com/openharmony/distributedschedule_samgr_lite)
 
