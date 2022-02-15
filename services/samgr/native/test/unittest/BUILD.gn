@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 
-module_output_path = "samgr/samgr"
+module_output_path = "samgr_standard/samgr"
 samgr_dir = "//foundation/distributedschedule/samgr"
 samgr_services_dir = "${samgr_dir}/services/samgr/native"
 
