@@ -81,7 +81,7 @@ enum {
     COMM_VPN_MANAGER_SYS_ABILITY_ID                  = 1155,
     COMM_DNS_MANAGER_SYS_ABILITY_ID                  = 1156,
     COMM_ETHERNET_MANAGER_SYS_ABILITY_ID             = 1157,
-    COMM_NETD_NATIVE_SYS_ABILITY_ID                  = 1158,
+    COMM_NETSYS_NATIVE_SYS_ABILITY_ID                  = 1158,
     SMART_COMM_SYS_ABILITY_ID                        = 1180,
     SUBSYS_DFX_SYS_ABILITY_ID_BEGIN                  = 1200,
     DFX_SYS_HIVIEW_ABILITY_ID                        = 1201,
