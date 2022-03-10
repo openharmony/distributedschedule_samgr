@@ -21,8 +21,8 @@
 
 namespace OHOS {
 namespace {
-constexpr int32_t UID_ROOT = 0;
-constexpr int32_t UID_SYSTEM = 1000;
+// constexpr int32_t UID_ROOT = 0;
+// constexpr int32_t UID_SYSTEM = 1000;
 }
 SystemAbilityStatusChangeStub::SystemAbilityStatusChangeStub()
 {
@@ -86,8 +86,7 @@ bool SystemAbilityStatusChangeStub::CheckInputSysAbilityId(int32_t systemAbility
 
 bool SystemAbilityStatusChangeStub::CanRequest()
 {
-    auto callingUid = IPCSkeleton::GetCallingUid();
-    return (callingUid == UID_ROOT) || (callingUid == UID_SYSTEM);
+    return true;
 }
 
 bool SystemAbilityStatusChangeStub::EnforceInterceToken(MessageParcel& data)
