@@ -78,8 +78,7 @@
             ],
             "test": [
                 "//foundation/distributedschedule/samgr/services/samgr/native/test:unittest",
-                "//foundation/distributedschedule/samgr/services/common/test:unittest",
-                "//foundation/distributedschedule/samgr/test/fuzztest/system_ability_manager_fuzzer:fuzztest"
+                "//foundation/distributedschedule/samgr/services/common/test:unittest"
             ]
         }
     }
