@@ -102,6 +102,9 @@ sptr<IRemoteObject> SystemAbilityManagerProxy::CheckSystemAbility(int32_t system
         return nullptr;
     }
     MessageParcel data;
+    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
+        return nullptr;
+    }
     bool ret = data.WriteInt32(systemAbilityId);
     if (!ret) {
         HILOGW("CheckSystemAbility Write systemAbilityId failed!");
