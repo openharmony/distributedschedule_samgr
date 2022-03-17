@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,17 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef SERVICES_SAMGR_NATIVE_INCLUDE_SAM_LOG_H_
-#define SERVICES_SAMGR_NATIVE_INCLUDE_SAM_LOG_H_
+#ifndef SAMGR_PROXY_INCLUDE_SAM_LOG_H_
+#define SAMGR_PROXY_INCLUDE_SAM_LOG_H_
 
 #include "hilog/log.h"
 
 namespace OHOS {
-static constexpr OHOS::HiviewDFX::HiLogLabel SYSTEM_ABLILITY_MGR_LABEL = {
+#ifdef SAMGR_PROXY
+static constexpr OHOS::HiviewDFX::HiLogLabel SYSTEM_ABLILITY_LABEL = {
+    LOG_CORE,
+    0xD001800,
+    "SA_CLIENT"
+};
+#else
+static constexpr OHOS::HiviewDFX::HiLogLabel SYSTEM_ABLILITY_LABEL = {
     LOG_CORE,
     0xD001800,
     "SAMGR"
 };
+#endif
 
 #ifdef HILOGF
 #undef HILOGF
@@ -45,11 +53,11 @@ static constexpr OHOS::HiviewDFX::HiLogLabel SYSTEM_ABLILITY_MGR_LABEL = {
 #undef HILOGD
 #endif
 
-#define HILOGF(...) (void)OHOS::HiviewDFX::HiLog::Fatal(SYSTEM_ABLILITY_MGR_LABEL, __VA_ARGS__)
-#define HILOGE(...) (void)OHOS::HiviewDFX::HiLog::Error(SYSTEM_ABLILITY_MGR_LABEL, __VA_ARGS__)
-#define HILOGW(...) (void)OHOS::HiviewDFX::HiLog::Warn(SYSTEM_ABLILITY_MGR_LABEL, __VA_ARGS__)
-#define HILOGI(...) (void)OHOS::HiviewDFX::HiLog::Info(SYSTEM_ABLILITY_MGR_LABEL, __VA_ARGS__)
-#define HILOGD(...) (void)OHOS::HiviewDFX::HiLog::Debug(SYSTEM_ABLILITY_MGR_LABEL, __VA_ARGS__)
+#define HILOGF(...) (void)OHOS::HiviewDFX::HiLog::Fatal(SYSTEM_ABLILITY_LABEL, __VA_ARGS__)
+#define HILOGE(...) (void)OHOS::HiviewDFX::HiLog::Error(SYSTEM_ABLILITY_LABEL, __VA_ARGS__)
+#define HILOGW(...) (void)OHOS::HiviewDFX::HiLog::Warn(SYSTEM_ABLILITY_LABEL, __VA_ARGS__)
+#define HILOGI(...) (void)OHOS::HiviewDFX::HiLog::Info(SYSTEM_ABLILITY_LABEL, __VA_ARGS__)
+#define HILOGD(...) (void)OHOS::HiviewDFX::HiLog::Debug(SYSTEM_ABLILITY_LABEL, __VA_ARGS__)
 } // namespace OHOS
 
-#endif // #ifndef SERVICES_SAMGR_NATIVE_INCLUDE_SAM_LOG_H_
+#endif // #ifndef SAMGR_PROXY_INCLUDE_SAM_LOG_H_

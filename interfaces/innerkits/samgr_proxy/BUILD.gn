@@ -29,6 +29,7 @@ config("samgr_proxy_private_config") {
 }
 
 ohos_shared_library("samgr_proxy") {
+  defines = [ "SAMGR_PROXY" ]
   sources = [
     "//foundation/distributedschedule/samgr/frameworks/native/source/system_ability_load_callback_stub.cpp",
     "//foundation/distributedschedule/samgr/frameworks/native/source/system_ability_manager_proxy.cpp",

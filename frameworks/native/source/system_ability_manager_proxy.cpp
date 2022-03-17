@@ -59,7 +59,7 @@ sptr<IRemoteObject> SystemAbilityManagerProxy::GetSystemAbilityWrapper(int32_t s
         if (deviceId.empty()) {
             svc = CheckSystemAbility(systemAbilityId, isExist);
             if (!isExist) {
-                HILOGE("%{public}s:sa %{public}d is not exist", __func__, systemAbilityId);
+                HILOGW("%{public}s:sa %{public}d is not exist", __func__, systemAbilityId);
                 usleep(SLEEP_ONE_MILLI_SECOND_TIME * SLEEP_INTERVAL_TIME);
                 continue;
             }
@@ -68,7 +68,6 @@ sptr<IRemoteObject> SystemAbilityManagerProxy::GetSystemAbilityWrapper(int32_t s
         }
 
         if (svc != nullptr) {
-            HILOGD("GetSystemAbilityWrapper found sa %{public}d", systemAbilityId);
             return svc;
         }
         usleep(SLEEP_ONE_MILLI_SECOND_TIME * SLEEP_INTERVAL_TIME);
@@ -88,7 +87,6 @@ sptr<IRemoteObject> SystemAbilityManagerProxy::CheckSystemAbilityWrapper(int32_t
     MessageOption option;
     int32_t err = remote->SendRequest(code, data, reply, option);
     if (err != ERR_NONE) {
-        HILOGE("CheckSystemAbility SA not found error:%{public}d!", err);
         return nullptr;
     }
     return reply.ReadRemoteObject();
@@ -178,7 +176,6 @@ sptr<IRemoteObject> SystemAbilityManagerProxy::CheckSystemAbility(int32_t system
     MessageOption option;
     int32_t err = remote->SendRequest(CHECK_SYSTEM_ABILITY_IMMEDIATELY_TRANSACTION, data, reply, option);
     if (err != ERR_NONE) {
-        HILOGE("CheckSystemAbility SA not found error:%{public}d!", err);
         return nullptr;
     }
     sptr<IRemoteObject> irsp(reply.ReadRemoteObject());
@@ -230,7 +227,6 @@ int32_t SystemAbilityManagerProxy::AddOnDemandSystemAbilityInfo(int32_t systemAb
     HILOGI("%{public}s:add ondemand system ability %{public}d %{public}s, return %{public}d",
         __func__, systemAbilityId, err ? "fail" : "succ", err);
     if (err != ERR_NONE) {
-        HILOGE("AddOnDemandSystemAbilityInfo SA not found error:%{public}d!", err);
         return err;
     }
 

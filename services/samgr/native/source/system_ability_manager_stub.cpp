@@ -250,7 +250,6 @@ int32_t SystemAbilityManagerStub::CheckSystemAbilityImmeInner(MessageParcel& dat
     }
     ret = reply.WriteRemoteObject(CheckSystemAbility(systemAbilityId, isExist));
     if (!ret) {
-        HILOGW("SystemAbilityManagerStub::CheckSystemAbilityImmeInner write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
 
@@ -343,7 +342,6 @@ int32_t SystemAbilityManagerStub::CheckSystemAbilityInner(MessageParcel& data, M
     }
     bool ret = reply.WriteRemoteObject(CheckSystemAbility(systemAbilityId));
     if (!ret) {
-        HILOGW("SystemAbilityManagerStub:CheckSystemAbilityInner write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
     return ERR_NONE;
