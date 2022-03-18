@@ -176,7 +176,7 @@ sptr<IRemoteObject> SystemAbilityManager::CheckSystemAbility(int32_t systemAbili
         HILOGI("found service : %{public}d.", systemAbilityId);
         return iter->second.remoteObj;
     }
-    HILOGI("NOT found service : %{public}d", systemAbilityId);
+    HILOGW("NOT found service : %{public}d", systemAbilityId);
     return nullptr;
 }
 
@@ -326,7 +326,6 @@ int32_t SystemAbilityManager::AddOnDemandSystemAbilityInfo(int32_t systemAbility
 
 int32_t SystemAbilityManager::StartOnDemandAbility(int32_t systemAbilityId)
 {
-    HILOGI("%{public}s called, systemAbilityId is %{public}d", __func__, systemAbilityId);
     lock_guard<recursive_mutex> onDemandAbilityLock(onDemandLock_);
     auto iter = onDemandAbilityMap_.find(systemAbilityId);
     if (iter == onDemandAbilityMap_.end()) {
@@ -358,7 +357,6 @@ sptr<IRemoteObject> SystemAbilityManager::CheckSystemAbility(int32_t systemAbili
             return nullptr;
         }
 
-        HILOGI("ability %{public}d is not found", systemAbilityId);
         isExist = false;
         return nullptr;
     }
