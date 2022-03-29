@@ -59,11 +59,9 @@ int32_t SystemAbilityManagerStub::OnRemoteRequest(uint32_t code,
 {
     HILOGI("SystemAbilityManagerStub::OnReceived, code = %{public}u, flags= %{public}d",
         code, option.GetFlags());
-    if (code != GET_SYSTEM_ABILITY_TRANSACTION && code != CHECK_SYSTEM_ABILITY_TRANSACTION) {
-        if (!EnforceInterceToken(data)) {
-            HILOGI("SystemAbilityManagerStub::OnReceived, code = %{public}u, check interfaceToken failed", code);
-            return ERR_PERMISSION_DENIED;
-        }
+    if (!EnforceInterceToken(data)) {
+        HILOGI("SystemAbilityManagerStub::OnReceived, code = %{public}u, check interfaceToken failed", code);
+        return ERR_PERMISSION_DENIED;
     }
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
