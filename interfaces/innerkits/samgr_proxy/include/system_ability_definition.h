@@ -170,6 +170,8 @@ enum {
     IVIPOWER_ENHANCED_SERVICE_ID                     = 3309,
     SUBSYS_ROUTER_SYS_ABILITY_ID_BEGIN               = 3400,
     SUBSYS_SECURITY_SYS_ABILITY_ID_BEGIN             = 3500,
+    ACCESS_TOKEN_MANAGER_SERVICE_ID                  = 3503,
+    TOKEN_SYNC_MANAGER_SERVICE_ID                    = 3504,
     DEVICE_SECURITY_LEVEL_MANAGER_SA_ID              = 3511,
     SUBSYS_SENSORS_SYS_ABILITY_ID_BEGIN              = 3600,
     SENSOR_SERVICE_ABILITY_ID                        = 3601,
