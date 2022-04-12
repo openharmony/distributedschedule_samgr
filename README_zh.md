@@ -129,13 +129,13 @@ samgr组件是OpenHarmony的核心组件，提供OpenHarmony系统服务启动�
     ```
 >说明：  
 >1.LoadSystemAbility方法调用成功后，指定SystemAbility加载成功后会触发回调OnLoadSystemAbilitySuccess，加载失败触发回调OnLoadSystemAbilityFail。  
->2.动态加载的进程cfg文件不能配置为开机启动，需指定"dynamic" : true, 示例如下:
+>2.动态加载的进程cfg文件不能配置为开机启动，需指定"ondemand" : true, 示例如下:
 >```
 >{
 >     "services" : [{
 >         "name" : "listen_test",
 >         "path" : ["/system/bin/sa_main", "/system/profile/listen_test.xml"],
->         "dynamic" : true,
+>         "ondemand" : true,
 >         "uid" : "system",
 >         "gid" : ["system", "shell"]
 >         }
