@@ -39,6 +39,8 @@ void SystemAbilityStatusChangeProxy::OnRemoveSystemAbility(int32_t systemAbility
 bool SystemAbilityStatusChangeProxy::SendRequestInner(uint32_t code, int32_t systemAbilityId,
     const std::string& deviceId)
 {
+    HILOGD("SystemAbilityStatusChangeProxy::SendRequestInner enter, systemAbilityId : %{public}d, code : %{public}u",
+        systemAbilityId, code);
     if (systemAbilityId <= 0) {
         HILOGE("SendRequestInner saId:%{public}d is invalid!", systemAbilityId);
         return false;

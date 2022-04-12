@@ -31,7 +31,7 @@ SystemAbilityStatusChangeStub::SystemAbilityStatusChangeStub()
 int32_t SystemAbilityStatusChangeStub::OnRemoteRequest(uint32_t code,
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    HILOGI("code:%{public}u, flags:%{public}d", code, option.GetFlags());
+    HILOGI("SystemAbilityStatusChangeStub::code:%{public}u, flags:%{public}d", code, option.GetFlags());
     if (!EnforceInterceToken(data)) {
         HILOGW("check interface token failed!");
         return ERR_PERMISSION_DENIED;
