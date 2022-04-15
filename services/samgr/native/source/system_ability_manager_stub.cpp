@@ -425,11 +425,6 @@ int32_t SystemAbilityManagerStub::LoadSystemAbilityInner(MessageParcel& data, Me
 bool SystemAbilityManagerStub::CanRequest()
 {
     auto accessTokenId = IPCSkeleton::GetCallingTokenID();
-    // accessTokenId equals 0 means kernel not supported
-    if (accessTokenId == 0) {
-        HILOGW("SystemAbilityManagerStub::CanRequest GetCallingTokenID kernel not supported!");
-        return true;
-    }
     AccessToken::ATokenTypeEnum tokenType = AccessToken::AccessTokenKit::GetTokenTypeFlag(accessTokenId);
     HILOGD("SystemAbilityManagerStub::CanRequest tokenId:%{public}u, tokenType:%{public}d",
         accessTokenId, tokenType);
