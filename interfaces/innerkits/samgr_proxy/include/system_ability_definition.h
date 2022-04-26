@@ -154,6 +154,7 @@ enum {
     MEDIA_LIBRARY_SERVICE_ID                         = 3007,
     CAMERA_SERVICE_ID                                = 3008,
     AUDIO_POLICY_SERVICE_ID                          = 3009,
+    AVSESSION_SERVICE_ID                             = 3010,
     SUBSYS_MULTIMODAINPUT_SYS_ABILITY_ID_BEGIN       = 3100,
     MULTIMODAL_INPUT_SERVICE_ID                      = 3101,
     MULTIMODAL_CHANNEL_SERVICE_ID                    = 3102,
@@ -312,6 +313,7 @@ static const std::map<int, std::string> saNameMap_ = {
     { CA_DAEMON_ID, "CaDaemon"},
     { ACCESSIBILITY_MANAGER_SERVICE_ID, "AccessibilityManagerService"},
     { MEMORY_MANAGER_SA_ID, "MemoryManagerService" },
+    { AVSESSION_SERVICE_ID, "AVSessionService" },
 };
 } // namespace OHOS
 
