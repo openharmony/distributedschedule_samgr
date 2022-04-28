@@ -23,6 +23,8 @@ samgr_services_dir = "${samgr_dir}/services/samgr/native"
 ohos_fuzztest("SystemAbilityFuzz") {
   module_out_path = module_output_path
 
+  fuzz_config_file = "//foundation/distributedschedule/samgr/test/fuzztest/system_ability_manager_fuzzer"
+
   configs = [
     "${samgr_dir}/interfaces/innerkits/lsamgr:config_samgr",
     "${samgr_dir}/services/samgr/native:sam_config",
