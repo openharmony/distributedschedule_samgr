@@ -3,7 +3,7 @@
 
 The **samgr** module is a core module of OpenHarmony. It provides functions, such as start, registration, and query, of system abilities (also called system services).
 
-![](figures/zh-cn_image_0000001115820566.png)
+![](figures/en-us_image_0000001115820566.png)
 
 ## Directory Structure<a name="section161941989596"></a>
 
@@ -89,7 +89,8 @@ The **samgr** module is a core module of OpenHarmony. It provides functions, suc
     ```
 
 3. The samgr service dynamically loads the system service process and system ability. Instead of starting upon system startup, the system process starts when the system ability is accessed and loads the specified system ability. 
-    3.1 Inherit from the **SystemAbilityLoadCallbackStub** class and overwrite the **OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject)** and **OnLoadSystemAbilityFail(int32_t systemAbilityId)** methods.
+    
+	3.1 Inherit from the **SystemAbilityLoadCallbackStub** class and overwrite the **OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject)** and **OnLoadSystemAbilityFail(int32_t systemAbilityId)** methods.
     
     ```
     class OnDemandLoadCallback : public SystemAbilityLoadCallbackStub {
