@@ -150,7 +150,7 @@ The **samgr** module is a core module of OpenHarmony. It provides functions, suc
 
 ## Repositories Involved<a name="section1371113476307"></a>
 
-**System Service Management Subsystem**
+**Distributed Scheduler Subsystem**
 
 [distributedschedule\_safwk](https://gitee.com/openharmony/distributedschedule_safwk)
 
