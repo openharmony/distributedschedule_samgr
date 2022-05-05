@@ -1,37 +1,32 @@
 # samgr<a name="EN-US_TOPIC_0000001162068341"></a>
-
--   [Introduction](#section11660541593)
--   [Directory Structure](#section161941989596)
--   [Usage](#section1312121216216)
--   [Repositories Involved](#section1371113476307)
-
 ## Introduction<a name="section11660541593"></a>
 
-The  **samgr**  module is a core module of OpenHarmony. It provides functions related to system abilities \(also called system services\), including system ability \(SA\) startup, registration, and query.
+The **samgr** module is a core module of OpenHarmony. It provides functions, such as start, registration, and query, of system abilities (also called system services).
 
 ![](figures/en-us_image_0000001115820566.png)
 
 ## Directory Structure<a name="section161941989596"></a>
 
 ```
-/foundation/distributedschedule/samgr/services/samgr/
-├── native             
-│   ├── BUILD.gn  # Compilation script
-│   ├── include   # Header files
-│   ├── samgr.rc  # RC file for starting samgr
-│   ├── source    # Source code
-│   ├── test      # Test code
+/foundation/distributedschedule
+├── samgr
+│   ├── bundle.json  # Description and build file of samgr
+│   ├── frameworks   # Framework implementation
+│   ├── interfaces   # APIs
+│   ├── services     # Directory for samgr services
+│   ├── test         # Test code
+│   ├── utils        # Utils
 ```
 
 ## Usage<a name="section1312121216216"></a>
 
-1.  After receiving the registration message from the SA framework, the samgr service saves information about the particular SA in the local cache.
+1.  Upon receiving a registration message from the system ability (SA) framework, the samgr service saves the system ability information in the local cache.
 
     ```
     int32_t SystemAbilityManager::AddSystemAbility(int32_t systemAbilityId, const sptr<IRemoteObject>& ability,
         const SAExtraProp& extraProp)
     {
-        if (!CheckInputSysAbilityId(systemAbilityId) || ability == nullptr || (!CheckCapability(extraProp.capability))) {
+        if (!CheckInputSysAbilityId(systemAbilityId) || ability == nullptr) {
             HILOGE("AddSystemAbilityExtra input params is invalid.");
             return ERR_INVALID_VALUE;
         }
@@ -48,69 +43,120 @@ The  **samgr**  module is a core module of OpenHarmony. It provides functions re
             saInfo.capability = extraProp.capability;
             saInfo.permission = Str16ToStr8(extraProp.permission);
             abilityMap_[systemAbilityId] = std::move(saInfo);
-            HILOGI("insert %{public}d. size : %zu,", systemAbilityId, abilityMap_.size());
+            HILOGI("insert %{public}d. size : %{public}zu", systemAbilityId, abilityMap_.size());
         }
+        RemoveCheckLoadedMsg(systemAbilityId);
         if (abilityDeath_ != nullptr) {
             ability->AddDeathRecipient(abilityDeath_);
         }
-        FindSystemAbilityManagerNotify(systemAbilityId, ADD_SYSTEM_ABILITY_TRANSACTION);
+
         u16string strName = Str8ToStr16(to_string(systemAbilityId));
         if (extraProp.isDistributed && dBinderService_ != nullptr) {
-            dBinderService_->RegisterRemoteProxy(strName, ability);
+            dBinderService_->RegisterRemoteProxy(strName, systemAbilityId);
             HILOGD("AddSystemAbility RegisterRemoteProxy, serviceId is %{public}d", systemAbilityId);
         }
-        if (systemAbilityDataStorage_ == nullptr) {
-            HILOGE("AddSystemAbility systemAbilityDataStorage not init!");
-            return ERR_NO_INIT;
+        if (systemAbilityId == SOFTBUS_SERVER_SA_ID && !isDbinderStart_) {
+            if (dBinderService_ != nullptr && rpcCallbackImp_ != nullptr) {
+                bool ret = dBinderService_->StartDBinderService(rpcCallbackImp_);
+                HILOGI("start result is %{public}s", ret ? "succeed" : "fail");
+                isDbinderStart_ = true;
+            }
         }
-        if (extraProp.isDistributed) {
-            systemAbilityDataStorage_->ClearSyncRecords();
-            DoInsertSaData(strName, ability, extraProp);
-        }
+        SendSystemAbilityAddedMsg(systemAbilityId, ability);
+        return ERR_OK;
     }
     ```
 
-2.  If the SA requested by the SA framework is a local SA, the samgr service searches for the proxy object of the SA based on the SA ID and then returns the proxy object to the SA framework.
+2.  If the system service requested by the SA framework is a local service, the samgr service locates the proxy object of the system service based on the service ID and then returns the proxy object to the SA framework.
 
     ```
     sptr<IRemoteObject> SystemAbilityManager::CheckSystemAbility(int32_t systemAbilityId)
     {
         if (!CheckInputSysAbilityId(systemAbilityId)) {
+            HILOGW("CheckSystemAbility CheckSystemAbility invalid!");
             return nullptr;
         }
-    
-        std::string selectedDeviceId;
-        if (CheckRemoteSa(to_string(systemAbilityId), selectedDeviceId)) {
-           return CheckSystemAbility(systemAbilityId, selectedDeviceId);
-        }
-    
+
         shared_lock<shared_mutex> readLock(abilityMapLock_);
         auto iter = abilityMap_.find(systemAbilityId);
         if (iter != abilityMap_.end()) {
-            auto callingUid = IPCSkeleton::GetCallingUid();
-            if (IsSystemApp(callingUid) || CheckPermission(iter->second.permission)) {
-                 return iter->second.remoteObj;
-            }
-            return nullptr;
+            HILOGI("found service : %{public}d.", systemAbilityId);
+            return iter->second.remoteObj;
         }
+        HILOGI("NOT found service : %{public}d", systemAbilityId);
         return nullptr;
     }
     ```
 
+3. The samgr service dynamically loads the system service process and system ability. Instead of starting upon system startup, the process starts when the system ability is accessed and loads the specified system ability. 
+   
+
+	3.1 Inherit from the **SystemAbilityLoadCallbackStub** class and overwrite the **OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject)** and **OnLoadSystemAbilityFail(int32_t systemAbilityId)** methods.
+	
+	```
+	class OnDemandLoadCallback : public SystemAbilityLoadCallbackStub {
+	public:
+	    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
+	    void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
+	};
+	
+	void OnDemandLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
+	    const sptr<IRemoteObject>& remoteObject) // systemAbilityId is the ID of the system ability to be loaded, and remoteObject indicates the proxy object of the system ability.
+	{
+	    cout << "OnLoadSystemAbilitySuccess systemAbilityId:" << systemAbilityId << " IRemoteObject result:" <<
+	        ((remoteObject != nullptr) ? "succeed" : "failed") << endl;
+	}
+	
+	void OnDemandLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId) // systemAbilityId is the ID of the system ability to be loaded.
+	{
+	    cout << "OnLoadSystemAbilityFail systemAbilityId:" << systemAbilityId << endl;
+	}
+	```
+	
+	3.2 Call **LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback)** provided by samgr.
+	```
+	// Construct a SystemAbilityLoadCallbackStub instance (mentioned in step 3.1).
+	sptr<OnDemandLoadCallback> loadCallback_ = new OnDemandLoadCallback();
+	// Call the LoadSystemAbility method.
+	sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+	if (sm == nullptr) {
+	    cout << "GetSystemAbilityManager samgr object null!" << endl;
+	    return;
+	}
+	int32_t result = sm->LoadSystemAbility(systemAbilityId, loadCallback_);
+	if (result != ERR_OK) {
+	    cout << "systemAbilityId:" << systemAbilityId << " load failed, result code:" << result << endl;
+	    return;
+	}
+	```
+>**NOTE**: 
+>
+>- After the **LoadSystemAbility** method is called, the **OnLoadSystemAbilitySuccess** callback will be invoked if the specified system ability is successfully loaded and the **OnLoadSystemAbilityFail** callback will be invoked if the system ability fails to be loaded. 
+>- The dynamically loaded process cannot start upon system startup. You must set **"ondemand": true** in the .cfg file. The following is an example:
+>
+>```
+>{
+>"services" : [{
+>    "name" : "listen_test",
+>    "path" : ["/system/bin/sa_main", "/system/profile/listen_test.xml"],
+>    "ondemand" : true,
+>    "uid" : "system",
+>    "gid" : ["system", "shell"]
+>    }
+>]
+>}
+>```
+>- The **LoadSystemAbility** method applies to dynamic loading of system abilities. In other scenarios, use the **CheckSystemAbility** method to obtain a system ability.
+>- The process name in the .cfg file must be the same as that in the .xml configuration file of the system ability.
 
 ## Repositories Involved<a name="section1371113476307"></a>
 
-Distributed Scheduler subsystem
+**System Ability Management Subsystem**
 
-distributedschedule\_dms\_fwk
+[distributedschedule\_safwk](https://gitee.com/openharmony/distributedschedule_safwk)
 
-distributedschedule\_safwk
+[**distributedschedule\_samgr**](https://gitee.com/openharmony/distributedschedule_samgr)
 
-**distributedschedule\_samgr**
+[distributedschedule\_safwk\_lite](https://gitee.com/openharmony/distributedschedule_safwk_lite)
 
-distributedschedule\_safwk\_lite
-
-hdistributedschedule\_samgr\_lite
-
-distributedschedule\_dms\_fwk\_lite
-
+[distributedschedule\_samgr\_lite](https://gitee.com/openharmony/distributedschedule_samgr_lite)
