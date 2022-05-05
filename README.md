@@ -1,4 +1,4 @@
-# samgr<a name="ZH-CN_TOPIC_0000001162068341"></a>
+# samgr<a name="EN-US_TOPIC_0000001162068341"></a>
 ## Introduction<a name="section11660541593"></a>
 
 The **samgr** module is a core module of OpenHarmony. It provides functions, such as start, registration, and query, of system abilities (also called system services).
@@ -88,46 +88,47 @@ The **samgr** module is a core module of OpenHarmony. It provides functions, suc
     }
     ```
 
-3. The samgr service dynamically loads the system service process and system ability. Instead of starting upon system startup, the system process starts when the system ability is accessed and loads the specified system ability. 
-    
+3. The samgr service dynamically loads the system service process and system ability. Instead of starting upon system startup, the process starts when the system ability is accessed and loads the specified system ability. 
+   
+
 	3.1 Inherit from the **SystemAbilityLoadCallbackStub** class and overwrite the **OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject)** and **OnLoadSystemAbilityFail(int32_t systemAbilityId)** methods.
-    
-    ```
-    class OnDemandLoadCallback : public SystemAbilityLoadCallbackStub {
-    public:
-        void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
-        void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
-    };
-    
-    void OnDemandLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
-        const sptr<IRemoteObject>& remoteObject) // systemAbilityId is the ID of the system ability to be loaded, and remoteObject indicates the proxy object of the system ability.
-    {
-        cout << "OnLoadSystemAbilitySuccess systemAbilityId:" << systemAbilityId << " IRemoteObject result:" <<
-            ((remoteObject != nullptr) ? "succeed" : "failed") << endl;
-    }
-    
-    void OnDemandLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId) // systemAbilityId is the ID of the system ability to be loaded.
-    {
-        cout << "OnLoadSystemAbilityFail systemAbilityId:" << systemAbilityId << endl;
-    }
-    ```
-    
-    3.2 Call **LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback)** provided by samgr.
-    ```
-    // Construct a SystemAbilityLoadCallbackStub instance (mentioned in step 3.1).
-    sptr<OnDemandLoadCallback> loadCallback_ = new OnDemandLoadCallback();
-    // Call the LoadSystemAbility method.
-    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sm == nullptr) {
-        cout << "GetSystemAbilityManager samgr object null!" << endl;
-        return;
-    }
-    int32_t result = sm->LoadSystemAbility(systemAbilityId, loadCallback_);
-    if (result != ERR_OK) {
-        cout << "systemAbilityId:" << systemAbilityId << " load failed, result code:" << result << endl;
-        return;
-    }
-    ```
+	
+	```
+	class OnDemandLoadCallback : public SystemAbilityLoadCallbackStub {
+	public:
+	    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
+	    void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
+	};
+	
+	void OnDemandLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
+	    const sptr<IRemoteObject>& remoteObject) // systemAbilityId is the ID of the system ability to be loaded, and remoteObject indicates the proxy object of the system ability.
+	{
+	    cout << "OnLoadSystemAbilitySuccess systemAbilityId:" << systemAbilityId << " IRemoteObject result:" <<
+	        ((remoteObject != nullptr) ? "succeed" : "failed") << endl;
+	}
+	
+	void OnDemandLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId) // systemAbilityId is the ID of the system ability to be loaded.
+	{
+	    cout << "OnLoadSystemAbilityFail systemAbilityId:" << systemAbilityId << endl;
+	}
+	```
+	
+	3.2 Call **LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback)** provided by samgr.
+	```
+	// Construct a SystemAbilityLoadCallbackStub instance (mentioned in step 3.1).
+	sptr<OnDemandLoadCallback> loadCallback_ = new OnDemandLoadCallback();
+	// Call the LoadSystemAbility method.
+	sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+	if (sm == nullptr) {
+	    cout << "GetSystemAbilityManager samgr object null!" << endl;
+	    return;
+	}
+	int32_t result = sm->LoadSystemAbility(systemAbilityId, loadCallback_);
+	if (result != ERR_OK) {
+	    cout << "systemAbilityId:" << systemAbilityId << " load failed, result code:" << result << endl;
+	    return;
+	}
+	```
 >**NOTE**: 
 >
 >- After the **LoadSystemAbility** method is called, the **OnLoadSystemAbilitySuccess** callback will be invoked if the specified system ability is successfully loaded and the **OnLoadSystemAbilityFail** callback will be invoked if the system ability fails to be loaded. 
