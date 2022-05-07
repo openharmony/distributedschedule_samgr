@@ -82,11 +82,6 @@ ohos_executable("samgr") {
       "ipc:libdbinder",
       "utils_base:utils",
     ]
-
-    if (build_selinux) {
-      external_deps += [ "selinux:libservice_checker" ]
-      defines = [ "WITH_SELINUX" ]
-    }
     public_deps = [ "//third_party/libxml2:libxml2" ]
     part_name = "samgr_standard"
   }
