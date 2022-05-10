@@ -43,7 +43,7 @@ constexpr int32_t SPLIT_NAME_VECTOR_SIZE = 2;
 constexpr int32_t UID_ROOT = 0;
 constexpr int32_t UID_SYSTEM = 1000;
 constexpr int32_t MAX_SUBSCRIBE_COUNT = 256;
-constexpr int64_t CHECK_LOADED_DELAY_TIME = 60 * 1000; // ms
+constexpr int64_t CHECK_LOADED_DELAY_TIME = 60 * 1000;
 }
 
 std::mutex SystemAbilityManager::instanceLock;
