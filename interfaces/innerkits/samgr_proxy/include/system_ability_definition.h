@@ -20,7 +20,10 @@
 #include<string>
 
 namespace OHOS {
-// system ability definition should be a number between FIRST_SYS_ABILITY_ID and LAST_SYS_ABILITY_ID
+/*
+System ability definition should be a number between FIRST_SYS_ABILITY_ID and LAST_SYS_ABILITY_ID.
+And for vendor, should be a number between VENDOR_SYS_ABILITY_ID_BEGIN and VENDOR_SYS_ABILITY_ID_END.
+*/
 enum {
     FIRST_SYS_ABILITY_ID                             = 0x00000001,
     SUBSYS_COMMON_SYS_ABILITY_ID_BEGIN               = 1,
@@ -244,6 +247,10 @@ enum {
     DISTRIBUTED_DEVICE_PROFILE_SA_ID                 = 6001,
     SUBSYS_ACE_SYS_ABILITY_ID_BEGIN                  = 7001,
     CA_DAEMON_ID                                     = 8001,
+
+    // reserved for vendor
+    VENDOR_SYS_ABILITY_ID_BEGIN                      = 0x00010000,  // 65536
+    VENDOR_SYS_ABILITY_ID_END                        = 0x00020000,  // 131072
     LAST_SYS_ABILITY_ID                              = 0x00ffffff,  // 16777215
 };
 
