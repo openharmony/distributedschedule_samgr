@@ -15,7 +15,11 @@
 
 #include "system_ability_manager_stub.h"
 
+#include <unistd.h>
+#include <cinttypes>
+
 #include "accesstoken_kit.h"
+#include "datetime_ex.h"
 #include "errors.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
@@ -30,14 +34,20 @@
 
 namespace {
 #ifdef WITH_SELINUX
+    using namespace OHOS::HiviewDFX;
+    OHOS::HiviewDFX::HiLogLabel label_ = { LOG_CORE, 0xD001800, "SA_SELINUX" };
     std::unique_ptr<ServiceChecker> selinuxChecker_ = std::make_unique<ServiceChecker>(false);
 #endif
 
     bool CheckGetSAPermission(const int32_t said)
     {
 #ifdef WITH_SELINUX
+        int64_t begin = OHOS::GetTickCount();
         auto callingPid = OHOS::IPCSkeleton::GetCallingPid();
-        return selinuxChecker_->GetServiceCheck(callingPid, std::to_string(said)) == 0;
+        auto ret = selinuxChecker_->GetServiceCheck(callingPid, std::to_string(said)) == 0;
+        HiLog::Debug(label_, "[Performance] GetServiceCheck SA : %{public}d spend %{public}" PRId64 " ms",
+            said, OHOS::GetTickCount() - begin);
+        return  ret;
 #else
         return true; // if not support selinux, not check selinux permission
 #endif
@@ -46,8 +56,12 @@ namespace {
     bool CheckAddOrRemovePermission(const int32_t said)
     {
 #ifdef WITH_SELINUX
+        int64_t begin = OHOS::GetTickCount();
         auto callingPid = OHOS::IPCSkeleton::GetCallingPid();
-        return selinuxChecker_->AddServiceCheck(callingPid, std::to_string(said)) == 0;
+        auto ret = selinuxChecker_->AddServiceCheck(callingPid, std::to_string(said)) == 0;
+        HiLog::Debug(label_, "[Performance] AddServiceCheck SA : %{public}d spend %{public}" PRId64 " ms",
+            said, OHOS::GetTickCount() - begin);
+        return ret;
 #else
         return true; // if not support selinux, not check selinux permission
 #endif
@@ -56,8 +70,12 @@ namespace {
     bool CheckGetRemoteSAPermission(const int32_t said)
     {
 #ifdef WITH_SELINUX
+        int64_t begin = OHOS::GetTickCount();
         auto callingPid = OHOS::IPCSkeleton::GetCallingPid();
-        return selinuxChecker_->GetRemoteServiceCheck(callingPid, std::to_string(said)) == 0;
+        auto ret = selinuxChecker_->GetRemoteServiceCheck(callingPid, std::to_string(said)) == 0;
+        HiLog::Debug(label_, "[Performance] GetRemoteServiceCheck SA : %{public}d spend %{public}" PRId64 " ms",
+            said, OHOS::GetTickCount() - begin);
+        return ret;
 #else
         return true; // if not support selinux, not check selinux permission
 #endif
@@ -66,8 +84,12 @@ namespace {
     bool CheckListSAPermission()
     {
 #ifdef WITH_SELINUX
+        int64_t begin = OHOS::GetTickCount();
         auto callingPid = OHOS::IPCSkeleton::GetCallingPid();
-        return selinuxChecker_->ListServiceCheck(callingPid) == 0;
+        auto ret = selinuxChecker_->ListServiceCheck(callingPid) == 0;
+        HiLog::Debug(label_, "[Performance] ListServiceCheck spend %{public}" PRId64 " ms",
+            OHOS::GetTickCount() - begin);
+        return ret;
 #else
         return true; // if not support selinux, not check selinux permission
 #endif
