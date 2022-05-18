@@ -29,7 +29,10 @@ int main(int argc, char *argv[])
     OHOS::sptr<OHOS::SystemAbilityManager> manager = OHOS::SystemAbilityManager::GetInstance();
     manager->Init();
     OHOS::sptr<OHOS::IRemoteObject> serv = manager->AsObject();
-    IPCSkeleton::SetContextObject(serv);
+
+    if (!IPCSkeleton::SetContextObject(serv)) {
+        HILOGE("set context fail!"); // add log for dfx
+    }
 
     HILOGI("start System Ability Manager Loop");
     OHOS::IPCSkeleton::JoinWorkThread();
