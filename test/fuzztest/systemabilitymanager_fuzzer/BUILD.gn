@@ -20,7 +20,7 @@ samgr_dir = "//foundation/distributedschedule/samgr"
 samgr_services_dir = "${samgr_dir}/services/samgr/native"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("SystemAbilityFuzzTest") {
+ohos_fuzztest("SystemAbilityManagerFuzzTest") {
   module_out_path = module_output_path
 
   fuzz_config_file = "//foundation/distributedschedule/samgr/test/fuzztest/systemabilitymanager_fuzzer"
@@ -63,6 +63,6 @@ group("fuzztest") {
 
   deps += [
     # deps file
-    ":SystemAbilityFuzzTest",
+    ":SystemAbilityManagerFuzzTest",
   ]
 }
