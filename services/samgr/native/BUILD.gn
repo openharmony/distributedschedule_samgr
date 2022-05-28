@@ -80,6 +80,7 @@ ohos_executable("samgr") {
       "init:libbegetutil",
       "ipc:ipc_core",
       "ipc:libdbinder",
+      "startup_l2:syspara",
       "utils_base:utils",
     ]
 

@@ -17,6 +17,7 @@
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "iservice_registry.h"
+#include "parameter.h"
 #include "sam_log.h"
 #include "system_ability_manager.h"
 
@@ -33,8 +34,8 @@ int main(int argc, char *argv[])
     if (!IPCSkeleton::SetContextObject(serv)) {
         HILOGE("set context fail!"); // add log for dfx
     }
-
-    HILOGI("start System Ability Manager Loop");
+    bool result = SetParameter("bootevent.samgr.ready", "true");
+    HILOGI("set samgr ready ret : %{public}s", result ? "succeed" : "failed");
     OHOS::IPCSkeleton::JoinWorkThread();
     return -1;
 }
