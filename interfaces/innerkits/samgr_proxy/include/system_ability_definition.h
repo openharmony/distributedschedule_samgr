@@ -207,6 +207,7 @@ enum {
     TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID            = 4010,
     TELEPHONY_DATA_STORAGE_SYS_ABILITY_ID            = 4012,
     SUBSYS_UPDATE_SYS_ABILITY_ID_BEGIN               = 4100,
+    LIVE_UPDATER_DISTRIBUTED_SERVICE_ID              = 4101,
     SUBSYS_USB_SYS_ABILITY_ID_BEGIN                  = 4200,
     USB_SYSTEM_ABILITY_ID                            = 4201,
     SUBSYS_WEARABLE_SYS_ABILITY_ID_BEGIN             = 4300,
@@ -324,6 +325,7 @@ static const std::map<int, std::string> saNameMap_ = {
     { ACCESSIBILITY_MANAGER_SERVICE_ID, "AccessibilityManagerService"},
     { MEMORY_MANAGER_SA_ID, "MemoryManagerService" },
     { AVSESSION_SERVICE_ID, "AVSessionService" },
+    { LIVE_UPDATER_DISTRIBUTED_SERVICE_ID, "LiveUpdaterService" },
 };
 } // namespace OHOS
 
