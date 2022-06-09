@@ -49,5 +49,8 @@ ohos_shared_library("samgr_proxy") {
 
     part_name = "samgr_standard"
   }
+
+  install_images = [ system_base_dir ]
+  relative_install_dir = "chipset-pub-sdk"
   subsystem_name = "distributedschedule"
 }
