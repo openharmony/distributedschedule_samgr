@@ -601,11 +601,10 @@ int32_t SystemAbilityManager::AddSystemAbility(int32_t systemAbilityId, const sp
         dBinderService_->RegisterRemoteProxy(strName, systemAbilityId);
         HILOGD("AddSystemAbility RegisterRemoteProxy, serviceId is %{public}d", systemAbilityId);
     }
-    if (systemAbilityId == SOFTBUS_SERVER_SA_ID && !isDbinderStart_) {
+    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         if (dBinderService_ != nullptr && rpcCallbackImp_ != nullptr) {
             bool ret = dBinderService_->StartDBinderService(rpcCallbackImp_);
             HILOGI("start result is %{public}s", ret ? "succeed" : "fail");
-            isDbinderStart_ = true;
         }
     }
     SendSystemAbilityAddedMsg(systemAbilityId, ability);
