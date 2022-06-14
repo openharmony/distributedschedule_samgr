@@ -249,6 +249,7 @@ enum {
     FILEMANAGEMENT_BACKUP_SERVICE_SA_ID              = 5203,
     DISTRIBUTED_DEVICE_PROFILE_SA_ID                 = 6001,
     SUBSYS_ACE_SYS_ABILITY_ID_BEGIN                  = 7001,
+    ARKUI_UI_APPEARANCE_SERVICE_ID                   = 7002,
     CA_DAEMON_ID                                     = 8001,
 
     // reserved for vendor
@@ -326,6 +327,7 @@ static const std::map<int, std::string> saNameMap_ = {
     { MEMORY_MANAGER_SA_ID, "MemoryManagerService" },
     { AVSESSION_SERVICE_ID, "AVSessionService" },
     { LIVE_UPDATER_DISTRIBUTED_SERVICE_ID, "LiveUpdaterService" },
+    { ARKUI_UI_APPEARANCE_SERVICE_ID, "UiAppearanceService"},
 };
 } // namespace OHOS
 
