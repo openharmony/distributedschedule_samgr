@@ -17,6 +17,9 @@
         "adapted_system_type": [
             "standard"
         ],
+        "hisysevent_config": [
+            "//foundation/distributedschedule/samgr/hisysevent.yaml"
+            ],
         "rom": "300KB",
         "ram": "7130KB",
         "deps": {

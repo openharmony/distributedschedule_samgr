@@ -19,6 +19,11 @@ module_output_path = "samgr_standard/samgr"
 samgr_dir = "//foundation/distributedschedule/samgr"
 samgr_services_dir = "${samgr_dir}/services/samgr/native"
 
+config("sam_fuzz_test_config") {
+  include_dirs =
+      [ "//foundation/distributedschedule/samgr/services/dfx/include" ]
+}
+
 ##############################fuzztest##########################################
 ohos_fuzztest("SystemAbilityManagerFuzzTest") {
   module_out_path = module_output_path
@@ -26,6 +31,7 @@ ohos_fuzztest("SystemAbilityManagerFuzzTest") {
   fuzz_config_file = "//foundation/distributedschedule/samgr/test/fuzztest/systemabilitymanager_fuzzer"
 
   configs = [
+    ":sam_fuzz_test_config",
     "${samgr_dir}/interfaces/innerkits/lsamgr:config_samgr",
     "${samgr_dir}/services/samgr/native:sam_config",
   ]
@@ -40,6 +46,7 @@ ohos_fuzztest("SystemAbilityManagerFuzzTest") {
     "${samgr_dir}/utils/native/source/tools.cpp",
     "${samgr_services_dir}/source/system_ability_manager.cpp",
     "${samgr_services_dir}/source/system_ability_manager_stub.cpp",
+    "//foundation/distributedschedule/samgr/services/dfx/source/hisysevent_adapter.cpp",
     "systemabilitymanager_fuzzer.cpp",
   ]
   deps = []
@@ -47,6 +54,8 @@ ohos_fuzztest("SystemAbilityManagerFuzzTest") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",

@@ -21,6 +21,7 @@
 #include "accesstoken_kit.h"
 #include "datetime_ex.h"
 #include "errors.h"
+#include "hitrace_meter.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "sam_log.h"
@@ -514,6 +515,8 @@ int32_t SystemAbilityManagerStub::AddSystemProcessInner(MessageParcel& data, Mes
 int32_t SystemAbilityManagerStub::LoadSystemAbilityInner(MessageParcel& data, MessageParcel& reply)
 {
     int32_t systemAbilityId = data.ReadInt32();
+    std::string loadSystemAbilityTag = ToString(systemAbilityId) + "_LoadSystemAbility";
+    HITRACE_METER_NAME(HITRACE_TAG_SAMGR, loadSystemAbilityTag);
     if (!CheckInputSysAbilityId(systemAbilityId)) {
         HILOGW("SystemAbilityManagerStub::LoadSystemAbilityInner read systemAbilityId failed!");
         return ERR_INVALID_VALUE;

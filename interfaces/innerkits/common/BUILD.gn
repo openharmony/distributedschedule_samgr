@@ -17,6 +17,7 @@ config("config_samgr_common") {
   include_dirs = [
     "include",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/distributedschedule/samgr/services/dfx/include",
     "//third_party/libxml2/include",
   ]
 }
@@ -25,12 +26,15 @@ config("config_samgr_common") {
 ohos_shared_library("samgr_common") {
   sources = [
     "//foundation/distributedschedule/samgr/services/common/src/parse_util.cpp",
+    "//foundation/distributedschedule/samgr/services/dfx/source/hisysevent_adapter.cpp",
   ]
 
   configs = [ ":config_samgr_common" ]
   public_configs = [ ":config_samgr_common" ]
   if (is_standard_system) {
     external_deps = [
+      "hisysevent_native:libhisysevent",
+      "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]

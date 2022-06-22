@@ -22,6 +22,8 @@
 #include "datetime_ex.h"
 #include "directory_ex.h"
 #include "errors.h"
+#include "hisysevent_adapter.h"
+#include "hitrace_meter.h"
 #include "if_local_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "local_ability_manager_proxy.h"
@@ -165,6 +167,7 @@ sptr<IRemoteObject> SystemAbilityManager::GetSystemAbilityFromRemote(int32_t sys
 sptr<IRemoteObject> SystemAbilityManager::CheckSystemAbility(int32_t systemAbilityId)
 {
     HILOGD("%{public}s called, systemAbilityId = %{public}d", __func__, systemAbilityId);
+    ReportGetSAFrequency(IPCSkeleton::GetCallingPid(), systemAbilityId);
     if (!CheckInputSysAbilityId(systemAbilityId)) {
         HILOGW("CheckSystemAbility CheckSystemAbility invalid!");
         return nullptr;

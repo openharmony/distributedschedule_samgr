@@ -35,6 +35,8 @@ namespace {
 constexpr int32_t TEST_VALUE = 2021;
 constexpr int32_t TEST_REVERSE_VALUE = 1202;
 constexpr int32_t REPEAT = 10;
+constexpr int32_t OVERFLOW_TIME = 257;
+constexpr int32_t TEST_OVERFLOW_SAID = 99999;
 constexpr int32_t TEST_EXCEPTION_HIGH_SA_ID = LAST_SYS_ABILITY_ID + 1;
 constexpr int32_t TEST_EXCEPTION_LOW_SA_ID = FIRST_SYS_ABILITY_ID - 1;
 const std::u16string SAMANAGER_INTERFACE_TOKEN = u"ohos.samgr.accessToken";
@@ -676,5 +678,43 @@ HWTEST_F(SystemAbilityMgrTest, OnLoadSystemAbilitySuccess003, TestSize.Level1)
     saMgr->NotifySystemAbilityLoaded(DISTRIBUTED_SCHED_TEST_SO_ID, remoteObject, callback);
     EXPECT_TRUE(callback->GetSystemAbilityId() == DISTRIBUTED_SCHED_TEST_SO_ID);
     EXPECT_TRUE(callback->GetRemoteObject() == remoteObject);
+}
+
+/**
+ * @tc.name: ReportSubscribeOverflow001
+ * @tc.desc: ReportSubscribeOverflow001
+ * @tc.type: FUNC
+ * @tc.require: AR000H04KS
+ */
+HWTEST_F(SystemAbilityMgrTest, ReportSubscribeOverflow001, TestSize.Level1)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    ASSERT_TRUE(saMgr != nullptr);
+    std::vector<sptr<SaStatusChangeMock>> tmpCallbak;
+    sptr<SaStatusChangeMock> callback = nullptr;
+    for (int i = 0; i < OVERFLOW_TIME; ++i) {
+        callback = new SaStatusChangeMock();
+        tmpCallbak.emplace_back(callback);
+        saMgr->SubscribeSystemAbility(TEST_OVERFLOW_SAID, callback);
+    }
+    for (const auto& callback : tmpCallbak) {
+        saMgr->UnSubscribeSystemAbility(TEST_OVERFLOW_SAID, callback);
+    }
+}
+
+/**
+ * @tc.name: ReportLoadSAOverflow001
+ * @tc.desc: ReportLoadSAOverflow001
+ * @tc.type: FUNC
+ * @tc.require: SR000H04KR
+ */
+HWTEST_F(SystemAbilityMgrTest, ReportLoadSAOverflow001, TestSize.Level1)
+{
+    sptr<ISystemAbilityManager> saMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_TRUE(saMgr != nullptr);
+    for (int i = 0; i < OVERFLOW_TIME; ++i) {
+        sptr<SystemAbilityLoadCallbackMock> callback = new SystemAbilityLoadCallbackMock();
+        saMgr->LoadSystemAbility(TEST_OVERFLOW_SAID, callback);
+    }
 }
 } // namespace OHOS

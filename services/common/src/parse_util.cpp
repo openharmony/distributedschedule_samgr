@@ -19,8 +19,10 @@
 #include <dlfcn.h>
 #include <fstream>
 #include <sstream>
-#include "datetime_ex.h"
 
+#include "datetime_ex.h"
+#include "hisysevent_adapter.h"
+#include "hitrace_meter.h"
 #include "sam_log.h"
 #include "string_ex.h"
 
@@ -97,6 +99,8 @@ void ParseUtil::OpenSo()
 void ParseUtil::OpenSo(SaProfile& saProfile)
 {
     if (saProfile.handle == nullptr) {
+        std::string dlopenTag = ToString(saProfile.saId) + "_DLOPEN";
+        HITRACE_METER_NAME(HITRACE_TAG_SAMGR, dlopenTag);
         int64_t begin = GetTickCount();
         DlHandle handle = dlopen(Str16ToStr8(saProfile.libPath).c_str(), RTLD_NOW);
         HILOGI("[PerformanceTest] SA:%{public}d OpenSo spend %{public}" PRId64 " ms",
@@ -108,6 +112,7 @@ void ParseUtil::OpenSo(SaProfile& saProfile)
             if ((libPathVec.size() > 0)) {
                 fileName = libPathVec[libPathVec.size() - 1];
             }
+            ReportAddSystemAbilityFailed(saProfile.saId, fileName);
             HILOGE("dlopen %{public}s failed with errno:%s!", fileName.c_str(), dlerror());
             return;
         }

@@ -21,6 +21,7 @@ config("sam_test_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "${samgr_services_dir}/test/unittest/include",
+    "//foundation/distributedschedule/samgr/services/dfx/include",
     "//foundation/distributedschedule/samgr/utils/native/include",
   ]
 }
@@ -38,6 +39,7 @@ ohos_unittest("SystemAbilityMgrTest") {
     "${samgr_services_dir}/test/unittest/src/itest_transaction_service.cpp",
     "${samgr_services_dir}/test/unittest/src/sa_status_change_mock.cpp",
     "${samgr_services_dir}/test/unittest/src/system_ability_mgr_test.cpp",
+    "//foundation/distributedschedule/samgr/services/dfx/source/hisysevent_adapter.cpp",
   ]
 
   configs = [
@@ -61,6 +63,8 @@ ohos_unittest("SystemAbilityMgrTest") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",

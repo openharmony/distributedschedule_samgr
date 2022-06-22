@@ -24,6 +24,7 @@ config("sam_config") {
   # header file path
   include_dirs = [
     "//foundation/distributedschedule/samgr/services/samgr/native/include",
+    "//foundation/distributedschedule/samgr/services/dfx/include",
     "//foundation/distributedschedule/samgr/utils/native/include",
     "//foundation/distributedschedule/samgr/services/lsamgr/include",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/common/include",
@@ -34,6 +35,7 @@ config("sam_config") {
 ohos_executable("samgr") {
   install_enable = true
   sources = [
+    "//foundation/distributedschedule/samgr/services/dfx/source/hisysevent_adapter.cpp",
     "//foundation/distributedschedule/samgr/services/samgr/native/source/ability_death_recipient.cpp",
     "//foundation/distributedschedule/samgr/services/samgr/native/source/main.cpp",
     "//foundation/distributedschedule/samgr/services/samgr/native/source/rpc_callback_imp.cpp",
@@ -61,6 +63,8 @@ ohos_executable("samgr") {
     external_deps = [
       "access_token:libaccesstoken_sdk",
       "eventhandler:libeventhandler",
+      "hisysevent_native:libhisysevent",
+      "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "init:libbegetutil",
       "ipc:ipc_core",
