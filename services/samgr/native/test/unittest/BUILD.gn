@@ -99,10 +99,62 @@ ohos_executable("ondemand") {
   subsystem_name = "distributedschedule"
 }
 
+ohos_executable("TestTool") {
+  #module_out_path = module_output_path
+  sources = [
+    "${samgr_dir}/utils/native/source/tools.cpp",
+    "${samgr_services_dir}/source/ability_death_recipient.cpp",
+    "${samgr_services_dir}/source/rpc_callback_imp.cpp",
+    "${samgr_services_dir}/source/system_ability_load_callback_proxy.cpp",
+    "${samgr_services_dir}/source/system_ability_manager.cpp",
+    "${samgr_services_dir}/source/system_ability_manager_stub.cpp",
+    "${samgr_services_dir}/source/system_ability_status_change_proxy.cpp",
+    "${samgr_services_dir}/test/unittest/src/itest_transaction_service.cpp",
+    "./src/system_ability_test_tool.cpp",
+    "//foundation/distributedschedule/samgr/services/dfx/source/hisysevent_adapter.cpp",
+  ]
+
+  configs = [
+    ":sam_test_config",
+    "${samgr_dir}/interfaces/innerkits/lsamgr:config_samgr",
+    "${samgr_dir}/interfaces/innerkits/samgr_proxy:samgr_proxy_config",
+    "${samgr_dir}/services/samgr/native:sam_config",
+  ]
+  deps = [
+    "${samgr_dir}/interfaces/innerkits/common:samgr_common",
+    "${samgr_dir}/interfaces/innerkits/samgr_proxy:samgr_proxy",
+  ]
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog_base" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  cflags = []
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+  external_deps += [
+    "access_token:libaccesstoken_sdk",
+    "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
+    "hiviewdfx_hilog_native:libhilog",
+    "hiviewdfx_hilog_native:libhilog_base",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "ipc:libdbinder",
+    "utils_base:utils",
+  ]
+  part_name = "samgr_standard"
+  subsystem_name = "distributedschedule"
+}
+
 group("unittest") {
   testonly = true
   deps = [
     ":SystemAbilityMgrTest",
+    ":TestTool",
     ":ondemand",
   ]
 }
