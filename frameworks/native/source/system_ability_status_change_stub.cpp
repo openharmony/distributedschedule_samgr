@@ -15,7 +15,13 @@
 
 #include "system_ability_status_change_stub.h"
 
-#include "ipc_skeleton.h"
+#include "errors.h"
+#include "ipc_object_stub.h"
+#include "ipc_types.h"
+#include "isystem_ability_status_change.h"
+#include "message_option.h"
+#include "message_parcel.h"
+#include "refbase.h"
 #include "sam_log.h"
 #include "system_ability_definition.h"
 

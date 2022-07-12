@@ -14,8 +14,11 @@
  */
 
 #include "local_ability_manager_proxy.h"
+
 #include "ipc_types.h"
-#include "parcel.h"
+#include "iremote_object.h"
+#include "message_option.h"
+#include "message_parcel.h"
 
 using namespace std;
 using namespace OHOS::HiviewDFX;

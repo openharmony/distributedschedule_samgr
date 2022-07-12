@@ -17,8 +17,11 @@
 #define LOCAL_ABILITY_MANAGER_PROXY_H_
 
 #include <string>
-#include "if_local_ability_manager.h"
 #include "hilog/log.h"
+#include "if_local_ability_manager.h"
+#include "iremote_broker.h"
+#include "iremote_proxy.h"
+#include "refbase.h"
 
 namespace OHOS {
 class LocalAbilityManagerProxy : public IRemoteProxy<ILocalAbilityManager> {

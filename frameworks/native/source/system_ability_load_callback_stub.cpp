@@ -15,7 +15,12 @@
 
 #include "system_ability_load_callback_stub.h"
 
-#include "ipc_skeleton.h"
+#include "errors.h"
+#include "ipc_object_stub.h"
+#include "ipc_types.h"
+#include "isystem_ability_load_callback.h"
+#include "message_parcel.h"
+#include "refbase.h"
 #include "sam_log.h"
 #include "system_ability_definition.h"
 

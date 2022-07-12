@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 #include "hisysevent_adapter.h"
+
+#include <string>
+
+#include "def.h"
 #include "hisysevent.h"
 #include "sam_log.h"
 

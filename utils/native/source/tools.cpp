@@ -14,9 +14,7 @@
  */
 
 #include "tools.h"
-#include <codecvt>
-#include <locale>
-#include <map>
+
 #include <string>
 
 namespace OHOS {

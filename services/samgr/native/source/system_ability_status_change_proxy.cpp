@@ -16,7 +16,11 @@
 #include "system_ability_status_change_proxy.h"
 
 #include "ipc_types.h"
-#include "parcel.h"
+#include "iremote_object.h"
+#include "isystem_ability_status_change.h"
+#include "message_option.h"
+#include "message_parcel.h"
+#include "refbase.h"
 #include "sam_log.h"
 
 namespace OHOS {

@@ -15,8 +15,7 @@
 #ifndef SAMGR_TEST_UNITTEST_INCLUDE_ONDEMAND_HELPER_H
 #define SAMGR_TEST_UNITTEST_INCLUDE_ONDEMAND_HELPER_H
 
-#include <mutex>
-#include <set>
+#include "refbase.h"
 #include "system_ability_load_callback_stub.h"
 namespace OHOS {
 class OnDemandHelper {
