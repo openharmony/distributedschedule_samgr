@@ -19,7 +19,6 @@
 
 #include "errors.h"
 #include "hilog/log.h"
-#include "if_local_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "iremote_broker.h"

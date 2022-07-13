@@ -15,9 +15,8 @@
 
 #include "errors.h"
 #include "ipc_skeleton.h"
-#include "ipc_types.h"
-#include "iservice_registry.h"
 #include "parameter.h"
+#include "refbase.h"
 #include "sam_log.h"
 #include "system_ability_manager.h"
 

@@ -18,9 +18,7 @@
 #include <cinttypes>
 #include <dlfcn.h>
 #include <fstream>
-#include <map>
 #include <memory>
-#include <set>
 #include <sstream>
 #include <vector>
 
@@ -28,11 +26,9 @@
 #include "hisysevent_adapter.h"
 #include "hitrace_meter.h"
 #include "libxml/globals.h"
-#include "libxml/parser.h"
 #include "libxml/tree.h"
 #include "libxml/xmlstring.h"
 #include "sam_log.h"
-#include "sa_profiles.h"
 #include "string_ex.h"
 
 namespace OHOS {

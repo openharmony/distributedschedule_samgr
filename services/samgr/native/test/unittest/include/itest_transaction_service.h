@@ -19,6 +19,7 @@
 #include "iremote_object.h"
 #include "iremote_proxy.h"
 #include "iremote_stub.h"
+#include "refbase.h"
 #include "sam_log.h"
 
 namespace OHOS {

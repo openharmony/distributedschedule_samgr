@@ -16,9 +16,15 @@
 #include "ondemand_helper.h"
 
 #include <iostream>
+#include <memory>
+
 #include "datetime_ex.h"
+#include "errors.h"
 #include "if_system_ability_manager.h"
+#include "ipc_types.h"
+#include "iremote_object.h"
 #include "iservice_registry.h"
+#include "isystem_ability_load_callback.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS;

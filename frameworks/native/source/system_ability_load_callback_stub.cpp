@@ -18,7 +18,6 @@
 #include "errors.h"
 #include "ipc_object_stub.h"
 #include "ipc_types.h"
-#include "isystem_ability_load_callback.h"
 #include "message_parcel.h"
 #include "refbase.h"
 #include "sam_log.h"

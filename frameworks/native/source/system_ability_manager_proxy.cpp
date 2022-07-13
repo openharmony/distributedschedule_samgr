@@ -15,12 +15,10 @@
 
 #include "system_ability_manager_proxy.h"
 
-#include <string>
 #include <unistd.h>
 #include <vector>
 
 #include "errors.h"
-#include "if_local_ability_manager.h"
 #include "ipc_types.h"
 #include "iremote_object.h"
 #include "isystem_ability_load_callback.h"

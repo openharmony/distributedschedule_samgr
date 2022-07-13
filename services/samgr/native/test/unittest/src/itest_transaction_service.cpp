@@ -15,6 +15,11 @@
 
 #include "itest_transaction_service.h"
 
+#include "ipc_object_stub.h"
+#include "ipc_types.h"
+#include "message_option.h"
+#include "message_parcel.h"
+
 using namespace std;
 
 namespace OHOS {
