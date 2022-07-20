@@ -39,13 +39,19 @@
             "third_party": [ "libxml2" ]
         },
         "build": {
-            "sub_component": [
-                "//foundation/distributedschedule/samgr/interfaces/innerkits/common:samgr_common",
-                "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
-                "//foundation/distributedschedule/samgr/services/samgr/native:samgr",
-                "//foundation/distributedschedule/samgr/etc:samgr_etc",
-                "//third_party/libxml2:libxml2"
-            ],
+            "group_type": {
+                "base_group": [],
+                "fwk_group": [
+                    "//foundation/distributedschedule/samgr/interfaces/innerkits/common:samgr_common",
+                    "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr:lsamgr",
+                    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy"
+                ],
+                "service_group": [
+                    "//foundation/distributedschedule/samgr/etc:samgr_etc",
+                    "//foundation/distributedschedule/samgr/services/samgr/native:samgr",
+                    "//third_party/libxml2:libxml2"
+                ]
+            },
             "inner_kits": [
                 {
                     "header": {
