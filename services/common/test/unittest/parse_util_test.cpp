@@ -70,7 +70,6 @@ void ParseUtilTest::TearDown()
  * @tc.name: ParseSaProfile001
  * @tc.desc: Verify if can load not exist file
  * @tc.type: FUNC
- * @tc.require: AR000GGVQF
  */
 HWTEST_F(ParseUtilTest, ParseSaProfile001, TestSize.Level1)
 {
@@ -87,7 +86,6 @@ HWTEST_F(ParseUtilTest, ParseSaProfile001, TestSize.Level1)
  * @tc.name: ParseSaProfile002
  * @tc.desc: Verify if can load invalid root file
  * @tc.type: FUNC
- * @tc.require: SR000GGVP1
  */
 HWTEST_F(ParseUtilTest, ParseSaProfile002, TestSize.Level1)
 {
@@ -104,7 +102,6 @@ HWTEST_F(ParseUtilTest, ParseSaProfile002, TestSize.Level1)
  * @tc.name: ParseSaProfile003
  * @tc.desc: Verify if can load normal profile
  * @tc.type: FUNC
- * @tc.require: AR000GGVQF
  */
 HWTEST_F(ParseUtilTest, ParseSaProfile003, TestSize.Level1)
 {
@@ -121,7 +118,6 @@ HWTEST_F(ParseUtilTest, ParseSaProfile003, TestSize.Level1)
  * @tc.name: GetSaProfiles001
  * @tc.desc:  Verify if not load sa file return empty list
  * @tc.type: FUNC
- * @tc.require: SR000GGVP1
  */
 HWTEST_F(ParseUtilTest, GetSaProfiles001, TestSize.Level1)
 {
@@ -138,7 +134,6 @@ HWTEST_F(ParseUtilTest, GetSaProfiles001, TestSize.Level1)
  * @tc.name: GetSaProfiles002
  * @tc.desc:  Verify if can load normal sa profile
  * @tc.type: FUNC
- * @tc.require: SR000GGVP1
  */
 HWTEST_F(ParseUtilTest, GetSaProfiles002, TestSize.Level1)
 {
@@ -161,7 +156,6 @@ HWTEST_F(ParseUtilTest, GetSaProfiles002, TestSize.Level1)
  * @tc.name: ParseTrustConfig001
  * @tc.desc:  Verify if can load file with one sa
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, ParseTrustConfig001, TestSize.Level1)
 {
@@ -188,7 +182,6 @@ HWTEST_F(ParseUtilTest, ParseTrustConfig001, TestSize.Level1)
  * @tc.name: ParseTrustConfig002
  * @tc.desc:  Verify if can load file with muti sa
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, ParseTrustConfig002, TestSize.Level1)
 {
@@ -215,7 +208,6 @@ HWTEST_F(ParseUtilTest, ParseTrustConfig002, TestSize.Level1)
  * @tc.name: ParseTrustConfig003
  * @tc.desc:  Verify if can load not invalid root file
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, ParseTrustConfig003, TestSize.Level1)
 {
@@ -233,7 +225,6 @@ HWTEST_F(ParseUtilTest, ParseTrustConfig003, TestSize.Level1)
  * @tc.name: ParseTrustConfig004
  * @tc.desc:  Verify if can load not exist file
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, ParseTrustConfig004, TestSize.Level1)
 {
@@ -251,7 +242,6 @@ HWTEST_F(ParseUtilTest, ParseTrustConfig004, TestSize.Level1)
  * @tc.name: ParseTrustConfig005
  * @tc.desc:  Verify if can load invalid element config
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, ParseTrustConfig005, TestSize.Level1)
 {
@@ -274,7 +264,6 @@ HWTEST_F(ParseUtilTest, ParseTrustConfig005, TestSize.Level1)
  * @tc.name: ParseTrustConfig006
  * @tc.desc:  Verify if can load invalid muti root file
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, ParseTrustConfig006, TestSize.Level1)
 {
@@ -292,7 +281,6 @@ HWTEST_F(ParseUtilTest, ParseTrustConfig006, TestSize.Level1)
  * @tc.name: RemoveSaProfile001
  * @tc.desc:  Verify if can remove not-existed id
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, RemoveSaProfile001, TestSize.Level1)
 {
@@ -316,7 +304,6 @@ HWTEST_F(ParseUtilTest, RemoveSaProfile001, TestSize.Level1)
  * @tc.name: RemoveSaProfile002
  * @tc.desc:  Verify if can can remove not-existed id
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, RemoveSaProfile002, TestSize.Level1)
 {
@@ -342,7 +329,6 @@ HWTEST_F(ParseUtilTest, RemoveSaProfile002, TestSize.Level1)
  * @tc.name: RemoveSaProfile003
  * @tc.desc:  Verify if can remove one existed id
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, RemoveSaProfile003, TestSize.Level1)
 {
@@ -368,7 +354,6 @@ HWTEST_F(ParseUtilTest, RemoveSaProfile003, TestSize.Level1)
  * @tc.name: RemoveSaProfile004
  * @tc.desc:  Verify if can remove one existed id
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, RemoveSaProfile004, TestSize.Level1)
 {
@@ -394,7 +379,6 @@ HWTEST_F(ParseUtilTest, RemoveSaProfile004, TestSize.Level1)
  * @tc.name: RemoveSaProfile005
  * @tc.desc:  Verify if can remove more existed id
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, RemoveSaProfile005, TestSize.Level1)
 {
@@ -422,7 +406,6 @@ HWTEST_F(ParseUtilTest, RemoveSaProfile005, TestSize.Level1)
  * @tc.name: CheckPathExist001
  * @tc.desc:  Verify if can check not exist file
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, CheckPathExist001, TestSize.Level1)
 {
@@ -439,7 +422,6 @@ HWTEST_F(ParseUtilTest, CheckPathExist001, TestSize.Level1)
  * @tc.name: CheckPathExist002
  * @tc.desc:  Verify if can check exist file
  * @tc.type: FUNC
- * @tc.require: AR000GICSU
  */
 HWTEST_F(ParseUtilTest, CheckPathExist002, TestSize.Level1)
 {
@@ -456,7 +438,6 @@ HWTEST_F(ParseUtilTest, CheckPathExist002, TestSize.Level1)
  * @tc.name: GetProfile001
  * @tc.desc:  Verify if can get not-exist profile
  * @tc.type: FUNC
- * @tc.require: AR000GH56I
  */
 HWTEST_F(ParseUtilTest, GetProfile001, TestSize.Level1)
 {
@@ -474,7 +455,6 @@ HWTEST_F(ParseUtilTest, GetProfile001, TestSize.Level1)
  * @tc.name: GetProfile002
  * @tc.desc:  Verify if can get exist profile
  * @tc.type: FUNC
- * @tc.require: AR000GH56I
  */
 HWTEST_F(ParseUtilTest, GetProfile002, TestSize.Level1)
 {

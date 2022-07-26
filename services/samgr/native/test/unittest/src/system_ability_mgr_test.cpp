@@ -65,7 +65,6 @@ void SystemAbilityMgrTest::TearDown()
  * @tc.name: AddSystemAbility001
  * @tc.desc: add system ability, input invalid parameter
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, AddSystemAbility001, TestSize.Level1)
 {
@@ -80,7 +79,6 @@ HWTEST_F(SystemAbilityMgrTest, AddSystemAbility001, TestSize.Level1)
  * @tc.name: AddSystemAbility002
  * @tc.desc: add system ability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, AddSystemAbility002, TestSize.Level1)
 {
@@ -97,7 +95,6 @@ HWTEST_F(SystemAbilityMgrTest, AddSystemAbility002, TestSize.Level1)
  * @tc.name: AddSystemAbility003
  * @tc.desc: add system ability saId exception.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, AddSystemAbility003, TestSize.Level1)
 {
@@ -116,7 +113,6 @@ HWTEST_F(SystemAbilityMgrTest, AddSystemAbility003, TestSize.Level1)
  * @tc.name: AddSystemAbility004
  * @tc.desc: add system ability with empty capability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, AddSystemAbility004, TestSize.Level1)
 {
@@ -134,7 +130,6 @@ HWTEST_F(SystemAbilityMgrTest, AddSystemAbility004, TestSize.Level1)
  * @tc.name: AddSystemAbility005
  * @tc.desc: add system ability with validated capability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, AddSystemAbility005, TestSize.Level1)
 {
@@ -154,7 +149,6 @@ HWTEST_F(SystemAbilityMgrTest, AddSystemAbility005, TestSize.Level1)
  * @tc.name: RemoveSystemAbility001
  * @tc.desc: remove not exist system ability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, RemoveSystemAbility001, TestSize.Level1)
 {
@@ -168,7 +162,6 @@ HWTEST_F(SystemAbilityMgrTest, RemoveSystemAbility001, TestSize.Level1)
  * @tc.name: RemoveSystemAbility002
  * @tc.desc: remove system ability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, RemoveSystemAbility002, TestSize.Level1)
 {
@@ -184,7 +177,6 @@ HWTEST_F(SystemAbilityMgrTest, RemoveSystemAbility002, TestSize.Level1)
  * @tc.name: GetSystemAbility001
  * @tc.desc: get not exist system ability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, GetSystemAbility001, TestSize.Level1)
 {
@@ -198,7 +190,6 @@ HWTEST_F(SystemAbilityMgrTest, GetSystemAbility001, TestSize.Level1)
  * @tc.name: GetSystemAbility002
  * @tc.desc: get system ability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, GetSystemAbility002, TestSize.Level1)
 {
@@ -215,7 +206,6 @@ HWTEST_F(SystemAbilityMgrTest, GetSystemAbility002, TestSize.Level1)
  * @tc.name: GetSystemAbility003
  * @tc.desc: get system ability and then transaction.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, GetSystemAbility003, TestSize.Level1)
 {
@@ -238,7 +228,6 @@ HWTEST_F(SystemAbilityMgrTest, GetSystemAbility003, TestSize.Level1)
  * @tc.name: GetSystemAbility004
  * @tc.desc: get system ability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, GetSystemAbility004, TestSize.Level2)
 {
@@ -260,7 +249,6 @@ HWTEST_F(SystemAbilityMgrTest, GetSystemAbility004, TestSize.Level2)
  * @tc.name: GetSystemAbility005
  * @tc.desc: get remote device system ability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, GetSystemAbility005, TestSize.Level2)
 {
@@ -275,7 +263,6 @@ HWTEST_F(SystemAbilityMgrTest, GetSystemAbility005, TestSize.Level2)
  * @tc.name: CheckSystemAbility001
  * @tc.desc: check system ability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, CheckSystemAbility001, TestSize.Level1)
 {
@@ -293,7 +280,6 @@ HWTEST_F(SystemAbilityMgrTest, CheckSystemAbility001, TestSize.Level1)
  * @tc.name: CheckOnDemandSystemAbility001
  * @tc.desc: check on demand system ability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, CheckOnDemandSystemAbility001, TestSize.Level1)
 {
@@ -310,7 +296,6 @@ HWTEST_F(SystemAbilityMgrTest, CheckOnDemandSystemAbility001, TestSize.Level1)
  * @tc.name: CheckOnDemandSystemAbility002
  * @tc.desc: check on demand system ability.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, CheckOnDemandSystemAbility002, TestSize.Level1)
 {
@@ -330,7 +315,6 @@ HWTEST_F(SystemAbilityMgrTest, CheckOnDemandSystemAbility002, TestSize.Level1)
  * @tc.name: ListSystemAbility001
  * @tc.desc: list all system abilities.
  * @tc.type: FUNC
- * @tc.require: AR000GGVR6
  */
 HWTEST_F(SystemAbilityMgrTest, ListSystemAbility001, TestSize.Level1)
 {
@@ -349,7 +333,6 @@ HWTEST_F(SystemAbilityMgrTest, ListSystemAbility001, TestSize.Level1)
  * @tc.name: LoadSystemAbility001
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: SR000GH59P
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility001, TestSize.Level0)
 {
@@ -364,7 +347,6 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility001, TestSize.Level0)
  * @tc.name: LoadSystemAbility002
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: AR000GH5TH
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility002, TestSize.Level0)
 {
@@ -379,7 +361,6 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility002, TestSize.Level0)
  * @tc.name: LoadSystemAbility003
  * @tc.desc: load system ability with invalid callback.
  * @tc.type: FUNC
- * @tc.require: AR000GH5P8
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility003, TestSize.Level0)
 {
@@ -394,7 +375,6 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility003, TestSize.Level0)
  * @tc.name: LoadSystemAbility004
  * @tc.desc: load system ability with not exist systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: AR000GH5P9
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility004, TestSize.Level0)
 {
@@ -410,7 +390,6 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility004, TestSize.Level0)
  * @tc.name: LoadSystemAbility005
  * @tc.desc: test OnRemoteRequest, invalid interface token.
  * @tc.type: FUNC
- * @tc.require: AR000GH59Q
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility005, TestSize.Level1)
 {
@@ -428,7 +407,6 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility005, TestSize.Level1)
  * @tc.name: LoadSystemAbility006
  * @tc.desc: test OnRemoteRequest, invalid systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: AR000GH5TH
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility006, TestSize.Level1)
 {
@@ -447,7 +425,6 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility006, TestSize.Level1)
  * @tc.name: LoadSystemAbility007
  * @tc.desc: test OnRemoteRequest, invalid systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: AR000GH5TH
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility007, TestSize.Level1)
 {
@@ -467,7 +444,6 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility007, TestSize.Level1)
  * @tc.name: LoadSystemAbility008
  * @tc.desc: test OnRemoteRequest, null callback.
  * @tc.type: FUNC
- * @tc.require: AR000GH5TH
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility008, TestSize.Level1)
 {
@@ -487,7 +463,6 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility008, TestSize.Level1)
  * @tc.name: LoadSystemAbility009
  * @tc.desc: test OnRemoteRequest, not exist systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: AR000GH5TH
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility009, TestSize.Level1)
 {
@@ -509,7 +484,6 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbility009, TestSize.Level1)
  * @tc.name: OnRemoteDied001
  * @tc.desc: test OnRemoteDied, remove registered callback.
  * @tc.type: FUNC
- * @tc.require: AR000GH5TH
  */
 HWTEST_F(SystemAbilityMgrTest, OnRemoteDied001, TestSize.Level1)
 {
@@ -524,7 +498,6 @@ HWTEST_F(SystemAbilityMgrTest, OnRemoteDied001, TestSize.Level1)
  * @tc.name: StartOnDemandAbility001
  * @tc.desc: test StartOnDemandAbility, invalid systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: AR000GH5TH
  */
 HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility001, TestSize.Level0)
 {
@@ -538,7 +511,6 @@ HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility001, TestSize.Level0)
  * @tc.name: StartOnDemandAbility002
  * @tc.desc: test StartOnDemandAbility, invalid systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: AR000GH5TH
  */
 HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility002, TestSize.Level0)
 {
@@ -552,7 +524,6 @@ HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility002, TestSize.Level0)
  * @tc.name: StartOnDemandAbility003
  * @tc.desc: test StartOnDemandAbility, not exist systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: AR000GH5TH
  */
 HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility003, TestSize.Level0)
 {
@@ -566,7 +537,6 @@ HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility003, TestSize.Level0)
  * @tc.name: StartOnDemandAbility004
  * @tc.desc: test StartOnDemandAbility, not on-demand systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: AR000GH5P8
  */
 HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility004, TestSize.Level0)
 {
@@ -580,7 +550,6 @@ HWTEST_F(SystemAbilityMgrTest, StartOnDemandAbility004, TestSize.Level0)
  * @tc.name: AddOnDemandSystemAbilityInfo001
  * @tc.desc: test AddOnDemandSystemAbilityInfo, invalid systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: AR000GH5P8
  */
 HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo001, TestSize.Level0)
 {
@@ -594,7 +563,6 @@ HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo001, TestSize.Level0)
  * @tc.name: AddOnDemandSystemAbilityInfo002
  * @tc.desc: test AddOnDemandSystemAbilityInfo, invalid systemAbilityId.
  * @tc.type: FUNC
- * @tc.require: AR000GH5P8
  */
 HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo002, TestSize.Level0)
 {
@@ -608,7 +576,6 @@ HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo002, TestSize.Level0)
  * @tc.name: AddOnDemandSystemAbilityInfo003
  * @tc.desc: test AddOnDemandSystemAbilityInfo, invalid procName.
  * @tc.type: FUNC
- * @tc.require: AR000GH5P8
  */
 HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo003, TestSize.Level0)
 {
@@ -622,7 +589,6 @@ HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo003, TestSize.Level0)
  * @tc.name: AddOnDemandSystemAbilityInfo004
  * @tc.desc: test AddOnDemandSystemAbilityInfo, procName not registered.
  * @tc.type: FUNC
- * @tc.require: AR000GH5P8
  */
 HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo004, TestSize.Level0)
 {
@@ -636,7 +602,6 @@ HWTEST_F(SystemAbilityMgrTest, AddOnDemandSystemAbilityInfo004, TestSize.Level0)
  * @tc.name: OnLoadSystemAbilitySuccess001
  * @tc.desc: test OnLoadSystemAbilitySuccess, null callback.
  * @tc.type: FUNC
- * @tc.require: AR000GH59Q
  */
 HWTEST_F(SystemAbilityMgrTest, OnLoadSystemAbilitySuccess001, TestSize.Level1)
 {
@@ -651,7 +616,6 @@ HWTEST_F(SystemAbilityMgrTest, OnLoadSystemAbilitySuccess001, TestSize.Level1)
  * @tc.name: OnLoadSystemAbilitySuccess002
  * @tc.desc: test OnLoadSystemAbilitySuccess, null IRemoteObject.
  * @tc.type: FUNC
- * @tc.require: AR000GH59Q
  */
 HWTEST_F(SystemAbilityMgrTest, OnLoadSystemAbilitySuccess002, TestSize.Level1)
 {
@@ -667,7 +631,6 @@ HWTEST_F(SystemAbilityMgrTest, OnLoadSystemAbilitySuccess002, TestSize.Level1)
  * @tc.name: OnLoadSystemAbilitySuccess003
  * @tc.desc: test OnLoadSystemAbilitySuccess.
  * @tc.type: FUNC
- * @tc.require: AR000GH59Q
  */
 HWTEST_F(SystemAbilityMgrTest, OnLoadSystemAbilitySuccess003, TestSize.Level1)
 {
@@ -684,7 +647,6 @@ HWTEST_F(SystemAbilityMgrTest, OnLoadSystemAbilitySuccess003, TestSize.Level1)
  * @tc.name: ReportSubscribeOverflow001
  * @tc.desc: ReportSubscribeOverflow001
  * @tc.type: FUNC
- * @tc.require: AR000H04KS
  */
 HWTEST_F(SystemAbilityMgrTest, ReportSubscribeOverflow001, TestSize.Level1)
 {
@@ -706,7 +668,6 @@ HWTEST_F(SystemAbilityMgrTest, ReportSubscribeOverflow001, TestSize.Level1)
  * @tc.name: ReportLoadSAOverflow001
  * @tc.desc: ReportLoadSAOverflow001
  * @tc.type: FUNC
- * @tc.require: SR000H04KR
  */
 HWTEST_F(SystemAbilityMgrTest, ReportLoadSAOverflow001, TestSize.Level1)
 {

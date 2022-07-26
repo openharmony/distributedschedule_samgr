@@ -62,7 +62,6 @@ void SystemAbilityManagerTest::TearDown()
  * @tc.name: param check samgr ready event
  * @tc.desc: param check samgr ready event
  * @tc.type: FUNC
- * @tc.require: AR000H0IFC
  */
 HWTEST_F(SystemAbilityManagerTest, SamgrReady001, TestSize.Level1)
 {
