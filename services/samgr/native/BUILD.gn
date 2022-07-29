@@ -49,7 +49,6 @@ ohos_executable("samgr") {
   deps = [
     "//foundation/distributedschedule/samgr/interfaces/innerkits/common:samgr_common",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr:lsamgr",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
   ]
 
   configs = [
