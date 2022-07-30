@@ -1,24 +1,24 @@
 {
-    "name": "@ohos/distributedschedule_samgr",
+    "name": "@ohos/systemabilitymgr_samgr",
     "description": "system ability manager",
     "homePage": "https://gitee.com/openharmony",
     "version": "3.1",
     "license": "Apache License 2.0",
-    "repository": "https://gitee.com/openharmony/distributedschedule_samgr",
+    "repository": "https://gitee.com/openharmony/systemabilitymgr_samgr",
     "publishAs": "code-segment",
     "segment": {
-        "destPath": "foundation/distributedschedule/samgr"
+        "destPath": "foundation/systemabilitymgr/samgr"
     },
     "dirs": {},
     "scripts": {},
     "component": {
-        "name": "samgr_standard",
-        "subsystem": "distributedschedule",
+        "name": "samgr",
+        "subsystem": "systemabilitymgr",
         "adapted_system_type": [
             "standard"
         ],
         "hisysevent_config": [
-            "//foundation/distributedschedule/samgr/hisysevent.yaml"
+            "//foundation/systemabilitymgr/samgr/hisysevent.yaml"
             ],
         "rom": "300KB",
         "ram": "7130KB",
@@ -31,7 +31,7 @@
                 "hiviewdfx_hilog_native",
                 "init",
                 "ipc",
-                "samgr_standard",
+                "samgr",
                 "selinux",
                 "startup_l2",
                 "utils_base"
@@ -42,20 +42,20 @@
             "group_type": {
                 "base_group": [],
                 "fwk_group": [
-                    "//foundation/distributedschedule/samgr/interfaces/innerkits/common:samgr_common",
-                    "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr:lsamgr",
-                    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy"
+                    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common:samgr_common",
+                    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/lsamgr:lsamgr",
+                    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy"
                 ],
                 "service_group": [
-                    "//foundation/distributedschedule/samgr/etc:samgr_etc",
-                    "//foundation/distributedschedule/samgr/services/samgr/native:samgr",
+                    "//foundation/systemabilitymgr/samgr/etc:samgr_etc",
+                    "//foundation/systemabilitymgr/samgr/services/samgr/native:samgr",
                     "//third_party/libxml2:libxml2"
                 ]
             },
             "inner_kits": [
                 {
                     "header": {
-                        "header_base": "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include/",
+                        "header_base": "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include/",
                         "header_files": [
                             "if_system_ability_manager.h",
                             "iservice_registry.h",
@@ -68,33 +68,33 @@
                             "sam_log.h"
                         ]
                     },
-                    "name": "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy"
+                    "name": "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy"
                 },
                 {
                     "header": {
-                        "header_base": "//foundation/distributedschedule/samgr/interfaces/innerkits/common/include/",
+                        "header_base": "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common/include/",
                         "header_files": [
                             "sa_profiles.h",
                             "parse_util.h"
                         ]
                     },
-                    "name": "//foundation/distributedschedule/samgr/interfaces/innerkits/common:samgr_common"
+                    "name": "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common:samgr_common"
                 },
                 {
                     "header": {
-                        "header_base": "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr/",
+                        "header_base": "//foundation/systemabilitymgr/samgr/interfaces/innerkits/lsamgr/",
                         "header_files": [
                             "if_local_ability_manager.h",
                             "local_ability_manager_proxy.h"
                         ]
                     },
-                    "name": "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr:lsamgr"
+                    "name": "//foundation/systemabilitymgr/samgr/interfaces/innerkits/lsamgr:lsamgr"
                 }
             ],
             "test": [
-                "//foundation/distributedschedule/samgr/services/samgr/native/test:unittest",
-                "//foundation/distributedschedule/samgr/test/fuzztest/systemabilitymanager_fuzzer:fuzztest",
-                "//foundation/distributedschedule/samgr/services/common/test:unittest"
+                "//foundation/systemabilitymgr/samgr/services/samgr/native/test:unittest",
+                "//foundation/systemabilitymgr/samgr/test/fuzztest/systemabilitymanager_fuzzer:fuzztest",
+                "//foundation/systemabilitymgr/samgr/services/common/test:unittest"
             ]
         }
     }

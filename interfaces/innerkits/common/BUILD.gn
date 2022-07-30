@@ -16,8 +16,8 @@ import("//build/ohos.gni")
 config("config_samgr_common") {
   include_dirs = [
     "include",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
-    "//foundation/distributedschedule/samgr/services/dfx/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/systemabilitymgr/samgr/services/dfx/include",
     "//third_party/libxml2/include",
   ]
 }
@@ -25,8 +25,8 @@ config("config_samgr_common") {
 ################################################################################
 ohos_shared_library("samgr_common") {
   sources = [
-    "//foundation/distributedschedule/samgr/services/common/src/parse_util.cpp",
-    "//foundation/distributedschedule/samgr/services/dfx/source/hisysevent_adapter.cpp",
+    "//foundation/systemabilitymgr/samgr/services/common/src/parse_util.cpp",
+    "//foundation/systemabilitymgr/samgr/services/dfx/source/hisysevent_adapter.cpp",
   ]
 
   configs = [ ":config_samgr_common" ]
@@ -38,10 +38,10 @@ ohos_shared_library("samgr_common") {
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]
-    part_name = "samgr_standard"
+    part_name = "samgr"
   }
 
   public_deps = [ "//third_party/libxml2:libxml2" ]
-  subsystem_name = "distributedschedule"
+  subsystem_name = "systemabilitymgr"
 }
 ################################################################################

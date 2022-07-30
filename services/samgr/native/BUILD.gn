@@ -17,44 +17,44 @@ import("//build/ohos_var.gni")
 config("distributed_store_config") {
   visibility = [ ":*" ]
   include_dirs =
-      [ "//foundation/distributedschedule/samgr/services/samgr/native/include" ]
+      [ "//foundation/systemabilitymgr/samgr/services/samgr/native/include" ]
 }
 
 config("sam_config") {
   # header file path
   include_dirs = [
-    "//foundation/distributedschedule/samgr/services/samgr/native/include",
-    "//foundation/distributedschedule/samgr/services/dfx/include",
-    "//foundation/distributedschedule/samgr/utils/native/include",
-    "//foundation/distributedschedule/samgr/services/lsamgr/include",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/common/include",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/include",
+    "//foundation/systemabilitymgr/samgr/services/dfx/include",
+    "//foundation/systemabilitymgr/samgr/utils/native/include",
+    "//foundation/systemabilitymgr/samgr/services/lsamgr/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
   ]
 }
 
 ohos_executable("samgr") {
   install_enable = true
   sources = [
-    "//foundation/distributedschedule/samgr/services/dfx/source/hisysevent_adapter.cpp",
-    "//foundation/distributedschedule/samgr/services/samgr/native/source/ability_death_recipient.cpp",
-    "//foundation/distributedschedule/samgr/services/samgr/native/source/main.cpp",
-    "//foundation/distributedschedule/samgr/services/samgr/native/source/rpc_callback_imp.cpp",
-    "//foundation/distributedschedule/samgr/services/samgr/native/source/system_ability_load_callback_proxy.cpp",
-    "//foundation/distributedschedule/samgr/services/samgr/native/source/system_ability_manager.cpp",
-    "//foundation/distributedschedule/samgr/services/samgr/native/source/system_ability_manager_stub.cpp",
-    "//foundation/distributedschedule/samgr/services/samgr/native/source/system_ability_status_change_proxy.cpp",
-    "//foundation/distributedschedule/samgr/utils/native/source/tools.cpp",
+    "//foundation/systemabilitymgr/samgr/services/dfx/source/hisysevent_adapter.cpp",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/source/ability_death_recipient.cpp",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/source/main.cpp",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/source/rpc_callback_imp.cpp",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/source/system_ability_load_callback_proxy.cpp",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/source/system_ability_manager.cpp",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/source/system_ability_manager_stub.cpp",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/source/system_ability_status_change_proxy.cpp",
+    "//foundation/systemabilitymgr/samgr/utils/native/source/tools.cpp",
   ]
 
   deps = [
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/common:samgr_common",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr:lsamgr",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common:samgr_common",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/lsamgr:lsamgr",
   ]
 
   configs = [
     ":sam_config",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/common:config_samgr_common",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr:config_samgr",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common:config_samgr_common",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/lsamgr:config_samgr",
     ":distributed_store_config",
   ]
 
@@ -76,7 +76,7 @@ ohos_executable("samgr") {
       defines = [ "WITH_SELINUX" ]
     }
     public_deps = [ "//third_party/libxml2:libxml2" ]
-    part_name = "samgr_standard"
+    part_name = "samgr"
   }
-  subsystem_name = "distributedschedule"
+  subsystem_name = "systemabilitymgr"
 }

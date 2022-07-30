@@ -13,16 +13,16 @@
 
 import("//build/test.gni")
 
-module_output_path = "samgr_standard/samgr"
-samgr_dir = "//foundation/distributedschedule/samgr"
+module_output_path = "samgr/samgr"
+samgr_dir = "//foundation/systemabilitymgr/samgr"
 samgr_services_dir = "${samgr_dir}/services/samgr/native"
 
 config("sam_test_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "${samgr_services_dir}/test/unittest/include",
-    "//foundation/distributedschedule/samgr/services/dfx/include",
-    "//foundation/distributedschedule/samgr/utils/native/include",
+    "//foundation/systemabilitymgr/samgr/services/dfx/include",
+    "//foundation/systemabilitymgr/samgr/utils/native/include",
   ]
 }
 
@@ -39,7 +39,7 @@ ohos_unittest("SystemAbilityMgrTest") {
     "${samgr_services_dir}/test/unittest/src/itest_transaction_service.cpp",
     "${samgr_services_dir}/test/unittest/src/sa_status_change_mock.cpp",
     "${samgr_services_dir}/test/unittest/src/system_ability_mgr_test.cpp",
-    "//foundation/distributedschedule/samgr/services/dfx/source/hisysevent_adapter.cpp",
+    "//foundation/systemabilitymgr/samgr/services/dfx/source/hisysevent_adapter.cpp",
   ]
 
   configs = [
@@ -92,11 +92,11 @@ ohos_executable("ondemand") {
   }
   external_deps += [
     "ipc:ipc_core",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "utils_base:utils",
   ]
-  part_name = "samgr_standard"
-  subsystem_name = "distributedschedule"
+  part_name = "samgr"
+  subsystem_name = "systemabilitymgr"
 }
 
 ohos_executable("TestTool") {
@@ -111,7 +111,7 @@ ohos_executable("TestTool") {
     "${samgr_services_dir}/source/system_ability_status_change_proxy.cpp",
     "${samgr_services_dir}/test/unittest/src/itest_transaction_service.cpp",
     "./src/system_ability_test_tool.cpp",
-    "//foundation/distributedschedule/samgr/services/dfx/source/hisysevent_adapter.cpp",
+    "//foundation/systemabilitymgr/samgr/services/dfx/source/hisysevent_adapter.cpp",
   ]
 
   configs = [
@@ -146,8 +146,8 @@ ohos_executable("TestTool") {
     "ipc:libdbinder",
     "utils_base:utils",
   ]
-  part_name = "samgr_standard"
-  subsystem_name = "distributedschedule"
+  part_name = "samgr"
+  subsystem_name = "systemabilitymgr"
 }
 
 group("unittest") {
