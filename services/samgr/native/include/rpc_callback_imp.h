@@ -17,13 +17,25 @@
 #define SERVICES_SAMGR_NATIVE_INCLUDE_RPC_CALLBACK_IMP_H_
 
 #include "rpc_system_ability_callback.h"
+#include "system_ability_load_callback_stub.h"
 
 namespace OHOS {
 class RpcCallbackImp : public RpcSystemAbilityCallback {
 public:
     sptr<IRemoteObject> GetSystemAbilityFromRemote(int32_t systemAbilityId) override;
+    bool LoadSystemAbilityFromRemote(const std::string& srcNetworkId, int32_t systemAbilityId) override;
     RpcCallbackImp() = default;
     ~RpcCallbackImp() override = default;
+protected:
+    class LoadCallbackImp : public SystemAbilityLoadCallbackStub {
+    public:
+        void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
+        void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
+        explicit LoadCallbackImp(const std::string& srcNetWorkId) : srcNetWorkId_(srcNetWorkId) {}
+        ~LoadCallbackImp() override = default;
+    private:
+        std::string srcNetWorkId_;
+    };
 };
 } // namespace OHOS
 

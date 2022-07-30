@@ -39,13 +39,15 @@ using namespace std;
 namespace OHOS {
 namespace {
 const string PREFIX = "/system/profile/";
+const string LOCAL_DEVICE = "local";
+
 constexpr int32_t MAX_NAME_SIZE = 200;
 constexpr int32_t SPLIT_NAME_VECTOR_SIZE = 2;
 
 constexpr int32_t UID_ROOT = 0;
 constexpr int32_t UID_SYSTEM = 1000;
 constexpr int32_t MAX_SUBSCRIBE_COUNT = 256;
-constexpr int64_t CHECK_LOADED_DELAY_TIME = 60 * 1000; // ms
+constexpr int64_t CHECK_LOADED_DELAY_TIME = 4 * 1000; // ms
 }
 
 std::mutex SystemAbilityManager::instanceLock;
@@ -58,6 +60,7 @@ SystemAbilityManager::SystemAbilityManager()
 
 SystemAbilityManager::~SystemAbilityManager()
 {
+    loadPool_.Stop();
 }
 
 void SystemAbilityManager::Init()
@@ -66,12 +69,16 @@ void SystemAbilityManager::Init()
     systemProcessDeath_ = sptr<IRemoteObject::DeathRecipient>(new SystemProcessDeathRecipient());
     abilityStatusDeath_ = sptr<IRemoteObject::DeathRecipient>(new AbilityStatusDeathRecipient());
     abilityCallbackDeath_ = sptr<IRemoteObject::DeathRecipient>(new AbilityCallbackDeathRecipient());
+    remoteCallbackDeath_ = sptr<IRemoteObject::DeathRecipient>(new RemoteCallbackDeathRecipient());
+    
     rpcCallbackImp_ = make_shared<RpcCallbackImp>();
     if (workHandler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create("workHandler");
         workHandler_ = make_shared<AppExecFwk::EventHandler>(runner);
     }
     InitSaProfile();
+    loadPool_.Start(std::thread::hardware_concurrency());
+    loadPool_.SetMaxTaskNum(std::thread::hardware_concurrency());
 }
 
 const sptr<DBinderService> SystemAbilityManager::GetDBinder() const
@@ -195,21 +202,7 @@ bool SystemAbilityManager::CheckDistributedPermission()
 sptr<IRemoteObject> SystemAbilityManager::CheckSystemAbility(int32_t systemAbilityId,
     const std::string& deviceId)
 {
-    sptr<DBinderServiceStub> remoteBinder = nullptr;
-    if (dBinderService_ != nullptr) {
-        string strName = to_string(systemAbilityId);
-        HILOGI("CheckSystemAbility, MakeRemoteBinder begin, systemAbilityId is %{public}d, deviceId is %s",
-            systemAbilityId, deviceId.c_str());
-        remoteBinder = dBinderService_->MakeRemoteBinder(Str8ToStr16(strName), deviceId, systemAbilityId, 0);
-        if (remoteBinder == nullptr) {
-            HILOGE("MakeRemoteBinder error, remoteBinder is null, systemAbilityId is %{public}d, deviceId is %s",
-                systemAbilityId, deviceId.c_str());
-        } else {
-            HILOGI("CheckSystemAbility, MakeRemoteBinder end, systemAbilityId is %{public}d, deviceId is %s",
-                systemAbilityId, deviceId.c_str());
-        }
-    }
-    return remoteBinder;
+    return DoMakeRemoteBinder(systemAbilityId, IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid(), deviceId);
 }
 
 int32_t SystemAbilityManager::FindSystemAbilityNotify(int32_t systemAbilityId, int32_t code)
@@ -719,50 +712,59 @@ void SystemAbilityManager::SendSystemAbilityRemovedMsg(int32_t systemAbilityId)
 }
 
 void SystemAbilityManager::SendCheckLoadedMsg(int32_t systemAbilityId, const std::u16string& name,
-    const sptr<ISystemAbilityLoadCallback>& callback)
+    const std::string& srcDeviceId, const sptr<ISystemAbilityLoadCallback>& callback)
 {
     if (workHandler_ == nullptr) {
         HILOGE("SendCheckLoadedMsg work handler not initialized!");
         return;
     }
 
-    auto delayTask = [systemAbilityId, name, callback, this]() {
+    auto delayTask = [systemAbilityId, name, srcDeviceId, callback, this]() {
         HILOGI("SendCheckLoadedMsg handle for SA : %{public}d.", systemAbilityId);
         if (CheckSystemAbility(systemAbilityId) != nullptr) {
             HILOGI("SendCheckLoadedMsg SA : %{public}d loaded.", systemAbilityId);
             return;
         }
-        {
-            lock_guard<recursive_mutex> autoLock(onDemandLock_);
-            auto iter = startingAbilityMap_.find(systemAbilityId);
-            if (iter == startingAbilityMap_.end()) {
-                HILOGI("SendCheckLoadedMsg SA : %{public}d not in startingAbilityMap.", systemAbilityId);
-                return;
-            }
-            auto& abilityItem = iter->second;
-            for (auto& callbackItem : abilityItem.callbackList) {
-                if (callback->AsObject() == callbackItem.first->AsObject()) {
-                    NotifySystemAbilityLoadFail(systemAbilityId, callbackItem.first);
-                    RemoveStartingAbilityCallbackLocked(callbackItem);
-                    abilityItem.callbackList.remove(callbackItem);
-                    break;
-                }
-            }
-            if (abilityItem.callbackList.empty()) {
-                HILOGI("SendCheckLoadedMsg startingAbilityMap remove SA : %{public}d.", systemAbilityId);
-                startingAbilityMap_.erase(iter);
-            }
-            auto iterStarting = startingProcessMap_.find(name);
-            if (iterStarting != startingProcessMap_.end()) {
-                HILOGI("SendCheckLoadedMsg clean process:%{public}s", Str16ToStr8(name).c_str());
-                startingProcessMap_.erase(iterStarting);
-            }
-        }
+        CleanCallbackForLoadFailed(systemAbilityId, name, srcDeviceId, callback);
         (void)GetSystemProcess(name);
     };
     bool ret = workHandler_->PostTask(delayTask, ToString(systemAbilityId), CHECK_LOADED_DELAY_TIME);
     HILOGI("SendCheckLoadedMsg PostTask name : %{public}d!, ret : %{public}s",
         systemAbilityId, ret ? "success" : "failed");
+}
+
+void SystemAbilityManager::CleanCallbackForLoadFailed(int32_t systemAbilityId, const std::u16string& name,
+    const std::string& srcDeviceId, const sptr<ISystemAbilityLoadCallback>& callback)
+{
+    lock_guard<recursive_mutex> autoLock(onDemandLock_);
+    auto iterStarting = startingProcessMap_.find(name);
+    if (iterStarting != startingProcessMap_.end()) {
+        HILOGI("CleanCallback clean process:%{public}s", Str16ToStr8(name).c_str());
+        startingProcessMap_.erase(iterStarting);
+    }
+    auto iter = startingAbilityMap_.find(systemAbilityId);
+    if (iter == startingAbilityMap_.end()) {
+        HILOGI("CleanCallback SA : %{public}d not in startingAbilityMap.", systemAbilityId);
+        return;
+    }
+    auto& abilityItem = iter->second;
+    for (auto& callbackItem : abilityItem.callbackMap[srcDeviceId]) {
+        if (callback->AsObject() == callbackItem.first->AsObject()) {
+            NotifySystemAbilityLoadFail(systemAbilityId, callbackItem.first);
+            RemoveStartingAbilityCallbackLocked(callbackItem);
+            abilityItem.callbackMap[srcDeviceId].remove(callbackItem);
+            break;
+        }
+    }
+    if (abilityItem.callbackMap[srcDeviceId].empty()) {
+        HILOGI("CleanCallback startingAbilityMap remove SA : %{public}d. with deviceId", systemAbilityId);
+        abilityItem.callbackMap.erase(srcDeviceId);
+    }
+
+    if (abilityItem.callbackMap.empty()) {
+        HILOGI("CleanCallback startingAbilityMap remove SA : %{public}d.", systemAbilityId);
+        startingAbilityMap_.erase(iter);
+    }
 }
 
 void SystemAbilityManager::RemoveCheckLoadedMsg(int32_t systemAbilityId)
@@ -772,6 +774,22 @@ void SystemAbilityManager::RemoveCheckLoadedMsg(int32_t systemAbilityId)
         return;
     }
     workHandler_->RemoveTask(ToString(systemAbilityId));
+}
+
+void SystemAbilityManager::SendLoadedSystemAblityMsg(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject,
+    const sptr<ISystemAbilityLoadCallback>& callback)
+{
+    if (workHandler_ == nullptr) {
+        HILOGE("SendLoadedSystemAblityMsg work handler not initialized!");
+        return;
+    }
+    auto notifyLoadedTask = [systemAbilityId, remoteObject, callback, this]() {
+        NotifySystemAbilityLoaded(systemAbilityId, remoteObject, callback);
+    };
+    bool ret = workHandler_->PostTask(notifyLoadedTask);
+    if (!ret) {
+        HILOGW("SendLoadedSystemAblityMsg PostTask failed!");
+    }
 }
 
 void SystemAbilityManager::NotifySystemAbilityLoaded(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject,
@@ -793,9 +811,11 @@ void SystemAbilityManager::NotifySystemAbilityLoaded(int32_t systemAbilityId, co
         return;
     }
     auto& abilityItem = iter->second;
-    for (auto& callbackItem : abilityItem.callbackList) {
-        NotifySystemAbilityLoaded(systemAbilityId, remoteObject, callbackItem.first);
-        RemoveStartingAbilityCallbackLocked(callbackItem);
+    for (auto& [deviceId, callbackList] : abilityItem.callbackMap) {
+        for (auto& callbackItem : callbackList) {
+            NotifySystemAbilityLoaded(systemAbilityId, remoteObject, callbackItem.first);
+            RemoveStartingAbilityCallbackLocked(callbackItem);
+        }
     }
     startingAbilityMap_.erase(iter);
 }
@@ -841,6 +861,40 @@ int32_t SystemAbilityManager::StartingSystemProcess(const std::u16string& procNa
     return result;
 }
 
+bool SystemAbilityManager::LoadSystemAbilityFromRpc(const std::string& srcDeviceId, int32_t systemAbilityId,
+    const sptr<ISystemAbilityLoadCallback>& callback)
+{
+    if (!CheckInputSysAbilityId(systemAbilityId) || callback == nullptr) {
+        HILOGW("LoadSystemAbility said or callback invalid!");
+        return false;
+    }
+    SaProfile saProfile;
+    bool ret = GetSaProfile(systemAbilityId, saProfile);
+    if (!ret) {
+        HILOGE("LoadSystemAbilityFromRpc said:%{public}d not supported!", systemAbilityId);
+        return false;
+    }
+
+    if (!saProfile.distributed) {
+        HILOGE("LoadSystemAbilityFromRpc said:%{public}d not distributed!", systemAbilityId);
+        return false;
+    }
+
+    sptr<IRemoteObject> targetObject = CheckSystemAbility(systemAbilityId);
+    if (targetObject != nullptr) {
+        SendLoadedSystemAblityMsg(systemAbilityId, targetObject, callback);
+        return true;
+    }
+    {
+        lock_guard<recursive_mutex> autoLock(onDemandLock_);
+        auto& abilityItem = startingAbilityMap_[systemAbilityId];
+        abilityItem.callbackMap[srcDeviceId].emplace_back(callback, 0);
+        StartingSystemProcess(saProfile.process, systemAbilityId);
+    }
+    SendCheckLoadedMsg(systemAbilityId, saProfile.process, srcDeviceId, callback);
+    return true;
+}
+
 int32_t SystemAbilityManager::LoadSystemAbility(int32_t systemAbilityId,
     const sptr<ISystemAbilityLoadCallback>& callback)
 {
@@ -865,7 +919,7 @@ int32_t SystemAbilityManager::LoadSystemAbility(int32_t systemAbilityId,
     {
         lock_guard<recursive_mutex> autoLock(onDemandLock_);
         auto& abilityItem = startingAbilityMap_[systemAbilityId];
-        for (const auto& itemCallback : abilityItem.callbackList) {
+        for (const auto& itemCallback : abilityItem.callbackMap[LOCAL_DEVICE]) {
             if (callback->AsObject() == itemCallback.first->AsObject()) {
                 HILOGI("LoadSystemAbility already existed callback object systemAbilityId:%{public}d", systemAbilityId);
                 return ERR_OK;
@@ -877,7 +931,7 @@ int32_t SystemAbilityManager::LoadSystemAbility(int32_t systemAbilityId,
             return ERR_PERMISSION_DENIED;
         }
         ++count;
-        abilityItem.callbackList.emplace_back(callback, callingPid);
+        abilityItem.callbackMap[LOCAL_DEVICE].emplace_back(callback, callingPid);
         if (abilityCallbackDeath_ != nullptr) {
             ret = callback->AsObject()->AddDeathRecipient(abilityCallbackDeath_);
             HILOGI("LoadSystemAbility systemAbilityId:%{public}d AddDeathRecipient %{public}s",
@@ -885,10 +939,89 @@ int32_t SystemAbilityManager::LoadSystemAbility(int32_t systemAbilityId,
         }
         result = StartingSystemProcess(saProfile.process, systemAbilityId);
         HILOGI("LoadSystemAbility systemAbilityId:%{public}d size : %{public}zu",
-            systemAbilityId, abilityItem.callbackList.size());
+            systemAbilityId, abilityItem.callbackMap[LOCAL_DEVICE].size());
     }
-    SendCheckLoadedMsg(systemAbilityId, saProfile.process, callback);
+    SendCheckLoadedMsg(systemAbilityId, saProfile.process, LOCAL_DEVICE, callback);
     return result;
+}
+
+int32_t SystemAbilityManager::LoadSystemAbility(int32_t systemAbilityId, const std::string& deviceId,
+    const sptr<ISystemAbilityLoadCallback>& callback)
+{
+    std::string key = ToString(systemAbilityId) + "_" + deviceId;
+    {
+        lock_guard<mutex> autoLock(loadRemoteLock_);
+        auto& callbacks = remoteCallbacks_[key];
+        auto iter = std::find_if(callbacks.begin(), callbacks.end(), [callback](auto itemCallback) {
+            return callback->AsObject() == itemCallback->AsObject();
+        });
+        if (iter != callbacks.end()) {
+            HILOGI("LoadSystemAbility already existed callback object systemAbilityId:%{public}d", systemAbilityId);
+            return ERR_OK;
+        }
+        if (remoteCallbackDeath_ != nullptr) {
+            bool ret = callback->AsObject()->AddDeathRecipient(remoteCallbackDeath_);
+            HILOGI("LoadSystemAbility systemAbilityId:%{public}d AddDeathRecipient %{public}s",
+                systemAbilityId, ret ? "succeed" : "failed");
+        }
+        callbacks.emplace_back(callback);
+    }
+    auto callingPid = IPCSkeleton::GetCallingPid();
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    auto task = std::bind(&SystemAbilityManager::DoLoadRemoteSystemAbility, this,
+        systemAbilityId, callingPid, callingUid, deviceId, callback);
+    loadPool_.AddTask(task);
+    return ERR_OK;
+}
+
+void SystemAbilityManager::DoLoadRemoteSystemAbility(int32_t systemAbilityId, int32_t callingPid,
+    int32_t callingUid, const std::string& deviceId, const sptr<ISystemAbilityLoadCallback>& callback)
+{
+    sptr<DBinderServiceStub> remoteBinder = DoMakeRemoteBinder(systemAbilityId, callingPid, callingUid, deviceId);
+
+    if (callback == nullptr) {
+        HILOGI("DoLoadRemoteSystemAbility return, callback is nullptr, said : %{public}d", systemAbilityId);
+        return;
+    }
+    callback->OnLoadSACompleteForRemote(deviceId, systemAbilityId, remoteBinder);
+    std::string key = ToString(systemAbilityId) + "_" + deviceId;
+    {
+        lock_guard<mutex> autoLock(loadRemoteLock_);
+        if (remoteCallbackDeath_ != nullptr) {
+            callback->AsObject()->RemoveDeathRecipient(remoteCallbackDeath_);
+        }
+        auto& callbacks = remoteCallbacks_[key];
+        callbacks.remove(callback);
+        if (callbacks.empty()) {
+            remoteCallbacks_.erase(key);
+        }
+    }
+}
+
+sptr<DBinderServiceStub> SystemAbilityManager::DoMakeRemoteBinder(int32_t systemAbilityId, int32_t callingPid,
+    int32_t callingUid, const std::string& deviceId)
+{
+    HILOGI("MakeRemoteBinder begin, said : %{public}d", systemAbilityId);
+    sptr<DBinderServiceStub> remoteBinder = nullptr;
+    if (dBinderService_ != nullptr) {
+        string strName = to_string(systemAbilityId);
+        remoteBinder = dBinderService_->MakeRemoteBinder(Str8ToStr16(strName),
+            deviceId, systemAbilityId, callingPid, callingUid);
+    }
+    HILOGI("MakeRemoteBinder end, result %{public}s, said : %{public}d, deviceId : %{public}s",
+        remoteBinder == nullptr ? " failed" : "succeed", systemAbilityId, AnonymizeDeviceId(deviceId).c_str());
+    return remoteBinder;
+}
+
+void SystemAbilityManager::NotifyRpcLoadCompleted(const std::string& srcDeviceId, int32_t systemAbilityId,
+    const sptr<IRemoteObject>& remoteObject)
+{
+    if (dBinderService_ != nullptr) {
+        dBinderService_->LoadSystemAbilityComplete(srcDeviceId, systemAbilityId, remoteObject);
+        return;
+    }
+    HILOGW("NotifyRpcLoadCompleted failed, said: %{public}d, deviceId : %{public}s",
+        systemAbilityId, AnonymizeDeviceId(srcDeviceId).c_str());
 }
 
 void SystemAbilityManager::RemoveStartingAbilityCallbackLocked(
@@ -906,16 +1039,31 @@ void SystemAbilityManager::RemoveStartingAbilityCallbackLocked(
     }
 }
 
-void SystemAbilityManager::RemoveStartingAbilityCallback(AbilityItem& abilityItem,
+void SystemAbilityManager::RemoveStartingAbilityCallbackForDevice(AbilityItem& abilityItem,
     const sptr<IRemoteObject>& remoteObject)
 {
-    auto& callbacks = abilityItem.callbackList;
-    auto iterCallback = callbacks.begin();
-    while (iterCallback != callbacks.end()) {
+    auto& callbacks = abilityItem.callbackMap;
+    auto iter = callbacks.begin();
+    while (iter != callbacks.end()) {
+        CallbackList& callbackList = iter->second;
+        RemoveStartingAbilityCallback(callbackList, remoteObject);
+        if (callbackList.empty()) {
+            callbacks.erase(iter++);
+        } else {
+            ++iter;
+        }
+    }
+}
+
+void SystemAbilityManager::RemoveStartingAbilityCallback(CallbackList& callbackList,
+    const sptr<IRemoteObject>& remoteObject)
+{
+    auto iterCallback = callbackList.begin();
+    while (iterCallback != callbackList.end()) {
         auto& callbackPair = *iterCallback;
         if (callbackPair.first->AsObject() == remoteObject) {
             RemoveStartingAbilityCallbackLocked(callbackPair);
-            iterCallback = callbacks.erase(iterCallback);
+            iterCallback = callbackList.erase(iterCallback);
             break;
         } else {
             ++iterCallback;
@@ -930,11 +1078,41 @@ void SystemAbilityManager::OnAbilityCallbackDied(const sptr<IRemoteObject>& remo
     auto iter = startingAbilityMap_.begin();
     while (iter != startingAbilityMap_.end()) {
         AbilityItem& abilityItem = iter->second;
-        RemoveStartingAbilityCallback(abilityItem, remoteObject);
-        if (abilityItem.callbackList.empty()) {
-            iter = startingAbilityMap_.erase(iter);
+        RemoveStartingAbilityCallbackForDevice(abilityItem, remoteObject);
+        if (abilityItem.callbackMap.empty()) {
+            startingAbilityMap_.erase(iter++);
         } else {
             ++iter;
+        }
+    }
+}
+
+void SystemAbilityManager::OnRemoteCallbackDied(const sptr<IRemoteObject>& remoteObject)
+{
+    HILOGI("OnRemoteCallbackDied received remoteObject died message!");
+    lock_guard<mutex> autoLock(loadRemoteLock_);
+    auto iter = remoteCallbacks_.begin();
+    while (iter != remoteCallbacks_.end()) {
+        auto& callbacks = iter->second;
+        RemoveRemoteCallbackLocked(callbacks, remoteObject);
+        if (callbacks.empty()) {
+            remoteCallbacks_.erase(iter++);
+        } else {
+            ++iter;
+        }
+    }
+}
+
+void SystemAbilityManager::RemoveRemoteCallbackLocked(std::list<sptr<ISystemAbilityLoadCallback>>& callbacks,
+    const sptr<IRemoteObject>& remoteObject)
+{
+    for (const auto& callback : callbacks) {
+        if (callback->AsObject() == remoteObject) {
+            if (remoteCallbackDeath_ != nullptr) {
+                callback->AsObject()->RemoveDeathRecipient(remoteCallbackDeath_);
+            }
+            callbacks.remove(callback);
+            break;
         }
     }
 }

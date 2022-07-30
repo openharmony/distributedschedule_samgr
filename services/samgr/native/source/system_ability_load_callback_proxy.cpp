@@ -96,4 +96,54 @@ void SystemAbilityLoadCallbackProxy::OnLoadSystemAbilityFail(int32_t systemAbili
         return;
     }
 }
+
+void SystemAbilityLoadCallbackProxy::OnLoadSACompleteForRemote(const std::string& deviceId, int32_t systemAbilityId,
+    const sptr<IRemoteObject>& remoteObject)
+{
+    if (systemAbilityId <= 0) {
+        HILOGE("OnLoadSACompleteForRemote systemAbilityId:%{public}d invalid!", systemAbilityId);
+        return;
+    }
+
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        HILOGE("OnLoadSACompleteForRemote remote is null!");
+        return;
+    }
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        HILOGE("OnLoadSACompleteForRemote write interface token failed!");
+        return;
+    }
+    bool ret = data.WriteString(deviceId);
+    if (!ret) {
+        HILOGE("OnLoadSACompleteForRemote write deviceId failed!");
+        return;
+    }
+    ret = data.WriteInt32(systemAbilityId);
+    if (!ret) {
+        HILOGE("OnLoadSACompleteForRemote write systemAbilityId failed!");
+        return;
+    }
+    if (remoteObject == nullptr) {
+        HILOGW("OnLoadSACompleteForRemote remoteObject null!");
+        ret = data.WriteBool(false);
+    } else {
+        data.WriteBool(true);
+        ret = data.WriteRemoteObject(remoteObject);
+    }
+
+    if (!ret) {
+        HILOGE("OnLoadSACompleteForRemote write failed!");
+        return;
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    int32_t status = remote->SendRequest(ON_LOAD_SYSTEM_ABILITY_COMPLETE_FOR_REMOTE, data, reply, option);
+    if (status != NO_ERROR) {
+        HILOGE("OnLoadSACompleteForRemote SendRequest failed, return value:%{public}d !", status);
+        return;
+    }
+}
 }

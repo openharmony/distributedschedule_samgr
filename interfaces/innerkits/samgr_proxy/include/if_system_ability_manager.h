@@ -56,6 +56,7 @@ public:
         LIST_SYSTEM_ABILITY_TRANSACTION = 5,
         SUBSCRIBE_SYSTEM_ABILITY_TRANSACTION = 6,
         LOAD_SYSTEM_ABILITY_TRANSACTION = 7,
+        LOAD_REMOTE_SYSTEM_ABILITY_TRANSACTION = 8,
         CHECK_REMOTE_SYSTEM_ABILITY_TRANSACTION = 9,
         ADD_ONDEMAND_SYSTEM_ABILITY_TRANSACTION = 10,
         CHECK_SYSTEM_ABILITY_IMMEDIATELY_TRANSACTION = 12,
@@ -113,6 +114,8 @@ public:
 
     virtual int32_t AddSystemProcess(const std::u16string& procName, const sptr<IRemoteObject>& procObject) = 0;
     virtual int32_t LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback) = 0;
+    virtual int32_t LoadSystemAbility(int32_t systemAbilityId, const std::string& deviceId,
+        const sptr<ISystemAbilityLoadCallback>& callback) = 0;
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.ISystemAbilityManager");
 protected:

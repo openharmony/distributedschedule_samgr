@@ -30,6 +30,7 @@ private:
 
     int32_t OnLoadSystemAbilitySuccessInner(MessageParcel& data, MessageParcel& reply);
     int32_t OnLoadSystemAbilityFailInner(MessageParcel& data, MessageParcel& reply);
+    int32_t OnLoadSACompleteForRemoteInner(MessageParcel& data, MessageParcel& reply);
 };
 }
 #endif /* SAMGR_INTERFACES_INNERKITS_SAMGR_PROXY_INCLUDE_SYSTEM_ABILITY_LOAD_CALLBACK_STUB_H */

@@ -24,13 +24,17 @@ namespace OHOS {
 class ISystemAbilityLoadCallback : public IRemoteBroker {
 public:
     virtual ~ISystemAbilityLoadCallback() = default;
-    virtual void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) = 0;
-    virtual void OnLoadSystemAbilityFail(int32_t systemAbilityId) = 0;
+    virtual void OnLoadSystemAbilitySuccess([[maybe_unused]] int32_t systemAbilityId,
+        [[maybe_unused]] const sptr<IRemoteObject>& remoteObject) {}
+    virtual void OnLoadSystemAbilityFail([[maybe_unused]] int32_t systemAbilityId) {}
+    virtual void OnLoadSACompleteForRemote([[maybe_unused]] const std::string& deviceId,
+        [[maybe_unused]] int32_t systemAbilityId, [[maybe_unused]] const sptr<IRemoteObject>& remoteObject) {}
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.ISystemAbilityLoadCallback");
 protected:
     enum {
         ON_LOAD_SYSTEM_ABILITY_SUCCESS = 1,
         ON_LOAD_SYSTEM_ABILITY_FAIL = 2,
+        ON_LOAD_SYSTEM_ABILITY_COMPLETE_FOR_REMOTE = 3,
     };
 };
 }

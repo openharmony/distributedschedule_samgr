@@ -24,9 +24,10 @@
 #include <utility>
 
 #include "event_handler.h"
-#include "rpc_callback_imp.h"
 #include "dbinder_service.h"
 #include "dbinder_service_stub.h"
+#include "rpc_callback_imp.h"
+#include "thread_pool.h"
 #include "sa_profiles.h"
 #include "system_ability_definition.h"
 #include "system_ability_manager_stub.h"
@@ -90,17 +91,27 @@ public:
     int32_t RemoveSystemProcess(const sptr<IRemoteObject>& procObject);
 
     int32_t LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback) override;
+    int32_t LoadSystemAbility(int32_t systemAbilityId, const std::string& deviceId,
+        const sptr<ISystemAbilityLoadCallback>& callback) override;
     void OnAbilityCallbackDied(const sptr<IRemoteObject>& remoteObject);
+    void OnRemoteCallbackDied(const sptr<IRemoteObject>& remoteObject);
     sptr<IRemoteObject> GetSystemAbilityFromRemote(int32_t systemAbilityId);
+    bool LoadSystemAbilityFromRpc(const std::string& srcDeviceId, int32_t systemAbilityId,
+        const sptr<ISystemAbilityLoadCallback>& callback);
+    void NotifyRpcLoadCompleted(const std::string& srcDeviceId, int32_t systemAbilityId,
+        const sptr<IRemoteObject>& remoteObject);
 private:
     enum class AbilityState {
         INIT,
         STARTING,
         STARTED,
     };
+
+    using CallbackList = std::list<std::pair<sptr<ISystemAbilityLoadCallback>, int32_t>>;
+
     struct AbilityItem {
         AbilityState state = AbilityState::INIT;
-        std::list<std::pair<sptr<ISystemAbilityLoadCallback>, int32_t>> callbackList;
+        std::map<std::string, CallbackList> callbackMap; // key : networkid
     };
 
     SystemAbilityManager();
@@ -135,11 +146,22 @@ private:
     void StartOnDemandAbility(const std::u16string& name, int32_t systemAbilityId);
     void StartOnDemandAbilityInner(const std::u16string& name, int32_t systemAbilityId, AbilityItem& abilityItem);
     int32_t StartDynamicSystemProcess(const std::u16string& name, int32_t systemAbilityId);
-    void RemoveStartingAbilityCallback(AbilityItem& abilityItem, const sptr<IRemoteObject>& remoteObject);
+    void RemoveStartingAbilityCallback(CallbackList& callbackList, const sptr<IRemoteObject>& remoteObject);
+    void RemoveStartingAbilityCallbackForDevice(AbilityItem& abilityItem, const sptr<IRemoteObject>& remoteObject);
     void RemoveStartingAbilityCallbackLocked(std::pair<sptr<ISystemAbilityLoadCallback>, int32_t>& itemPair);
-    void SendCheckLoadedMsg(int32_t systemAbilityId, const std::u16string& name,
+    void SendCheckLoadedMsg(int32_t systemAbilityId, const std::u16string& name, const std::string& srcDeviceId,
         const sptr<ISystemAbilityLoadCallback>& callback);
     void RemoveCheckLoadedMsg(int32_t systemAbilityId);
+    void SendLoadedSystemAblityMsg(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject,
+        const sptr<ISystemAbilityLoadCallback>& callback);
+    void DoLoadRemoteSystemAbility(int32_t systemAbilityId, int32_t callingPid,
+        int32_t callingUid, const std::string& deviceId, const sptr<ISystemAbilityLoadCallback>& callback);
+    sptr<DBinderServiceStub> DoMakeRemoteBinder(int32_t systemAbilityId, int32_t callingPid, int32_t callingUid,
+        const std::string& deviceId);
+    void RemoveRemoteCallbackLocked(std::list<sptr<ISystemAbilityLoadCallback>>& callbacks,
+        const sptr<IRemoteObject>& remoteObject);
+    void CleanCallbackForLoadFailed(int32_t systemAbilityId, const std::u16string& name,
+        const std::string& srcDeviceId, const sptr<ISystemAbilityLoadCallback>& callback);
 
     std::u16string deviceName_;
     static sptr<SystemAbilityManager> instance;
@@ -148,6 +170,7 @@ private:
     sptr<IRemoteObject::DeathRecipient> systemProcessDeath_;
     sptr<IRemoteObject::DeathRecipient> abilityStatusDeath_;
     sptr<IRemoteObject::DeathRecipient> abilityCallbackDeath_;
+    sptr<IRemoteObject::DeathRecipient> remoteCallbackDeath_;
     sptr<DBinderService> dBinderService_;
     std::shared_ptr<RpcSystemAbilityCallback> rpcCallbackImp_;
 
@@ -171,6 +194,11 @@ private:
 
     std::map<int32_t, SaProfile> saProfileMap_;
     std::mutex saProfileMapLock_;
+
+    std::mutex loadRemoteLock_;
+    std::map<std::string, std::list<sptr<ISystemAbilityLoadCallback>>> remoteCallbacks_; // key : said_deviceId
+
+    ThreadPool loadPool_;
 };
 } // namespace OHOS
 
