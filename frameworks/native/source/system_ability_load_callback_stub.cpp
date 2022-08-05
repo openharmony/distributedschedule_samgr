@@ -37,6 +37,8 @@ int32_t SystemAbilityLoadCallbackStub::OnRemoteRequest(uint32_t code,
             return OnLoadSystemAbilitySuccessInner(data, reply);
         case ON_LOAD_SYSTEM_ABILITY_FAIL:
             return OnLoadSystemAbilityFailInner(data, reply);
+        case ON_LOAD_SYSTEM_ABILITY_COMPLETE_FOR_REMOTE:
+            return OnLoadSACompleteForRemoteInner(data, reply);
         default:
             HILOGW("SystemAbilityLoadCallbackStub::OnRemoteRequest unknown request code!");
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -63,6 +65,21 @@ int32_t SystemAbilityLoadCallbackStub::OnLoadSystemAbilityFailInner(MessageParce
         return ERR_INVALID_VALUE;
     }
     OnLoadSystemAbilityFail(systemAbilityId);
+    return ERR_NONE;
+}
+
+int32_t SystemAbilityLoadCallbackStub::OnLoadSACompleteForRemoteInner(MessageParcel& data, MessageParcel& reply)
+{
+    std::string deviceId = data.ReadString();
+    int32_t systemAbilityId = data.ReadInt32();
+    if (!CheckInputSystemAbilityId(systemAbilityId)) {
+        HILOGW("OnLoadSACompleteForRemoteInner invalid systemAbilityId:%{public}d !", systemAbilityId);
+        return ERR_INVALID_VALUE;
+    }
+    bool ret = data.ReadBool();
+    HILOGI("OnLoadSACompleteForRemoteInner load : %{public}s", ret ? "succeed" : "failed");
+    sptr<IRemoteObject> remoteObject = ret ? data.ReadRemoteObject() : nullptr;
+    OnLoadSACompleteForRemote(deviceId, systemAbilityId, remoteObject);
     return ERR_NONE;
 }
 

@@ -125,6 +125,8 @@ SystemAbilityManagerStub::SystemAbilityManagerStub()
         &SystemAbilityManagerStub::AddSystemProcessInner;
     memberFuncMap_[LOAD_SYSTEM_ABILITY_TRANSACTION] =
         &SystemAbilityManagerStub::LoadSystemAbilityInner;
+    memberFuncMap_[LOAD_REMOTE_SYSTEM_ABILITY_TRANSACTION] =
+        &SystemAbilityManagerStub::LoadRemoteSystemAbilityInner;
 }
 
 int32_t SystemAbilityManagerStub::OnRemoteRequest(uint32_t code,
@@ -542,6 +544,44 @@ int32_t SystemAbilityManagerStub::LoadSystemAbilityInner(MessageParcel& data, Me
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGW("SystemAbilityManagerStub::LoadSystemAbilityInner write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return result;
+}
+
+int32_t SystemAbilityManagerStub::LoadRemoteSystemAbilityInner(MessageParcel& data, MessageParcel& reply)
+{
+    int32_t systemAbilityId = data.ReadInt32();
+    if (!CheckInputSysAbilityId(systemAbilityId)) {
+        HILOGW("SystemAbilityManagerStub::LoadRemoteSystemAbilityInner systemAbilityId invalid");
+        return ERR_INVALID_VALUE;
+    }
+
+    if (!CheckGetRemoteSAPermission(systemAbilityId)) {
+        HILOGE("LoadRemoteSystemAbilityInner selinux permission denied!SA : %{public}d", systemAbilityId);
+        return ERR_PERMISSION_DENIED;
+    }
+
+    std::string deviceId = data.ReadString();
+    if (deviceId.empty()) {
+        HILOGW("SystemAbilityManagerStub::LoadRemoteSystemAbilityInner read deviceId failed");
+        return ERR_INVALID_VALUE;
+    }
+    sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
+    if (remoteObject == nullptr) {
+        HILOGW("SystemAbilityManagerStub::LoadRemoteSystemAbilityInner read callback failed!");
+        return ERR_INVALID_VALUE;
+    }
+    sptr<ISystemAbilityLoadCallback> callback = iface_cast<ISystemAbilityLoadCallback>(remoteObject);
+    if (callback == nullptr) {
+        HILOGW("SystemAbilityManagerStub::LoadRemoteSystemAbilityInner iface_cast failed!");
+        return ERR_INVALID_VALUE;
+    }
+    int32_t result = LoadSystemAbility(systemAbilityId, deviceId, callback);
+    HILOGD("SystemAbilityManagerStub::LoadRemoteSystemAbilityInner result is %{public}d", result);
+    bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        HILOGW("SystemAbilityManagerStub::LoadRemoteSystemAbilityInner write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
     return result;

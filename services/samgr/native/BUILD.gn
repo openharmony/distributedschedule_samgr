@@ -35,6 +35,7 @@ config("sam_config") {
 ohos_executable("samgr") {
   install_enable = true
   sources = [
+    "//foundation/systemabilitymgr/samgr/frameworks/native/source/system_ability_load_callback_stub.cpp",
     "//foundation/systemabilitymgr/samgr/services/dfx/source/hisysevent_adapter.cpp",
     "//foundation/systemabilitymgr/samgr/services/samgr/native/source/ability_death_recipient.cpp",
     "//foundation/systemabilitymgr/samgr/services/samgr/native/source/main.cpp",

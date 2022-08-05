@@ -45,6 +45,8 @@ public:
 
     int32_t AddSystemProcess(const std::u16string& procName, const sptr<IRemoteObject>& procObject) override;
     int32_t LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback) override;
+    int32_t LoadSystemAbility(int32_t systemAbilityId, const std::string& deviceId,
+        const sptr<ISystemAbilityLoadCallback>& callback) override;
 private:
     sptr<IRemoteObject> GetSystemAbilityWrapper(int32_t systemAbilityId, const std::string& deviceId = "");
     sptr<IRemoteObject> CheckSystemAbilityWrapper(int32_t code, MessageParcel& data);

@@ -15,10 +15,36 @@
 
 #include "rpc_callback_imp.h"
 #include "system_ability_manager.h"
+#include "sam_log.h"
+#include "tools.h"
 
 namespace OHOS {
 sptr<IRemoteObject> RpcCallbackImp::GetSystemAbilityFromRemote(int32_t systemAbilityId)
 {
     return SystemAbilityManager::GetInstance()->GetSystemAbilityFromRemote(systemAbilityId);
+}
+
+bool RpcCallbackImp::LoadSystemAbilityFromRemote(const std::string& srcNetworkId, int32_t systemAbilityId)
+{
+    HILOGI("LoadSystemAbilityFromRemote! deviceId : %{public}s, said : %{public}d",
+        AnonymizeDeviceId(srcNetworkId).c_str(), systemAbilityId);
+    sptr<LoadCallbackImp> loadCallback = new LoadCallbackImp(srcNetworkId);
+    return SystemAbilityManager::GetInstance()->LoadSystemAbilityFromRpc(srcNetworkId,
+        systemAbilityId, loadCallback);
+}
+
+void RpcCallbackImp::LoadCallbackImp::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
+    const sptr<IRemoteObject>& remoteObject)
+{
+    HILOGI("LoadCallbackImp OnLoadSystemAbilitySuccess! deviceId : %{public}s, said : %{public}d",
+        AnonymizeDeviceId(srcNetWorkId_).c_str(), systemAbilityId);
+    SystemAbilityManager::GetInstance()->NotifyRpcLoadCompleted(srcNetWorkId_, systemAbilityId, remoteObject);
+}
+
+void RpcCallbackImp::LoadCallbackImp::OnLoadSystemAbilityFail(int32_t systemAbilityId)
+{
+    HILOGW("LoadCallbackImp OnLoadSystemAbilityFail! deviceId : %{public}s, said : %{public}d",
+        AnonymizeDeviceId(srcNetWorkId_).c_str(), systemAbilityId);
+    SystemAbilityManager::GetInstance()->NotifyRpcLoadCompleted(srcNetWorkId_, systemAbilityId, nullptr);
 }
 }

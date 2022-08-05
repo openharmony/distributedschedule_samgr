@@ -47,4 +47,11 @@ void AbilityCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remo
     SystemAbilityManager::GetInstance()->OnAbilityCallbackDied(remote.promote());
     HILOGD("AbilityCallbackDeathRecipient death notice success");
 }
+
+void RemoteCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+{
+    HILOGI("RemoteCallbackDeathRecipient called!");
+    SystemAbilityManager::GetInstance()->OnRemoteCallbackDied(remote.promote());
+    HILOGD("RemoteCallbackDeathRecipient death notice success");
+}
 } // namespace OHOS

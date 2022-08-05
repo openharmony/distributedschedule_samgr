@@ -474,6 +474,57 @@ int32_t SystemAbilityManagerProxy::LoadSystemAbility(int32_t systemAbilityId,
     return result;
 }
 
+int32_t SystemAbilityManagerProxy::LoadSystemAbility(int32_t systemAbilityId, const std::string& deviceId,
+    const sptr<ISystemAbilityLoadCallback>& callback)
+{
+    if (!CheckInputSysAbilityId(systemAbilityId) || deviceId.empty() || callback == nullptr) {
+        HILOGE("LoadSystemAbility systemAbilityId:%{public}d ,deviceId or callback invalid!", systemAbilityId);
+        return ERR_INVALID_VALUE;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        HILOGE("LoadSystemAbility remote is null!");
+        return ERR_INVALID_OPERATION;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(SAMANAGER_INTERFACE_TOKEN)) {
+        HILOGW("LoadSystemAbility write interface token failed!");
+        return ERR_FLATTEN_OBJECT;
+    }
+    bool ret = data.WriteInt32(systemAbilityId);
+    if (!ret) {
+        HILOGW("LoadSystemAbility write systemAbilityId failed!");
+        return ERR_FLATTEN_OBJECT;
+    }
+    ret = data.WriteString(deviceId);
+    if (!ret) {
+        HILOGW("LoadSystemAbility write deviceId failed!");
+        return ERR_FLATTEN_OBJECT;
+    }
+    ret = data.WriteRemoteObject(callback->AsObject());
+    if (!ret) {
+        HILOGW("LoadSystemAbility Write callback failed!");
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = remote->SendRequest(LOAD_REMOTE_SYSTEM_ABILITY_TRANSACTION, data, reply, option);
+    if (err != ERR_NONE) {
+        HILOGE("LoadSystemAbility systemAbilityId : %{public}d invalid error:%{public}d!", systemAbilityId, err);
+        return err;
+    }
+    HILOGD("LoadSystemAbility systemAbilityId : %{public}d for remote, SendRequest succeed!", systemAbilityId);
+    int32_t result = 0;
+    ret = reply.ReadInt32(result);
+    if (!ret) {
+        HILOGW("LoadSystemAbility read reply failed for remote!");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return result;
+}
+
 int32_t SystemAbilityManagerProxy::MarshalSAExtraProp(const SAExtraProp& extraProp, MessageParcel& data) const
 {
     if (!data.WriteBool(extraProp.isDistributed)) {
