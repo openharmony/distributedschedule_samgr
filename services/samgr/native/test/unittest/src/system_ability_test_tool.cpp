@@ -21,11 +21,14 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "itest_transaction_service.h"
+#include "nativetoken_kit.h"
+#include "sam_log.h"
+#include "softbus_bus_center.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
 #include "system_ability_load_callback_stub.h"
 #include "system_ability_status_change_stub.h"
-#include "sam_log.h"
+#include "token_setproc.h"
 
 #define private public
 #include "system_ability_manager.h"
@@ -39,7 +42,7 @@ namespace {
     constexpr int32_t ARGC_DEFAULT_LENTH = 2;
     constexpr int32_t ARGC_EXTEND_LENTH = 3;
     constexpr int32_t ARV_SAID_INDEX = 2;
-    constexpr int32_t ARV_DEVICEID_INDEX = 2;
+    constexpr int32_t ARV_DEVICEID_INDEX = 3;
 
     const string HELP_CONTENT = "usage: samgr test tool <command> <options>\n"
                             "These are common samgr test tool commands list:\n"
@@ -51,13 +54,17 @@ namespace {
                             "  add          add mock system ability\n"
                             "  remove       remove mock system ability\n"
                             "  load         load local system ability\n"
+                            "  loadrmt      load remote system ability\n"
                             "  subscribe    subscribe sa info with options\n"
-                            "  unsubcribe   unsubscribe sa info with options";
+                            "  unsubcribe   unsubscribe sa info with options\n"
+                            "  device       get remote device networkid";
 
     class MockLoadCallback : public SystemAbilityLoadCallbackStub {
     public:
         void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
         void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
+        void OnLoadSACompleteForRemote(const std::string& deviceId,
+            int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
     };
 
     void MockLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
@@ -70,6 +77,13 @@ namespace {
     void MockLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
     {
         cout << "OnLoadSystemAbilityFail systemAbilityId:" << systemAbilityId << endl;
+    }
+
+    void MockLoadCallback::OnLoadSACompleteForRemote(const std::string& devcieId, int32_t systemAbilityId,
+        const sptr<IRemoteObject>& remoteObject)
+    {
+        cout << "OnLoadSACompleteForRemote systemAbilityId:" << systemAbilityId <<  "ret : "<<
+            ((remoteObject != nullptr) ? "succeed" : "failed") << endl;
     }
 
     class MockSaStatusChange : public SystemAbilityStatusChangeStub {
@@ -145,7 +159,7 @@ namespace {
 
     static void DoGetRmt(int32_t said, const string& deviceid)
     {
-        cout << "get remote system ability " << said <<endl;
+        cout << "get remote system ability " << said << endl;
         sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (sm == nullptr)  {
             cout << "------------------samgr is unavailable-----------------------------------------" << endl;
@@ -154,10 +168,23 @@ namespace {
 
         auto ability = sm->GetSystemAbility(said, deviceid);
         if (ability != nullptr) {
-            cout << "----------------- find remote sa : "<< said << "-----------------------------------------" << endl;
+            cout << "----------------- find remote sa : "<< said << " remoteobject : "<< ability <<"---------" << endl;
         } else {
             cout << "----------------- not find remote sa : "<< said << "------------------------------------" << endl;
         }
+    }
+
+    static void DoLoadRemote(int32_t said, const string& deviceid)
+    {
+        cout << "DoLoadRemote system ability " << said <<endl;
+        sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (sm == nullptr)  {
+            cout << "------------------samgr is unavailable-----------------------------------------" << endl;
+            return;
+        }
+        sptr<MockLoadCallback> callback = new MockLoadCallback();
+        int32_t res = sm->LoadSystemAbility(said, deviceid, callback);
+        cout << "load system ability result : " << ((res == 0) ? "succeed" : "failed") << endl;
     }
 
     static void DoAdd()
@@ -201,7 +228,24 @@ namespace {
         cout << "load system ability result : " << ((res == 0) ? "succeed" : "failed") << endl;
     }
 
-    void DoSubscribe(int32_t said)
+    static void DoGetDevice()
+    {
+        cout << "get remote deviceid" << endl;
+        NodeBasicInfo *info = NULL;
+        int32_t infoNum = 0;
+        int32_t ret = GetAllNodeDeviceInfo("TestTool", &info, &infoNum);
+        if (ret != 0) {
+            cout << "get remote deviceid GetAllNodeDeviceInfo failed" << endl;
+            return;
+        }
+        for (int32_t i = 0; i < infoNum; i++) {
+            cout << "networkid : " << std::string(info->networkId) << " deviceName : "
+                << std::string(info->deviceName) << endl;
+            info++;
+        }
+    }
+
+    static void DoSubscribe(int32_t said)
     {
         cout << "subscribe system ability" << endl;
         sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -215,7 +259,7 @@ namespace {
         cout << "subscribe system ability result : " << ((res == 0) ? "succeed" : "failed") << endl;
     }
 
-    void DoUnSubscribe(int32_t said)
+    static void DoUnSubscribe(int32_t said)
     {
         cout << "unsubscribe system ability" << endl;
         sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -250,6 +294,10 @@ static void DoDefault(char* argv[])
     }
     if (strcmp(argv[1], "remove") == 0) {
         DoRemove();
+        return;
+    }
+    if (strcmp(argv[1], "device") == 0) {
+        DoGetDevice();
         return;
     }
     cout << "DoDefault failed, get help with arg 'h'"<< endl;
@@ -295,11 +343,34 @@ static void DoRemote(char* argv[])
         DoGetRmt(said, deviceid);
         return;
     }
+    if (strcmp(argv[1], "loadrmt") == 0) {
+        int32_t said = DEFAULT_SA_ID;
+        StrToInt(argv[ARV_SAID_INDEX], said);
+        string deviceid = argv[ARV_DEVICEID_INDEX];
+        DoLoadRemote(said, deviceid);
+        return;
+    }
     cout << "DoRemote failed, get help with arg 'h'"<< endl;
 }
 
 int main(int argc, char* argv[])
 {
+    static const char *PERMS[] = {
+        "ohos.permission.DISTRIBUTED_DATASYNC"
+    };
+    uint64_t tokenId;
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 1,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = PERMS,
+        .acls = nullptr,
+        .processName = "distributedsched",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
     if (argc == ARGC_DEFAULT_LENTH) {
         DoDefault(argv);
     } else if (argc == ARGC_EXTEND_LENTH) {

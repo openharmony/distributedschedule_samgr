@@ -14,8 +14,8 @@
  */
 
 #include "rpc_callback_imp.h"
-#include "system_ability_manager.h"
 #include "sam_log.h"
+#include "system_ability_manager.h"
 #include "tools.h"
 
 namespace OHOS {

@@ -39,6 +39,8 @@ constexpr int32_t OVERFLOW_TIME = 257;
 constexpr int32_t TEST_OVERFLOW_SAID = 99999;
 constexpr int32_t TEST_EXCEPTION_HIGH_SA_ID = LAST_SYS_ABILITY_ID + 1;
 constexpr int32_t TEST_EXCEPTION_LOW_SA_ID = FIRST_SYS_ABILITY_ID - 1;
+constexpr int32_t TEST_SYSTEM_ABILITY1 = 1491;
+constexpr int32_t TEST_SYSTEM_ABILITY2 = 1492;
 const std::u16string SAMANAGER_INTERFACE_TOKEN = u"ohos.samgr.accessToken";
 }
 void SystemAbilityMgrTest::SetUpTestCase()
@@ -677,5 +679,907 @@ HWTEST_F(SystemAbilityMgrTest, ReportLoadSAOverflow001, TestSize.Level1)
         sptr<SystemAbilityLoadCallbackMock> callback = new SystemAbilityLoadCallbackMock();
         saMgr->LoadSystemAbility(TEST_OVERFLOW_SAID, callback);
     }
+}
+
+/**
+ * @tc.name: LoadRemoteSystemAbility001
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility001, TestSize.Level2)
+{
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_TRUE(sm != nullptr);
+    int32_t systemAbilityId = TEST_EXCEPTION_LOW_SA_ID;
+    std::string deviceId = "";
+    int32_t result = sm->LoadSystemAbility(systemAbilityId, deviceId, nullptr);
+    EXPECT_TRUE(result != ERR_OK);
+}
+
+/**
+ * @tc.name: LoadRemoteSystemAbility002
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility002, TestSize.Level2)
+{
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_TRUE(sm != nullptr);
+    int32_t systemAbilityId = TEST_EXCEPTION_LOW_SA_ID;
+    std::string deviceId = "123456789";
+    int32_t result = sm->LoadSystemAbility(systemAbilityId, deviceId, nullptr);
+    EXPECT_TRUE(result != ERR_OK);
+}
+
+/**
+ * @tc.name: LoadRemoteSystemAbility002
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility003, TestSize.Level2)
+{
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_TRUE(sm != nullptr);
+    int32_t systemAbilityId = -1;
+    std::string deviceId = "123456789";
+    int32_t result = sm->LoadSystemAbility(systemAbilityId, deviceId, nullptr);
+    EXPECT_TRUE(result != ERR_OK);
+}
+
+/**
+ * @tc.name: LoadRemoteSystemAbility004
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility004, TestSize.Level2)
+{
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_TRUE(sm != nullptr);
+    int32_t systemAbilityId = 0;
+    std::string deviceId = "123456789";
+    int32_t result = sm->LoadSystemAbility(systemAbilityId, deviceId, nullptr);
+    EXPECT_TRUE(result != ERR_OK);
+}
+
+/**
+ * @tc.name: LoadRemoteSystemAbility004
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility005, TestSize.Level2)
+{
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_TRUE(sm != nullptr);
+    int32_t systemAbilityId = 0;
+    std::string deviceId = "";
+    int32_t result = sm->LoadSystemAbility(systemAbilityId, deviceId, nullptr);
+    EXPECT_TRUE(result != ERR_OK);
+}
+
+/**
+ * @tc.name: LoadRemoteSystemAbility004
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility006, TestSize.Level2)
+{
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_TRUE(sm != nullptr);
+    int32_t systemAbilityId = -1;
+    std::string deviceId = "";
+    int32_t result = sm->LoadSystemAbility(systemAbilityId, deviceId, nullptr);
+    EXPECT_TRUE(result != ERR_OK);
+}
+
+/**
+ * @tc.name: LoadSystemAbilityFromRpc001
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc001, TestSize.Level2)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    std::string deviceId = "";
+    int32_t systemAbilityId = -1;
+    sptr<SystemAbilityLoadCallbackMock> callback = new SystemAbilityLoadCallbackMock();
+    bool ret = saMgr->LoadSystemAbilityFromRpc(deviceId, systemAbilityId, callback);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LoadSystemAbilityFromRpc002
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc002, TestSize.Level2)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    std::string deviceId = "";
+    int32_t systemAbilityId = 0;
+    sptr<SystemAbilityLoadCallbackMock> callback = new SystemAbilityLoadCallbackMock();
+    bool ret = saMgr->LoadSystemAbilityFromRpc(deviceId, systemAbilityId, callback);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LoadSystemAbilityFromRpc003
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc003, TestSize.Level2)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    std::string deviceId = "";
+    int32_t systemAbilityId = 0;
+    bool ret = saMgr->LoadSystemAbilityFromRpc(deviceId, systemAbilityId, nullptr);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LoadSystemAbilityFromRpc004
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc004, TestSize.Level2)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    std::string deviceId = "1111111";
+    int32_t systemAbilityId = 0;
+    bool ret = saMgr->LoadSystemAbilityFromRpc(deviceId, systemAbilityId, nullptr);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DoMakeRemoteBinder001
+ * @tc.desc: load system ability with invalid systemAbilityId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, DoMakeRemoteBinder001, TestSize.Level2)
+{
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    std::string deviceId = "1111111";
+    int32_t systemAbilityId = 0;
+    auto remoteObject = saMgr->DoMakeRemoteBinder(systemAbilityId, 0, 0, deviceId);
+    EXPECT_TRUE(remoteObject == nullptr);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: startingAbilityMap_ init
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest001, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest001 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback3 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback4 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback5 = new SystemAbilityLoadCallbackMock();
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"111111", {{mockLoadCallback1, 0}}},
+        {"222222", {{mockLoadCallback1, 0}, {mockLoadCallback2, 0}}},
+        {"333333", {{mockLoadCallback2, 0}, {mockLoadCallback3, 1}}}
+    };
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap2 = {
+        {"111111", {{mockLoadCallback1, 0}}},
+        {"222222", {{mockLoadCallback1, 0}, {mockLoadCallback2, 0}}},
+        {"333333", {{mockLoadCallback2, 0}, {mockLoadCallback3, 1}}}
+    };
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap3 = {
+        {"111111", {{mockLoadCallback2, 0}}},
+        {"222222", {{mockLoadCallback3, 0}, {mockLoadCallback2, 0}}},
+        {"333333", {{mockLoadCallback4, 0}, {mockLoadCallback5, 1}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem2 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap2
+    };
+
+    saMgr->startingAbilityMap_.emplace(TEST_SYSTEM_ABILITY2, mockAbilityItem1);
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 1);
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+    ASSERT_TRUE(saMgr->startingAbilityMap_.size() > 1);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: test for callback dead, with one device, one callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest002, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest002 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"111111", {{mockLoadCallback1, 0}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+
+    saMgr->OnAbilityCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 0);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: test for callback dead, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest003, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest003 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"111111", {{mockLoadCallback1, 0}, {mockLoadCallback2, 1}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+    saMgr->OnAbilityCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 1);
+    ASSERT_EQ(saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1].callbackMap["111111"].size(), 1);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: test for callback dead, with no registered callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest004, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest004 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"111111", {{mockLoadCallback1, 1}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+    saMgr->OnAbilityCallbackDied(mockLoadCallback2->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 1);
+    ASSERT_EQ(saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1].callbackMap["111111"].size(), 1);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: test for callback dead, with some device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest005, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest004 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"111111", {{mockLoadCallback1, 1}}},
+        {"222222", {{mockLoadCallback2, 1}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+    saMgr->OnAbilityCallbackDied(mockLoadCallback2->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 1);
+    ASSERT_EQ(saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1].callbackMap.size(), 1);
+    ASSERT_EQ(saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1].callbackMap["111111"].size(), 1);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: test for callback dead, with some device, one callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest006, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest006 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"111111", {{mockLoadCallback1, 1}}},
+        {"222222", {{mockLoadCallback1, 0}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+    saMgr->OnAbilityCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 0);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: test for callback dead, with one device, some callback, some sa
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest007, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest007 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"111111", {{mockLoadCallback1, 1}, {mockLoadCallback2, 1}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+    saMgr->OnAbilityCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 1);
+    ASSERT_EQ(saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1].callbackMap.size(), 1);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: test for callback dead, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest008, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest007 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"111111", {{mockLoadCallback1, 1}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY2] = mockAbilityItem1;
+    saMgr->OnAbilityCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 0);
+    saMgr->OnAbilityCallbackDied(mockLoadCallback2->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 0);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: test for callback dead, with one device, some callback, some sa
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest009, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest009 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"111111", {{mockLoadCallback1, 1}, {mockLoadCallback2, 1}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY2] = mockAbilityItem1;
+    saMgr->OnAbilityCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_TRUE(saMgr->startingAbilityMap_.size() > 1);
+    ASSERT_EQ(saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1].callbackMap.size(), 1);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: test for callback dead, with some device, some callback, some sa
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest010, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest010 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"111111", {{mockLoadCallback1, 1}}}
+    };
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap2 = {
+        {"111111", {{mockLoadCallback1, 1}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem2 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap2
+    };
+
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY2] = mockAbilityItem2;
+    saMgr->OnAbilityCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 0);
+    saMgr->OnAbilityCallbackDied(mockLoadCallback2->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 0);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: test for callback dead, with one device, some callback, some sa
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest011, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest010 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"111111", {{mockLoadCallback1, 1}}}
+    };
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap2 = {
+        {"111111", {{mockLoadCallback2, 1}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+
+    SystemAbilityManager::AbilityItem mockAbilityItem2 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap2
+    };
+
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY2] = mockAbilityItem2;
+    saMgr->OnAbilityCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 1);
+    saMgr->OnAbilityCallbackDied(mockLoadCallback2->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 0);
+}
+
+/**
+ * @tc.name: startingAbilityMap_ test
+ * @tc.desc: test for callback dead, with one device, some callback, some sa
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest012, TestSize.Level1)
+{
+    DTEST_LOG << " startingAbilityMapTest010 start " << std::endl;
+    /**
+     * @tc.steps: step1. init startingAbilityMap_
+     * @tc.expected: step1. init startingAbilityMap_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->startingAbilityMap_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap1 = {
+        {"222222", {{mockLoadCallback1, 0}}},
+        {"111111", {{mockLoadCallback1, 1}}}
+    };
+
+    std::map<std::string, SystemAbilityManager::CallbackList> mockCallbackMap2 = {
+        {"22222", {{mockLoadCallback2, 1}}}
+    };
+    SystemAbilityManager::AbilityItem mockAbilityItem1 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap1
+    };
+
+    SystemAbilityManager::AbilityItem mockAbilityItem2 = {
+        SystemAbilityManager::AbilityState::INIT, mockCallbackMap2
+    };
+
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY1] = mockAbilityItem1;
+    saMgr->startingAbilityMap_[TEST_SYSTEM_ABILITY2] = mockAbilityItem2;
+    saMgr->OnAbilityCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 1);
+    saMgr->OnAbilityCallbackDied(mockLoadCallback2->AsObject());
+    ASSERT_EQ(saMgr->startingAbilityMap_.size(), 0);
+}
+
+/**
+ * @tc.name: OnRemoteCallbackDied001 test
+ * @tc.desc: test for callback dead, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied001, TestSize.Level1)
+{
+    DTEST_LOG << " OnRemoteCallbackDied001 start " << std::endl;
+    /**
+     * @tc.steps: step1. init remoteCallbacks_
+     * @tc.expected: step1. init remoteCallbacks_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+    saMgr->remoteCallbacks_.clear();
+    saMgr->remoteCallbacks_ = {
+        {"11111", {mockLoadCallback1, mockLoadCallback2}}
+    };
+    /**
+     * @tc.steps: step2. remove nullptr
+     * @tc.expected: step2. remove nothing and not crash
+     */
+    saMgr->OnAbilityCallbackDied(nullptr);
+    ASSERT_EQ(saMgr->remoteCallbacks_.size(), 1);
+}
+
+/**
+ * @tc.name: OnRemoteCallbackDied002 test
+ * @tc.desc: test for callback dead, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied002, TestSize.Level1)
+{
+    DTEST_LOG << " OnRemoteCallbackDied002 start " << std::endl;
+    /**
+     * @tc.steps: step1. init remoteCallbacks_ with one device and one callback
+     * @tc.expected: step1. init remoteCallbacks_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->remoteCallbacks_.clear();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    saMgr->remoteCallbacks_ = {
+        {"11111", {mockLoadCallback1}}
+    };
+    /**
+     * @tc.steps: step2. remove one callback
+     * @tc.expected: step2. remoteCallbacks_ size 0
+     */
+    saMgr->OnRemoteCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_EQ(saMgr->remoteCallbacks_.size(), 0);
+}
+
+/**
+ * @tc.name: OnRemoteCallbackDied003 test
+ * @tc.desc: test for callback dead, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied003, TestSize.Level1)
+{
+    DTEST_LOG << " OnRemoteCallbackDied003 start " << std::endl;
+    /**
+     * @tc.steps: step1. init remoteCallbacks_ with one device and one callback
+     * @tc.expected: step1. init remoteCallbacks_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->remoteCallbacks_.clear();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+    saMgr->remoteCallbacks_ = {
+        {"11111", {mockLoadCallback1}}
+    };
+    /**
+     * @tc.steps: step2. remove other callback
+     * @tc.expected: step2. remove nothing
+     */
+    saMgr->OnRemoteCallbackDied(mockLoadCallback2->AsObject());
+    ASSERT_EQ(saMgr->remoteCallbacks_.size(), 1);
+}
+
+/**
+ * @tc.name: OnRemoteCallbackDied004 test
+ * @tc.desc: test for callback dead, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied004, TestSize.Level1)
+{
+    DTEST_LOG << " OnRemoteCallbackDied004 start " << std::endl;
+    /**
+     * @tc.steps: step1. init remoteCallbacks_
+     * @tc.expected: step1. init remoteCallbacks_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->remoteCallbacks_.clear();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    saMgr->remoteCallbacks_ = {
+        {"11111", {mockLoadCallback1, mockLoadCallback2}}
+    };
+    /**
+     * @tc.steps: step2. remove one callback
+     * @tc.expected: step2. remoteCallbacks_ size 1
+     */
+    saMgr->OnRemoteCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_EQ(saMgr->remoteCallbacks_["11111"].size(), 1);
+    ASSERT_EQ(saMgr->remoteCallbacks_.size(), 1);
+}
+
+/**
+ * @tc.name: OnRemoteCallbackDied005 test
+ * @tc.desc: test for callback dead, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied005, TestSize.Level1)
+{
+    DTEST_LOG << " OnRemoteCallbackDied005 start " << std::endl;
+    /**
+     * @tc.steps: step1. init remoteCallbacks_
+     * @tc.expected: step1. init remoteCallbacks_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->remoteCallbacks_.clear();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    saMgr->remoteCallbacks_ = {
+        {"11111", {mockLoadCallback1, mockLoadCallback2}}
+    };
+    /**
+     * @tc.steps: step2. remove all callback
+     * @tc.expected: step2. remoteCallbacks_ empty
+     */
+    saMgr->OnRemoteCallbackDied(mockLoadCallback1->AsObject());
+    saMgr->OnRemoteCallbackDied(mockLoadCallback2->AsObject());
+    ASSERT_EQ(saMgr->remoteCallbacks_.size(), 0);
+}
+
+/**
+ * @tc.name: OnRemoteCallbackDied006 test
+ * @tc.desc: test for callback dead, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied006, TestSize.Level1)
+{
+    DTEST_LOG << " OnRemoteCallbackDied006 start " << std::endl;
+    /**
+     * @tc.steps: step1. init remoteCallbacks_
+     * @tc.expected: step1. init remoteCallbacks_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->remoteCallbacks_.clear();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    saMgr->remoteCallbacks_ = {
+        {"11111", {mockLoadCallback1}},
+        {"22222", {mockLoadCallback2}}
+    };
+    /**
+     * @tc.steps: step2. remove all callback
+     * @tc.expected: step2. remoteCallbacks_ empty
+     */
+    saMgr->OnRemoteCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_EQ(saMgr->remoteCallbacks_["22222"].size(), 1);
+    ASSERT_EQ(saMgr->remoteCallbacks_.size(), 1);
+}
+
+/**
+ * @tc.name: OnRemoteCallbackDied007 test
+ * @tc.desc: test for callback dead, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied007, TestSize.Level1)
+{
+    DTEST_LOG << " OnRemoteCallbackDied007 start " << std::endl;
+    /**
+     * @tc.steps: step1. init remoteCallbacks_
+     * @tc.expected: step1. init remoteCallbacks_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->remoteCallbacks_.clear();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    saMgr->remoteCallbacks_ = {
+        {"11111", {mockLoadCallback1, mockLoadCallback2}},
+        {"22222", {mockLoadCallback2}}
+    };
+    /**
+     * @tc.steps: step2. remove mockLoadCallback1
+     * @tc.expected: step2. remoteCallbacks_ empty
+     */
+    saMgr->OnRemoteCallbackDied(mockLoadCallback1->AsObject());
+    ASSERT_TRUE(saMgr->remoteCallbacks_.size() > 1);
+}
+
+/**
+ * @tc.name: OnRemoteCallbackDied008 test
+ * @tc.desc: test for callback dead, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied008, TestSize.Level1)
+{
+    DTEST_LOG << " OnRemoteCallbackDied008 start " << std::endl;
+    /**
+     * @tc.steps: step1. init remoteCallbacks_
+     * @tc.expected: step1. init remoteCallbacks_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->remoteCallbacks_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    saMgr->remoteCallbacks_ = {
+        {"11111", {mockLoadCallback1, mockLoadCallback2}},
+        {"22222", {mockLoadCallback2}}
+    };
+    /**
+     * @tc.steps: step2. remove one mockLoadCallback2
+     * @tc.expected: step2. remoteCallbacks_ remove all mockLoadCallback2
+     */
+    saMgr->OnRemoteCallbackDied(mockLoadCallback2->AsObject());
+    ASSERT_EQ(saMgr->remoteCallbacks_.size(), 1);
+}
+
+/**
+ * @tc.name: OnRemoteCallbackDied008 test
+ * @tc.desc: test for callback dead, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, DoLoadRemoteSystemAbility001, TestSize.Level1)
+{
+    DTEST_LOG << " DoLoadRemoteSystemAbility001 start " << std::endl;
+    /**
+     * @tc.steps: step1. init remoteCallbacks_
+     * @tc.expected: step1. init remoteCallbacks_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->remoteCallbacks_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    saMgr->remoteCallbacks_ = {
+        {"11111_111", {mockLoadCallback1, mockLoadCallback2}},
+        {"11111_222", {mockLoadCallback2}}
+    };
+    /**
+     * @tc.steps: step2. mockLoadCallback1 load complete
+     * @tc.expected: step2. remoteCallbacks_ remove mockLoadCallback1
+     */
+    saMgr->DoLoadRemoteSystemAbility(11111, 0, 0, "111", mockLoadCallback1);
+    ASSERT_EQ(saMgr->remoteCallbacks_["11111_111"].size(), 1);
+    ASSERT_TRUE(saMgr->remoteCallbacks_.size() > 1);
+}
+
+/**
+ * @tc.name: DoLoadRemoteSystemAbility002 test
+ * @tc.desc: test for load complete, with one device, one callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, DoLoadRemoteSystemAbility002, TestSize.Level1)
+{
+    DTEST_LOG << " DoLoadRemoteSystemAbility002 start " << std::endl;
+    /**
+     * @tc.steps: step1. init remoteCallbacks_
+     * @tc.expected: step1. init remoteCallbacks_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->remoteCallbacks_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    saMgr->remoteCallbacks_ = {
+        {"11111_222", {mockLoadCallback2}}
+    };
+    /**
+     * @tc.steps: step2. remove one mockLoadCallback2
+     * @tc.expected: step2. remoteCallbacks_ remove all mockLoadCallback2
+     */
+    saMgr->DoLoadRemoteSystemAbility(11111, 0, 0, "222", mockLoadCallback2);
+    ASSERT_EQ(saMgr->remoteCallbacks_.size(), 0);
+}
+
+/**
+ * @tc.name: DoLoadRemoteSystemAbility003 test
+ * @tc.desc: test for load complete, with one device, some callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SystemAbilityMgrTest, DoLoadRemoteSystemAbility003, TestSize.Level1)
+{
+    DTEST_LOG << " DoLoadRemoteSystemAbility003 start " << std::endl;
+    /**
+     * @tc.steps: step1. init remoteCallbacks_
+     * @tc.expected: step1. init remoteCallbacks_
+     */
+    sptr<SystemAbilityManager> saMgr = SystemAbilityManager::GetInstance();
+    saMgr->remoteCallbacks_.clear();
+
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback1 = new SystemAbilityLoadCallbackMock();
+    sptr<ISystemAbilityLoadCallback> mockLoadCallback2 = new SystemAbilityLoadCallbackMock();
+
+    saMgr->remoteCallbacks_ = {
+        {"11111_111", {mockLoadCallback1, mockLoadCallback2}},
+        {"11111_222", {mockLoadCallback2}}
+    };
+    /**
+     * @tc.steps: step2. remove one mockLoadCallback2
+     * @tc.expected: step2. remoteCallbacks_ remove all mockLoadCallback2
+     */
+    saMgr->DoLoadRemoteSystemAbility(11111, 0, 0, "222", mockLoadCallback2);
+    ASSERT_EQ(saMgr->remoteCallbacks_.size(), 1);
 }
 } // namespace OHOS

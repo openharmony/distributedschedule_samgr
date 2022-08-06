@@ -24,6 +24,16 @@ public:
     static OnDemandHelper& GetInstance();
 
     int32_t OnDemandAbility(int32_t systemAbilityId);
+    void GetDeviceList();
+    std::string GetFirstDevice();
+    int32_t LoadRemoteAbility(int32_t systemAbilityId, const std::string& deviceId,
+        const sptr<ISystemAbilityLoadCallback>& callback);
+    void LoadRemoteAbilityMuti(int32_t systemAbilityId, const std::string& deviceId);
+    void LoadRemoteAbilityMutiSA(int32_t systemAbilityId, const std::string& deviceId);
+    void LoadRemoteAbilityMutiSACb(int32_t systemAbilityId, const std::string& deviceId);
+    void LoadRemoteAbilityMutiCb(int32_t systemAbilityId, const std::string& deviceId);
+    void LoadRemoteAbilityPressure(int32_t systemAbilityId, const std::string& deviceId);
+    
     sptr<IRemoteObject> GetSystemAbility(int32_t systemAbilityId);
     void OnLoadSystemAbility(int32_t systemAbilityId);
 protected:
@@ -31,10 +41,15 @@ protected:
     public:
         void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
         void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
+        void OnLoadSACompleteForRemote(const std::string& deviceId, int32_t systemAbilityId,
+            const sptr<IRemoteObject>& remoteObject) override;
     };
 private:
     OnDemandHelper();
     sptr<OnDemandLoadCallback> loadCallback_;
+    sptr<OnDemandLoadCallback> loadCallback2_;
+    sptr<OnDemandLoadCallback> loadCallback3_;
+    sptr<OnDemandLoadCallback> loadCallback4_;
 };
 }
 #endif /* SAMGR_TEST_UNITTEST_INCLUDE_ONDEMAND_HELPER_H */

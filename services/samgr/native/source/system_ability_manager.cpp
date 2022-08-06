@@ -1074,6 +1074,9 @@ void SystemAbilityManager::RemoveStartingAbilityCallback(CallbackList& callbackL
 void SystemAbilityManager::OnAbilityCallbackDied(const sptr<IRemoteObject>& remoteObject)
 {
     HILOGI("OnAbilityCallbackDied received remoteObject died message!");
+    if (remoteObject == nullptr) {
+        return;
+    }
     lock_guard<recursive_mutex> autoLock(onDemandLock_);
     auto iter = startingAbilityMap_.begin();
     while (iter != startingAbilityMap_.end()) {
@@ -1090,6 +1093,9 @@ void SystemAbilityManager::OnAbilityCallbackDied(const sptr<IRemoteObject>& remo
 void SystemAbilityManager::OnRemoteCallbackDied(const sptr<IRemoteObject>& remoteObject)
 {
     HILOGI("OnRemoteCallbackDied received remoteObject died message!");
+    if (remoteObject == nullptr) {
+        return;
+    }
     lock_guard<mutex> autoLock(loadRemoteLock_);
     auto iter = remoteCallbacks_.begin();
     while (iter != remoteCallbacks_.end()) {
