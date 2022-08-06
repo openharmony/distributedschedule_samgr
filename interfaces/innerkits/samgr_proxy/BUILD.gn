@@ -21,21 +21,21 @@ config("samgr_proxy_config") {
 config("samgr_proxy_private_config") {
   include_dirs = [
     "include",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr",
-    "//foundation/distributedschedule/samgr/services/lsamgr/include",
-    "//foundation/distributedschedule/samgr/services/samgr/native/include",
-    "//foundation/distributedschedule/samgr/utils/native/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/lsamgr",
+    "//foundation/systemabilitymgr/samgr/services/lsamgr/include",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/include",
+    "//foundation/systemabilitymgr/samgr/utils/native/include",
   ]
 }
 
 ohos_shared_library("samgr_proxy") {
   defines = [ "SAMGR_PROXY" ]
   sources = [
-    "//foundation/distributedschedule/samgr/frameworks/native/source/system_ability_load_callback_stub.cpp",
-    "//foundation/distributedschedule/samgr/frameworks/native/source/system_ability_manager_proxy.cpp",
-    "//foundation/distributedschedule/samgr/frameworks/native/source/system_ability_status_change_stub.cpp",
-    "//foundation/distributedschedule/samgr/services/lsamgr/src/local_ability_manager_proxy.cpp",
-    "//foundation/distributedschedule/samgr/services/samgr/native/source/service_registry.cpp",
+    "//foundation/systemabilitymgr/samgr/frameworks/native/source/system_ability_load_callback_stub.cpp",
+    "//foundation/systemabilitymgr/samgr/frameworks/native/source/system_ability_manager_proxy.cpp",
+    "//foundation/systemabilitymgr/samgr/frameworks/native/source/system_ability_status_change_stub.cpp",
+    "//foundation/systemabilitymgr/samgr/services/lsamgr/src/local_ability_manager_proxy.cpp",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/source/service_registry.cpp",
   ]
   configs = [ ":samgr_proxy_private_config" ]
   public_configs = [ ":samgr_proxy_config" ]
@@ -47,10 +47,10 @@ ohos_shared_library("samgr_proxy") {
       "utils_base:utils",
     ]
 
-    part_name = "samgr_standard"
+    part_name = "samgr"
   }
 
   install_images = [ system_base_dir ]
   relative_install_dir = "chipset-pub-sdk"
-  subsystem_name = "distributedschedule"
+  subsystem_name = "systemabilitymgr"
 }

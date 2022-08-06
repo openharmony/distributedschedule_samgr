@@ -16,14 +16,14 @@ import("//build/ohos.gni")
 config("config_samgr") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//foundation/distributedschedule/samgr/services/lsamgr/include",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/systemabilitymgr/samgr/services/lsamgr/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
   ]
 }
 
 config("public_config_lsamgr") {
   include_dirs =
-      [ "//foundation/distributedschedule/samgr/interfaces/innerkits/lsamgr" ]
+      [ "//foundation/systemabilitymgr/samgr/interfaces/innerkits/lsamgr" ]
 }
 
 ################################################################################
@@ -39,9 +39,9 @@ ohos_shared_library("lsamgr") {
       "ipc:ipc_core",
       "utils_base:utils",
     ]
-    part_name = "samgr_standard"
+    part_name = "samgr"
   }
 
-  subsystem_name = "distributedschedule"
+  subsystem_name = "systemabilitymgr"
 }
 ################################################################################

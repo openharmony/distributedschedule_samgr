@@ -23,8 +23,8 @@ group("samgr_etc") {
 ohos_prebuilt_etc("samgr.param.dac") {
   source = "samgr.param.dac"
   relative_install_dir = "param"
-  part_name = "samgr_standard"
-  subsystem_name = "distributedschedule"
+  part_name = "samgr"
+  subsystem_name = "systemabilitymgr"
 }
 
 group("etc") {
@@ -34,6 +34,6 @@ group("etc") {
 ohos_prebuilt_etc("samgr_init") {
   source = "samgr_standard.cfg"
   relative_install_dir = "init"
-  part_name = "samgr_standard"
-  subsystem_name = "distributedschedule"
+  part_name = "samgr"
+  subsystem_name = "systemabilitymgr"
 }

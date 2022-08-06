@@ -13,22 +13,22 @@
 
 import("//build/test.gni")
 
-module_output_path = "samgr_standard/samgr"
+module_output_path = "samgr/samgr"
 
 ohos_unittest("ParseUtilTest") {
   module_out_path = module_output_path
   resource_config_file =
-      "//foundation/distributedschedule/samgr/test/resource/ohos_test.xml"
+      "//foundation/systemabilitymgr/samgr/test/resource/ohos_test.xml"
 
   include_dirs = [
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/common/include",
-    "//foundation/distributedschedule/samgr/utils/native/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common/include",
+    "//foundation/systemabilitymgr/samgr/utils/native/include",
   ]
 
   sources = [ "./parse_util_test.cpp" ]
 
   deps = [
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/common:samgr_common",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common:samgr_common",
     "//third_party/googletest:gtest_main",
   ]
 

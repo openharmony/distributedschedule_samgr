@@ -15,20 +15,19 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "samgr_standard/samgr"
-samgr_dir = "//foundation/distributedschedule/samgr"
+module_output_path = "samgr/samgr"
+samgr_dir = "//foundation/systemabilitymgr/samgr"
 samgr_services_dir = "${samgr_dir}/services/samgr/native"
 
 config("sam_fuzz_test_config") {
-  include_dirs =
-      [ "//foundation/distributedschedule/samgr/services/dfx/include" ]
+  include_dirs = [ "//foundation/systemabilitymgr/samgr/services/dfx/include" ]
 }
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SystemAbilityManagerFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "//foundation/distributedschedule/samgr/test/fuzztest/systemabilitymanager_fuzzer"
+  fuzz_config_file = "//foundation/systemabilitymgr/samgr/test/fuzztest/systemabilitymanager_fuzzer"
 
   configs = [
     ":sam_fuzz_test_config",
@@ -46,7 +45,7 @@ ohos_fuzztest("SystemAbilityManagerFuzzTest") {
     "${samgr_dir}/utils/native/source/tools.cpp",
     "${samgr_services_dir}/source/system_ability_manager.cpp",
     "${samgr_services_dir}/source/system_ability_manager_stub.cpp",
-    "//foundation/distributedschedule/samgr/services/dfx/source/hisysevent_adapter.cpp",
+    "//foundation/systemabilitymgr/samgr/services/dfx/source/hisysevent_adapter.cpp",
     "systemabilitymanager_fuzzer.cpp",
   ]
   deps = []
@@ -60,7 +59,7 @@ ohos_fuzztest("SystemAbilityManagerFuzzTest") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "ipc:libdbinder",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "utils_base:utils",
   ]
   public_deps = [ "//third_party/libxml2:libxml2" ]
