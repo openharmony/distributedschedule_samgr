@@ -33,7 +33,7 @@ public:
     void LoadRemoteAbilityMutiSACb(int32_t systemAbilityId, const std::string& deviceId);
     void LoadRemoteAbilityMutiCb(int32_t systemAbilityId, const std::string& deviceId);
     void LoadRemoteAbilityPressure(int32_t systemAbilityId, const std::string& deviceId);
-    
+
     sptr<IRemoteObject> GetSystemAbility(int32_t systemAbilityId);
     void OnLoadSystemAbility(int32_t systemAbilityId);
 protected:
