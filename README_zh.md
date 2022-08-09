@@ -1,7 +1,15 @@
-# samgr组件<a name="ZH-CN_TOPIC_0000001162068341"></a>
+公告：
+因OpenHarmony部件设计规范化需求，2022.08月起distributedschedule_samgr仓库更名为systemabilitymgr_samgr，本仓库归档不在维护。
+请前往[**systemabilitymgr\_samgr**](https://gitee.com/openharmony/systemabilitymgr_samgr)仓库，了解最新代码信息
+# 系统服务管理部件<a name="ZH-CN_TOPIC_0000001162068341"></a>
 ## 简介<a name="section11660541593"></a>
 
 samgr组件是OpenHarmony的核心组件，提供OpenHarmony系统服务启动、注册、查询等功能。
+
+## 系统架构<a name="section342962219551"></a>
+
+**图 1**  系统服务管理系统架构图
+
 
 ![](figures/zh-cn_image_0000001115820566.png)
 

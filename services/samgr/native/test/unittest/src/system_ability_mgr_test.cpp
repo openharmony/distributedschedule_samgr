@@ -685,6 +685,7 @@ HWTEST_F(SystemAbilityMgrTest, ReportLoadSAOverflow001, TestSize.Level1)
  * @tc.name: LoadRemoteSystemAbility001
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility001, TestSize.Level2)
 {
@@ -700,6 +701,7 @@ HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility001, TestSize.Level2)
  * @tc.name: LoadRemoteSystemAbility002
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility002, TestSize.Level2)
 {
@@ -715,6 +717,7 @@ HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility002, TestSize.Level2)
  * @tc.name: LoadRemoteSystemAbility002
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility003, TestSize.Level2)
 {
@@ -730,6 +733,7 @@ HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility003, TestSize.Level2)
  * @tc.name: LoadRemoteSystemAbility004
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility004, TestSize.Level2)
 {
@@ -745,6 +749,7 @@ HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility004, TestSize.Level2)
  * @tc.name: LoadRemoteSystemAbility004
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility005, TestSize.Level2)
 {
@@ -760,6 +765,7 @@ HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility005, TestSize.Level2)
  * @tc.name: LoadRemoteSystemAbility004
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility006, TestSize.Level2)
 {
@@ -775,6 +781,7 @@ HWTEST_F(SystemAbilityMgrTest, LoadRemoteSystemAbility006, TestSize.Level2)
  * @tc.name: LoadSystemAbilityFromRpc001
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc001, TestSize.Level2)
 {
@@ -790,6 +797,7 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc001, TestSize.Level2)
  * @tc.name: LoadSystemAbilityFromRpc002
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc002, TestSize.Level2)
 {
@@ -805,6 +813,7 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc002, TestSize.Level2)
  * @tc.name: LoadSystemAbilityFromRpc003
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc003, TestSize.Level2)
 {
@@ -819,6 +828,7 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc003, TestSize.Level2)
  * @tc.name: LoadSystemAbilityFromRpc004
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc004, TestSize.Level2)
 {
@@ -833,6 +843,7 @@ HWTEST_F(SystemAbilityMgrTest, LoadSystemAbilityFromRpc004, TestSize.Level2)
  * @tc.name: DoMakeRemoteBinder001
  * @tc.desc: load system ability with invalid systemAbilityId.
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, DoMakeRemoteBinder001, TestSize.Level2)
 {
@@ -847,6 +858,7 @@ HWTEST_F(SystemAbilityMgrTest, DoMakeRemoteBinder001, TestSize.Level2)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: startingAbilityMap_ init
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest001, TestSize.Level1)
 {
@@ -896,6 +908,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest001, TestSize.Level1)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: test for callback dead, with one device, one callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest002, TestSize.Level1)
 {
@@ -926,6 +939,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest002, TestSize.Level1)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: test for callback dead, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest003, TestSize.Level1)
 {
@@ -957,6 +971,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest003, TestSize.Level1)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: test for callback dead, with no registered callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest004, TestSize.Level1)
 {
@@ -988,6 +1003,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest004, TestSize.Level1)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: test for callback dead, with some device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest005, TestSize.Level1)
 {
@@ -1020,6 +1036,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest005, TestSize.Level1)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: test for callback dead, with some device, one callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest006, TestSize.Level1)
 {
@@ -1051,6 +1068,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest006, TestSize.Level1)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: test for callback dead, with one device, some callback, some sa
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest007, TestSize.Level1)
 {
@@ -1082,6 +1100,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest007, TestSize.Level1)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: test for callback dead, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest008, TestSize.Level1)
 {
@@ -1115,6 +1134,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest008, TestSize.Level1)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: test for callback dead, with one device, some callback, some sa
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest009, TestSize.Level1)
 {
@@ -1147,6 +1167,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest009, TestSize.Level1)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: test for callback dead, with some device, some callback, some sa
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest010, TestSize.Level1)
 {
@@ -1187,6 +1208,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest010, TestSize.Level1)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: test for callback dead, with one device, some callback, some sa
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest011, TestSize.Level1)
 {
@@ -1228,6 +1250,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest011, TestSize.Level1)
  * @tc.name: startingAbilityMap_ test
  * @tc.desc: test for callback dead, with one device, some callback, some sa
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest012, TestSize.Level1)
 {
@@ -1270,6 +1293,7 @@ HWTEST_F(SystemAbilityMgrTest, startingAbilityMapTest012, TestSize.Level1)
  * @tc.name: OnRemoteCallbackDied001 test
  * @tc.desc: test for callback dead, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied001, TestSize.Level1)
 {
@@ -1298,6 +1322,7 @@ HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied001, TestSize.Level1)
  * @tc.name: OnRemoteCallbackDied002 test
  * @tc.desc: test for callback dead, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied002, TestSize.Level1)
 {
@@ -1324,6 +1349,7 @@ HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied002, TestSize.Level1)
  * @tc.name: OnRemoteCallbackDied003 test
  * @tc.desc: test for callback dead, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied003, TestSize.Level1)
 {
@@ -1351,6 +1377,7 @@ HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied003, TestSize.Level1)
  * @tc.name: OnRemoteCallbackDied004 test
  * @tc.desc: test for callback dead, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied004, TestSize.Level1)
 {
@@ -1380,6 +1407,7 @@ HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied004, TestSize.Level1)
  * @tc.name: OnRemoteCallbackDied005 test
  * @tc.desc: test for callback dead, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied005, TestSize.Level1)
 {
@@ -1409,6 +1437,7 @@ HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied005, TestSize.Level1)
  * @tc.name: OnRemoteCallbackDied006 test
  * @tc.desc: test for callback dead, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied006, TestSize.Level1)
 {
@@ -1439,6 +1468,7 @@ HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied006, TestSize.Level1)
  * @tc.name: OnRemoteCallbackDied007 test
  * @tc.desc: test for callback dead, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied007, TestSize.Level1)
 {
@@ -1468,6 +1498,7 @@ HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied007, TestSize.Level1)
  * @tc.name: OnRemoteCallbackDied008 test
  * @tc.desc: test for callback dead, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied008, TestSize.Level1)
 {
@@ -1498,6 +1529,7 @@ HWTEST_F(SystemAbilityMgrTest, OnRemoteCallbackDied008, TestSize.Level1)
  * @tc.name: OnRemoteCallbackDied008 test
  * @tc.desc: test for callback dead, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, DoLoadRemoteSystemAbility001, TestSize.Level1)
 {
@@ -1529,6 +1561,7 @@ HWTEST_F(SystemAbilityMgrTest, DoLoadRemoteSystemAbility001, TestSize.Level1)
  * @tc.name: DoLoadRemoteSystemAbility002 test
  * @tc.desc: test for load complete, with one device, one callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, DoLoadRemoteSystemAbility002, TestSize.Level1)
 {
@@ -1557,6 +1590,7 @@ HWTEST_F(SystemAbilityMgrTest, DoLoadRemoteSystemAbility002, TestSize.Level1)
  * @tc.name: DoLoadRemoteSystemAbility003 test
  * @tc.desc: test for load complete, with one device, some callback
  * @tc.type: FUNC
+ * @tc.require: I5KMF7
  */
 HWTEST_F(SystemAbilityMgrTest, DoLoadRemoteSystemAbility003, TestSize.Level1)
 {
